@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Main pages -->
+  <url>
+    <loc>https://moxident.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- City pages -->
+  <url><loc>https://moxident.com/seattle/kirkland</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/bellevue</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/redmond</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/bothell</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/kenmore</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/shoreline</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/lynnwood</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/edmonds</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/mountlake-terrace</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/renton</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/tukwila</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/burien</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/seatac</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/kent</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/auburn</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/federal-way</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/issaquah</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/sammamish</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/mercer-island</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/woodinville</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/tacoma</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/everett</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/marysville</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/mukilteo</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/mill-creek</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/maple-valley</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/des-moines</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/covington</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/newcastle</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moxident.com/seattle/lake-stevens</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+</urlset>

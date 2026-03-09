@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17976922373/y2zsCLmf-v4bEIWiiPxC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-17976922373');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Moxident — Emergency Dental Care, Fast</title>
+<meta name="description" content="Tooth pain in Seattle? Get matched to a dentist who can see you today. No insurance required. Confirmed in minutes."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════
+   RESET & TOKENS
+═══════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+img,svg{display:block;max-width:100%;}
+button,input,select,textarea{font:inherit;}
+
+:root{
+  --ink:    #0d1117;
+  --ink2:   #3d4a5c;
+  --ink3:   #8391a6;
+  --paper:  #f8f7f4;
+  --white:  #ffffff;
+  --red:    #c8281e;
+  --red-h:  #e03228;
+  --red-lt: #fdf1f0;
+  --red-md: rgba(200,40,30,.12);
+  --grn:    #15774f;
+  --grn-lt: #edf7f2;
+  --amb:    #b45c0f;
+  --amb-lt: #fef3e2;
+  --bdr:    #e4e1da;
+  --bdr2:   #ccc8be;
+  --serif:  'Playfair Display',Georgia,serif;
+  --sans:   'Instrument Sans',system-ui,sans-serif;
+  --rad:    10px;
+  --rad-lg: 18px;
+  --sh:     0 2px 8px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04);
+  --sh-lg:  0 12px 40px rgba(0,0,0,.10),0 3px 12px rgba(0,0,0,.06);
+  --nav-h:  58px;
+}
+
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* ── UTILITIES ── */
+.hidden{display:none!important;}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes pulseRing{0%{transform:scale(1);opacity:.9;}100%{transform:scale(1.7);opacity:0;}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:none;}}
+
+.a1{animation:fadeUp .45s ease both;}
+.a2{animation:fadeUp .45s .07s ease both;}
+.a3{animation:fadeUp .45s .14s ease both;}
+.a4{animation:fadeUp .45s .21s ease both;}
+.a5{animation:fadeUp .45s .28s ease both;}
+.a6{animation:fadeUp .45s .35s ease both;}
+
+/* ═══════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════ */
+.nav{
+  position:sticky;top:0;z-index:500;
+  height:var(--nav-h);
+  background:rgba(248,247,244,.96);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;
+  padding:0 20px;gap:12px;
+}
+.nav-logo{
+  font-family:var(--serif);font-size:19px;font-weight:700;
+  color:var(--ink);display:flex;align-items:center;gap:7px;
+  cursor:pointer;flex-shrink:0;text-decoration:none;
+}
+.nav-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--red);
+  animation:blink 2s ease infinite;
+  flex-shrink:0;
+}
+/* desktop pill nav */
+.nav-pills{
+  display:flex;gap:2px;flex:1;overflow-x:auto;
+  scrollbar-width:none;justify-content:center;
+}
+.nav-pills::-webkit-scrollbar{display:none;}
+.nav-pill{
+  flex-shrink:0;padding:5px 13px;border-radius:100px;border:none;
+  cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:600;
+  color:var(--ink3);background:transparent;transition:all .15s;white-space:nowrap;
+}
+.nav-pill:hover{background:var(--red-lt);color:var(--red);}
+.nav-pill.active{background:var(--red);color:#fff;}
+/* hamburger */
+.hamburger{
+  display:none;flex-direction:column;gap:5px;
+  background:none;border:none;cursor:pointer;padding:6px;
+  margin-left:auto;flex-shrink:0;
+}
+.hamburger span{
+  display:block;width:22px;height:2px;
+  background:var(--ink);border-radius:2px;
+  transition:transform .25s,opacity .25s;
+}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* mobile drawer */
+.nav-drawer{
+  display:none;
+  position:fixed;top:var(--nav-h);left:0;right:0;bottom:0;z-index:499;
+  background:var(--white);border-top:1px solid var(--bdr);
+  overflow-y:auto;padding:16px;
+  animation:slideDown .2s ease;
+}
+.nav-drawer.open{display:block;}
+.drawer-pill{
+  display:block;width:100%;text-align:left;
+  padding:14px 16px;border-radius:var(--rad);border:none;
+  font-family:var(--sans);font-size:15px;font-weight:600;
+  color:var(--ink2);background:transparent;cursor:pointer;
+  transition:background .15s,color .15s;
+}
+.drawer-pill:hover{background:var(--red-lt);color:var(--red);}
+.drawer-pill.active{background:var(--red);color:#fff;}
+.drawer-section{
+  font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink3);padding:16px 16px 8px;
+}
+
+/* ═══════════════════════════════════════════
+   SHARED LAYOUT
+═══════════════════════════════════════════ */
+.page-wrap{max-width:740px;margin:0 auto;padding:0 20px 80px;}
+.wide-wrap{max-width:1060px;margin:0 auto;padding:0 20px;}
+
+/* ═══════════════════════════════════════════
+   LANDING PAGE
+═══════════════════════════════════════════ */
+.hero{
+  padding:64px 20px 56px;
+  max-width:700px;margin:0 auto;text-align:center;
+}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--red);background:var(--red-lt);
+  padding:5px 13px;border-radius:100px;margin-bottom:20px;
+}
+.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:blink 1.4s ease infinite;}
+.hero-h1{
+  font-family:var(--serif);
+  font-size:clamp(38px,8vw,68px);
+  line-height:1.07;letter-spacing:-.025em;
+  color:var(--ink);margin-bottom:16px;
+}
+.hero-h1 em{font-style:italic;color:var(--red);}
+.hero-sub{
+  font-size:clamp(15px,2.5vw,18px);color:var(--ink2);
+  line-height:1.65;margin-bottom:32px;
+  max-width:500px;margin-left:auto;margin-right:auto;
+}
+.hero-cta{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--red);color:#fff;
+  font-family:var(--sans);font-size:16px;font-weight:700;
+  padding:15px 30px;border-radius:var(--rad-lg);border:none;cursor:pointer;
+  box-shadow:0 4px 20px rgba(200,40,30,.35);
+  transition:background .15s,transform .15s,box-shadow .15s;
+  text-decoration:none;
+}
+.hero-cta:hover{background:var(--red-h);transform:translateY(-2px);box-shadow:0 8px 28px rgba(200,40,30,.42);}
+.hero-cta:active{transform:none;}
+.hero-cta-arrow{font-size:18px;transition:transform .15s;}
+.hero-cta:hover .hero-cta-arrow{transform:translateX(4px);}
+.hero-note{margin-top:13px;font-size:12px;color:var(--ink3);}
+
+/* trust bar */
+.trust-bar{
+  border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);
+  background:var(--white);padding:18px 20px;
+}
+.trust-inner{
+  max-width:760px;margin:0 auto;
+  display:flex;justify-content:center;align-items:center;
+  gap:8px 32px;flex-wrap:wrap;
+}
+.trust-item{
+  display:flex;align-items:center;gap:7px;
+  font-size:13px;font-weight:500;color:var(--ink2);
+}
+
+/* how it works */
+.how{padding:64px 20px;max-width:800px;margin:0 auto;}
+.section-eyebrow{
+  font-size:11px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);margin-bottom:8px;
+}
+.section-title{
+  font-family:var(--serif);font-size:clamp(26px,4vw,38px);
+  letter-spacing:-.02em;color:var(--ink);
+  margin-bottom:36px;line-height:1.2;
+}
+.steps-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+.step-card{
+  background:var(--white);border:1px solid var(--bdr);
+  border-radius:var(--rad-lg);padding:24px 20px;
+  position:relative;overflow:hidden;
+  box-shadow:var(--sh);transition:box-shadow .2s,transform .2s;
+}
+.step-card:hover{box-shadow:var(--sh-lg);transform:translateY(-2px);}
+.step-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--red);opacity:0;transition:opacity .2s;
+}
+.step-card:hover::after{opacity:1;}
+.step-num{font-family:var(--serif);font-size:40px;color:var(--bdr);line-height:1;margin-bottom:12px;}
+.step-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.step-desc{font-size:13px;color:var(--ink2);line-height:1.6;}
+
+/* symptom grid on landing */
+.symptom-grid-section{
+  background:var(--white);border-top:1px solid var(--bdr);
+  border-bottom:1px solid var(--bdr);padding:56px 20px;
+}
+.symptom-grid{
+  max-width:860px;margin:32px auto 0;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+}
+.symptom-card{
+  background:var(--paper);border:1px solid var(--bdr);
+  border-radius:var(--rad-lg);padding:20px 16px;
+  cursor:pointer;transition:all .18s;text-align:center;
+}
+.symptom-card:hover{
+  background:var(--white);border-color:var(--red);
+  box-shadow:0 4px 16px rgba(200,40,30,.12);
+  transform:translateY(-2px);
+}
+.symptom-card-icon{font-size:28px;margin-bottom:10px;}
+.symptom-card-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+.symptom-card-sub{font-size:11px;color:var(--ink3);line-height:1.4;}
+
+/* footer */
+.site-footer{
+  border-top:1px solid var(--bdr);padding:28px 20px;
+  text-align:center;font-size:12px;color:var(--ink3);
+}
+.site-footer strong{color:var(--ink2);}
+
+/* ═══════════════════════════════════════════
+   SYMPTOM PAGES
+═══════════════════════════════════════════ */
+.sym-hero{
+  padding:52px 0 44px;
+  border-bottom:1px solid var(--bdr);
+  margin-bottom:36px;
+}
+.sym-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--red);background:var(--red-lt);
+  padding:4px 12px;border-radius:100px;margin-bottom:16px;
+}
+.sym-badge-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:blink 1.3s ease infinite;}
+.sym-h1{
+  font-family:var(--serif);
+  font-size:clamp(30px,6vw,52px);
+  line-height:1.1;letter-spacing:-.025em;
+  color:var(--ink);margin-bottom:14px;
+}
+.sym-h1 em{font-style:italic;color:var(--red);}
+.sym-sub{font-size:clamp(14px,2vw,16px);color:var(--ink2);line-height:1.65;margin-bottom:24px;max-width:580px;}
+.chips{display:flex;gap:8px;flex-wrap:wrap;}
+.chip{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:600;color:var(--ink2);
+  background:var(--white);border:1px solid var(--bdr);
+  padding:6px 12px;border-radius:100px;
+}
+
+/* warning banner */
+.warn-card{
+  background:var(--red-lt);border:1px solid rgba(200,40,30,.2);
+  border-left:3px solid var(--red);border-radius:var(--rad);
+  padding:16px 18px;margin:24px 0;
+}
+.warn-title{font-size:13px;font-weight:700;color:var(--red);margin-bottom:5px;}
+.warn-body{font-size:13px;color:var(--ink2);line-height:1.65;}
+
+/* checklist */
+.check-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin:14px 0;}
+.check-list li{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:14px;color:var(--ink2);line-height:1.55;
+  padding:11px 14px;
+  background:var(--white);border:1px solid var(--bdr);border-radius:var(--rad);
+  transition:border-color .15s;
+}
+.check-list li:hover{border-color:var(--bdr2);}
+.check-list li::before{content:'✓';color:var(--red);font-weight:700;font-size:12px;flex-shrink:0;margin-top:2px;}
+
+/* MID-PAGE CTA */
+.mid-cta{
+  background:var(--ink);border-radius:var(--rad-lg);
+  padding:26px 28px;margin:36px 0;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.mid-cta-text h3{font-family:var(--serif);font-size:20px;color:#fff;margin-bottom:3px;letter-spacing:-.01em;}
+.mid-cta-text p{font-size:13px;color:rgba(255,255,255,.55);}
+.mid-cta-btn{
+  flex-shrink:0;display:flex;align-items:center;gap:8px;
+  background:var(--red);color:#fff;
+  font-family:var(--sans);font-size:14px;font-weight:700;
+  padding:12px 22px;border-radius:var(--rad);border:none;cursor:pointer;
+  box-shadow:0 4px 16px rgba(200,40,30,.38);
+  transition:background .15s,transform .15s;white-space:nowrap;
+}
+.mid-cta-btn:hover{background:var(--red-h);transform:translateY(-1px);}
+
+/* content */
+.content-block{margin-bottom:32px;}
+.content-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;}
+.content-h2{font-family:var(--serif);font-size:clamp(20px,3vw,28px);letter-spacing:-.015em;color:var(--ink);margin-bottom:12px;line-height:1.25;}
+.content-p{font-size:14px;color:var(--ink2);line-height:1.75;margin-bottom:12px;}
+
+/* FAQ */
+.faq-item{border-bottom:1px solid var(--bdr);}
+.faq-q{
+  width:100%;background:none;border:none;text-align:left;
+  font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink);
+  padding:15px 0;cursor:pointer;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  transition:color .15s;
+}
+.faq-q:hover{color:var(--red);}
+.faq-icon{font-size:20px;color:var(--ink3);flex-shrink:0;transition:transform .2s;line-height:1;}
+.faq-a{font-size:14px;color:var(--ink2);line-height:1.7;padding-bottom:14px;display:none;}
+.faq-item.open .faq-a{display:block;animation:fadeIn .2s ease;}
+.faq-item.open .faq-icon{transform:rotate(45deg);}
+
+/* ═══════════════════════════════════════════
+   INTAKE FORM PAGE
+═══════════════════════════════════════════ */
+.form-wrap{
+  min-height:calc(100vh - var(--nav-h));
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:40px 20px 72px;
+}
+.form-card{
+  background:var(--white);border:1px solid var(--bdr);
+  border-radius:var(--rad-lg);box-shadow:var(--sh-lg);
+  padding:36px;width:100%;max-width:520px;
+}
+.form-step-bar{display:flex;gap:5px;margin-bottom:20px;}
+.form-step-seg{height:4px;flex:1;border-radius:2px;background:var(--bdr);}
+.form-step-seg.on{background:var(--red);}
+.form-card-title{font-family:var(--serif);font-size:26px;letter-spacing:-.02em;margin-bottom:5px;}
+.form-card-sub{font-size:13px;color:var(--ink2);margin-bottom:24px;line-height:1.5;}
+.back-link{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:13px;color:var(--ink3);background:none;border:none;
+  cursor:pointer;padding:0;margin-bottom:18px;transition:color .15s;
+}
+.back-link:hover{color:var(--ink);}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.fl{font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.04em;}
+.fl-req{color:var(--red);}
+.fi{
+  height:46px;background:var(--paper);
+  border:1.5px solid var(--bdr);border-radius:var(--rad);
+  padding:0 13px;font-family:var(--sans);font-size:14px;color:var(--ink);
+  outline:none;transition:border-color .15s,box-shadow .15s;width:100%;appearance:none;
+}
+.fi::placeholder{color:var(--ink3);}
+.fi:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(200,40,30,.09);background:var(--white);}
+select.fi{
+  cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238391a6' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;
+}
+select.fi option{background:#fff;}
+.fg.err .fi{border-color:var(--red);background:var(--red-lt);}
+.f-err{font-size:11px;color:var(--red);display:none;}
+.fg.err .f-err{display:block;}
+.submit-btn{
+  width:100%;height:52px;background:var(--red);color:#fff;
+  font-family:var(--sans);font-size:15px;font-weight:700;
+  border:none;border-radius:var(--rad);cursor:pointer;margin-top:4px;
+  box-shadow:0 4px 18px rgba(200,40,30,.3);
+  transition:background .15s,transform .15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.submit-btn:hover{background:var(--red-h);transform:translateY(-1px);}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.form-disclaimer{margin-top:13px;font-size:11px;color:var(--ink3);text-align:center;line-height:1.6;}
+
+/* form at bottom of symptom pages */
+.sym-form-section{
+  background:var(--white);border:1px solid var(--bdr);
+  border-radius:var(--rad-lg);padding:32px;
+  box-shadow:var(--sh-lg);margin-top:40px;
+}
+.sym-form-title{font-family:var(--serif);font-size:22px;letter-spacing:-.01em;margin-bottom:4px;}
+.sym-form-sub{font-size:13px;color:var(--ink2);margin-bottom:22px;}
+
+/* early access response card (replaces success + waiting + confirmed) */
+.early-card{
+  background:var(--white);border:1px solid var(--bdr);
+  border-radius:var(--rad-lg);padding:36px 32px;text-align:center;
+  animation:fadeUp .4s ease both;
+}
+.early-icon{font-size:44px;margin-bottom:16px;line-height:1;}
+.early-title{
+  font-family:var(--serif);font-size:24px;letter-spacing:-.02em;
+  color:var(--ink);margin-bottom:10px;line-height:1.2;
+}
+.early-msg{
+  font-size:15px;color:var(--ink2);line-height:1.75;
+  margin-bottom:20px;max-width:420px;margin-left:auto;margin-right:auto;
+}
+.early-msg strong{color:var(--ink);font-weight:700;}
+.early-divider{height:1px;background:var(--bdr);margin:20px 0;}
+.early-urgent{
+  background:var(--red-lt);border:1px solid rgba(200,40,30,.18);
+  border-radius:var(--rad);padding:14px 16px;
+  font-size:13px;color:var(--ink2);line-height:1.65;text-align:left;
+}
+.early-urgent strong{color:var(--red);}
+.early-restart{
+  margin-top:20px;font-size:13px;color:var(--ink3);
+  background:none;border:none;cursor:pointer;
+  font-family:var(--sans);text-decoration:underline;
+}
+.early-restart:hover{color:var(--ink);}
+.early-zip{
+  display:inline-block;
+  font-family:'Courier New',monospace;
+  font-size:13px;font-weight:700;
+  color:var(--ink);background:var(--paper);
+  border:1px solid var(--bdr);border-radius:5px;
+  padding:1px 8px;margin:0 2px;
+}
+
+/* early access page layout */
+.early-wrap{
+  min-height:calc(100vh - var(--nav-h));
+  display:flex;align-items:center;justify-content:center;
+  padding:40px 20px 64px;
+}
+.early-shell{width:100%;max-width:480px;}
+
+/* ═══════════════════════════════════════════
+   TRACKING DASHBOARD
+═══════════════════════════════════════════ */
+.dash-wrap{max-width:860px;margin:0 auto;padding:36px 20px 80px;}
+.dash-title{font-family:var(--serif);font-size:32px;letter-spacing:-.02em;margin-bottom:4px;}
+.dash-sub{font-size:14px;color:var(--ink2);margin-bottom:28px;}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.kpi-card{background:var(--white);border:1px solid var(--bdr);border-radius:var(--rad-lg);padding:18px 20px;}
+.kpi-val{font-family:var(--serif);font-size:34px;font-weight:700;color:var(--ink);line-height:1;margin-bottom:4px;}
+.kpi-lbl{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);}
+.kpi-sub{font-size:11px;color:var(--ink3);margin-top:3px;}
+.tbl-wrap{background:var(--white);border:1px solid var(--bdr);border-radius:var(--rad-lg);overflow:hidden;overflow-x:auto;margin-bottom:20px;}
+.tbl-head{padding:14px 20px;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;}
+.tbl-head-title{font-size:14px;font-weight:700;}
+.tbl-head-hint{font-size:12px;color:var(--ink3);}
+table{width:100%;border-collapse:collapse;min-width:560px;}
+th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--bdr);background:var(--paper);white-space:nowrap;}
+td{padding:12px 14px;font-size:13px;color:var(--ink2);border-bottom:1px solid var(--bdr);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--paper);}
+.td-main{font-weight:700;color:var(--ink);font-size:13px;}
+.td-kws{font-size:11px;color:var(--ink3);margin-top:2px;}
+.bar-wrap{display:flex;align-items:center;gap:8px;}
+.bar-bg{height:6px;flex:1;background:var(--bdr);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+.bar-pct{font-size:12px;font-weight:700;color:var(--ink);width:36px;text-align:right;flex-shrink:0;}
+.bdg{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+.bdg-grn{background:var(--grn-lt);color:var(--grn);}
+.bdg-amb{background:var(--amb-lt);color:var(--amb);}
+.bdg-red{background:var(--red-lt);color:var(--red);}
+.kw-tag{display:inline-block;background:var(--paper);border:1px solid var(--bdr);border-radius:4px;padding:1px 6px;font-size:10px;color:var(--ink2);font-family:'Courier New',monospace;margin:1px;}
+.reset-btn{
+  padding:8px 16px;border-radius:var(--rad);border:1px solid var(--bdr2);
+  background:var(--white);font-family:var(--sans);font-size:12px;font-weight:600;
+  color:var(--ink2);cursor:pointer;transition:all .15s;
+}
+.reset-btn:hover{background:var(--red-lt);border-color:var(--red);color:var(--red);}
+.dash-bottom{display:flex;justify-content:flex-end;}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media(max-width:768px){
+  .nav-pills{display:none;}
+  .hamburger{display:flex;}
+  .steps-grid{grid-template-columns:1fr 1fr;}
+  .symptom-grid{grid-template-columns:repeat(2,1fr);}
+  .kpi-row{grid-template-columns:repeat(2,1fr);}
+  .mid-cta{flex-direction:column;align-items:flex-start;}
+}
+@media(max-width:520px){
+  .hero{padding:44px 0 40px;}
+  .steps-grid{grid-template-columns:1fr;}
+  .symptom-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .f-row{grid-template-columns:1fr;}
+  .form-card,.wait-card,.conf-body,.sym-form-section{padding:24px 18px;}
+  .conf-banner{padding:20px 18px;}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .trust-inner{gap:12px 24px;}
+  .hero-h1{font-size:clamp(32px,10vw,52px);}
+}
+@media(max-width:380px){
+  .symptom-grid{grid-template-columns:1fr 1fr;}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     NAV
+══════════════════════════════════════════ -->
+<nav class="nav" id="main-nav">
+  <div class="nav-logo" onclick="show('home')" role="button" tabindex="0">
+    <div class="nav-dot"></div>Moxident
+  </div>
+  <div class="nav-pills" id="nav-pills"></div>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleDrawer()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- mobile drawer -->
+<div class="nav-drawer" id="nav-drawer">
+  <div class="drawer-section">Emergency Symptoms</div>
+  <div id="drawer-pills"></div>
+  <div style="height:1px;background:var(--bdr);margin:12px 0;"></div>
+  <button class="drawer-pill" onclick="show('intake');closeDrawer()">🦷 Request Appointment</button>
+  <button class="drawer-pill" onclick="show('dashboard');closeDrawer()">📊 Tracking Dashboard</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     HOME PAGE
+══════════════════════════════════════════ -->
+<div id="view-home">
+
+  <!-- hero -->
+  <section style="background:var(--paper);">
+    <div class="hero">
+      <div class="eyebrow a1"><div class="eyebrow-dot"></div>Emergency Dental Care</div>
+      <h1 class="hero-h1 a2">Tooth pain<br><em>can't wait.</em></h1>
+      <p class="hero-sub a3">Tell us what's wrong. We'll match you with the first available dentist in the Seattle area — confirmed in minutes, not hours.</p>
+      <button class="hero-cta a4" onclick="show('intake')">
+        Find a Dentist Now
+        <span class="hero-cta-arrow">→</span>
+      </button>
+      <p class="hero-note a5">No insurance required &nbsp;·&nbsp; No app download &nbsp;·&nbsp; Free to patients</p>
+    </div>
+  </section>
+
+  <!-- trust bar -->
+  <div class="trust-bar">
+    <div class="trust-inner">
+      <div class="trust-item">⚡ Confirmed in minutes</div>
+      <div class="trust-item">🦷 Verified local dentists</div>
+      <div class="trust-item">💳 No insurance needed</div>
+      <div class="trust-item">📍 Matched by zip code</div>
+      <div class="trust-item">📱 SMS confirmation</div>
+    </div>
+  </div>
+
+  <!-- how it works -->
+  <section class="how">
+    <div class="section-eyebrow">How it works</div>
+    <div class="section-title">From pain to appointment<br>in 3 simple steps.</div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <div class="step-title">Tell us your situation</div>
+        <div class="step-desc">30-second form. Name, phone, zip, and what hurts. That's it — no account needed.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <div class="step-title">We find a dentist fast</div>
+        <div class="step-desc">We text the nearest available dentist. First one to confirm claims your case.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <div class="step-title">You get their details</div>
+        <div class="step-desc">Your confirmation shows dentist name, address, and direct phone number. Done.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- symptom cards -->
+  <section class="symptom-grid-section">
+    <div class="wide-wrap">
+      <div class="section-eyebrow" style="text-align:center;">What brings you in?</div>
+      <div class="section-title" style="text-align:center;margin-bottom:0;">Select your situation.</div>
+      <div class="symptom-grid" id="symptom-grid-home"></div>
+    </div>
+  </section>
+
+  <!-- footer -->
+  <footer class="site-footer">
+    <strong>Moxident</strong> — Emergency Dental Routing · Seattle, WA &nbsp;·&nbsp; Performance-based &nbsp;·&nbsp; $50 per completed appointment
+    <div style="margin-top:8px;font-size:11px;">
+      <span style="cursor:pointer;text-decoration:underline;" onclick="show('dashboard')">Tracking Dashboard</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SYMPTOM PAGES (injected by JS)
+══════════════════════════════════════════ -->
+<div id="view-symptom" class="hidden">
+  <div class="page-wrap" id="symptom-content"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     INTAKE FORM (standalone)
+══════════════════════════════════════════ -->
+<div id="view-intake" class="hidden">
+  <div class="form-wrap">
+    <div class="form-card">
+      <button class="back-link" type="button" onclick="show('home')">← Back</button>
+      <div class="form-step-bar">
+        <div class="form-step-seg on"></div>
+        <div class="form-step-seg"></div>
+        <div class="form-step-seg"></div>
+      </div>
+      <div class="form-card-title a1">Tell us what's happening.</div>
+      <div class="form-card-sub a2">We'll find the closest available dentist and confirm fast.</div>
+      <form id="main-intake-form" novalidate>
+        <div class="f-row">
+          <div class="fg" id="mfg-name">
+            <label class="fl">Full Name <span class="fl-req">*</span></label>
+            <input class="fi" id="mf-name" type="text" placeholder="Jane Smith" autocomplete="name"/>
+            <span class="f-err">Please enter your name</span>
+          </div>
+          <div class="fg" id="mfg-phone">
+            <label class="fl">Phone <span class="fl-req">*</span></label>
+            <input class="fi" id="mf-phone" type="tel" placeholder="(555) 000-0000" autocomplete="tel"/>
+            <span class="f-err">Enter a valid phone number</span>
+          </div>
+        </div>
+        <div class="fg" id="mfg-zip">
+          <label class="fl">Zip Code <span class="fl-req">*</span></label>
+          <input class="fi" id="mf-zip" type="text" placeholder="e.g. 98101" inputmode="numeric" maxlength="5"/>
+          <span class="f-err">Enter a valid 5-digit zip</span>
+        </div>
+        <div class="fg" id="mfg-symptom">
+          <label class="fl">What's the issue? <span class="fl-req">*</span></label>
+          <select class="fi" id="mf-symptom">
+            <option value="">Select your symptom…</option>
+            <option>Severe tooth pain</option>
+            <option>Broken or chipped tooth</option>
+            <option>Swollen gum or jaw</option>
+            <option>Tooth knocked out</option>
+            <option>Lost filling or crown</option>
+            <option>Dental abscess or infection</option>
+            <option>Bleeding that won't stop</option>
+            <option>Wisdom tooth pain</option>
+            <option>Other urgent issue</option>
+          </select>
+          <span class="f-err">Please select a symptom</span>
+        </div>
+        <button type="button" class="submit-btn" onclick="handleMainSubmit()">Request Emergency Appointment →</button>
+        <p class="form-disclaimer">Free to patients · No insurance required · One SMS confirmation only</p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     EARLY ACCESS RESPONSE (shown after any form submit)
+══════════════════════════════════════════ -->
+<div id="view-early" class="hidden">
+  <div class="early-wrap">
+    <div class="early-shell">
+      <div class="early-card">
+        <div class="early-icon">🦷</div>
+        <div class="early-title">You're on the list.</div>
+        <div class="early-msg">
+          We're currently onboarding local dentists in your area
+          (<span class="early-zip" id="early-zip-display">—</span>).
+          You're early — <strong>we'll notify you by SMS as soon as this launches near you.</strong>
+        </div>
+        <div class="early-divider"></div>
+        <div class="early-urgent">
+          <strong>⚠️ Need help right now?</strong><br/>
+          Please call a local dentist directly, visit an urgent care clinic,
+          or <strong>call 911 if this is a severe emergency</strong> involving
+          difficulty breathing, swallowing, or uncontrolled bleeding.
+        </div>
+        <button class="early-restart" onclick="resetFlow()">← Submit another request</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TRACKING DASHBOARD
+══════════════════════════════════════════ -->
+<div id="view-dashboard" class="hidden">
+  <div class="dash-wrap">
+    <div class="dash-title a1">Conversion Tracking</div>
+    <div class="dash-sub a2">Live form submit rate per symptom page — use this to decide where to spend ad budget.</div>
+    <div class="kpi-row" id="kpi-row"></div>
+    <div class="tbl-wrap">
+      <div class="tbl-head">
+        <div class="tbl-head-title">Page Performance</div>
+        <div class="tbl-head-hint">CVR = submits ÷ views</div>
+      </div>
+      <table><thead><tr>
+        <th>Symptom Page</th>
+        <th>Target Keywords</th>
+        <th>Views</th>
+        <th>Submits</th>
+        <th>CVR</th>
+        <th>Signal</th>
+      </tr></thead>
+      <tbody id="dash-tbody"></tbody></table>
+    </div>
+    <div class="dash-bottom">
+      <button class="reset-btn" onclick="resetTracking()">↺ Reset data</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ─── PAGE DATA ─────────────────────────────── */
+const PAGES = [
+  {
+    id:'pain-night', nav:'Tooth Pain Tonight', icon:'🌙',
+    cardSub:'Throbbing pain keeping you awake',
+    keywords:['tooth pain can\'t sleep seattle','toothache at night seattle','severe tooth pain tonight'],
+    badge:'🌙 Nighttime Pain',
+    h1:['Tooth pain keeping','you <em>awake tonight?</em>'],
+    sub:'Nighttime tooth pain is one of the most urgent dental emergencies. The throbbing worsens when you lie down. You don\'t have to wait until morning.',
+    chips:['⚡ Dentists available now','📍 Matched by zip','💬 Confirmed in minutes'],
+    warnTitle:'Why nighttime tooth pain feels worse',
+    warnBody:'When you lie flat, blood pressure in your head increases, amplifying throbbing pain around an inflamed nerve or abscess. This signals the situation needs attention now — not tomorrow morning.',
+    list:['Pain is throbbing or pulsing and won\'t let you sleep','Pain increases when you lie down or bend forward','Painkillers stopped working or barely help','Tooth feels sensitive to hot, cold, or pressure','You notice swelling in your gum or jaw'],
+    ctaH:'Stop suffering through the night.',ctaP:'We\'ll find you a dentist right now.',
+    body:`<p class="content-p">Most dental offices are closed right now — but that doesn't mean you're out of options. Moxident connects you directly to dentists who have confirmed they can see emergency patients today.</p><p class="content-p">Fill out the form below. We text the nearest available dentist. First to respond claims your case. You get their name, address, and phone number immediately.</p>`,
+    faqs:[
+      {q:'Can a dentist actually see me tonight or early morning?',a:'Yes. Dentists in our network flag availability specifically for emergency cases. If one isn\'t available right now, the next one gets alerted automatically.'},
+      {q:'Is it a real dental emergency if I can\'t sleep from the pain?',a:'Absolutely. Pain severe enough to interrupt sleep usually means the nerve is involved — either through deep decay, a cracked tooth, or infection. These worsen over time and are best treated urgently.'},
+      {q:'What should I do right now while I wait?',a:'Take ibuprofen if you\'re able — it reduces inflammation better than acetaminophen for dental pain. Apply a cold pack outside the jaw. Avoid hot, cold, or sweet foods. Keep your head elevated.'},
+      {q:'Do I need insurance?',a:'No. All participating dentists accept patients without insurance. You\'ll discuss payment directly with the office when you arrive.'},
+    ],
+  },
+  {
+    id:'broken-tooth', nav:'Broken Tooth', icon:'🦷',
+    cardSub:'Chipped, cracked, or sharp edge',
+    keywords:['broken tooth same day seattle','chipped tooth dentist today seattle','cracked tooth emergency'],
+    badge:'🦷 Broken / Chipped',
+    h1:['Broken tooth?','<em>Get seen today.</em>'],
+    sub:'A broken or chipped tooth can cut your tongue, expose the nerve, and worsen within hours. Same-day treatment protects what\'s left.',
+    chips:['⚡ Same-day appointments','🛡 Saves the tooth','📞 Dentist contacts you'],
+    warnTitle:'A broken tooth can get much worse fast',
+    warnBody:'Once enamel cracks, the inner dentin and nerve are exposed to bacteria, food, and temperature changes. A chip can become an infected tooth requiring root canal or extraction — often within days.',
+    list:['You can feel a sharp or jagged edge with your tongue','Part of the tooth or a filling has fallen out','Tooth is sensitive to air, temperature, or biting','You can see the tooth has cracked toward the gum','Pain when you bite or chew'],
+    ctaH:'The sooner you act, the better the outcome.',ctaP:'Let us find a dentist who can see you today.',
+    body:`<p class="content-p">A broken tooth is a dental emergency even without severe pain. Cracks can extend deeper over hours, especially if you continue eating or the tooth gets cold or hot. The goal of same-day treatment is to seal and stabilize the tooth before damage progresses.</p><p class="content-p">Bring any tooth fragments with you — a dentist may be able to bond them back. Keep fragments moist in milk or water. Don\'t use super glue or over-the-counter cement without seeing a dentist first.</p>`,
+    faqs:[
+      {q:'I broke my tooth but I\'m not in pain. Is it still an emergency?',a:'Yes. Many broken teeth don\'t cause immediate pain because the nerve is protected by dentin, but they become painful as exposure continues. The crack can extend and cause a much bigger problem.'},
+      {q:'Can a broken tooth be saved?',a:'Often yes, depending on how far the break extends. Minor chips can be bonded. More significant breaks may need a crown. If the crack reaches the root, extraction may be necessary — but early treatment gives you the best odds.'},
+      {q:'I broke my tooth eating. Should I save the pieces?',a:'Yes. Keep the fragment in milk, saliva, or water. Don\'t let it dry out. Bring it to the dentist — bonding the original piece back is sometimes possible.'},
+      {q:'What is the sharp edge cutting my tongue?',a:'That\'s exposed enamel or dentin. You can temporarily apply dental wax from a pharmacy to cushion it. This is temporary — see a dentist as soon as possible.'},
+    ],
+  },
+  {
+    id:'abscess', nav:'Abscess / Infection', icon:'🔴',
+    cardSub:'Swollen jaw, fever, or throbbing pain',
+    keywords:['dental abscess treatment seattle','tooth infection swollen jaw','abscess dentist today seattle'],
+    badge:'🔴 Abscess / Infection',
+    h1:['Swollen jaw or','<em>tooth infection?</em>'],
+    sub:'A dental abscess is a serious bacterial infection. Facial swelling, fever, and throbbing pain are warning signs that need same-day attention — infections can spread rapidly.',
+    chips:['🚨 Serious — act fast','💊 Antibiotics same day','📍 Nearest dentist now'],
+    warnTitle:'Dental infections can become life-threatening',
+    warnBody:'This is one of the few dental conditions that can become a medical emergency. An untreated abscess can spread to the jaw, neck, or airway. If you have difficulty swallowing, breathing, or swelling spreading to your neck — go to the ER immediately.',
+    list:['Visible swelling in your gum, jaw, cheek, or neck','Severe throbbing pain that doesn\'t respond to painkillers','Fever or general feeling of illness','A pimple-like bump on the gum that may be draining','Pain that has been building for several days'],
+    ctaH:'Infections don\'t wait. Neither should you.',ctaP:'Connect with a dentist in your area right now.',
+    body:`<p class="content-p">A dental abscess is a pocket of pus caused by a bacterial infection inside the tooth, in the gum, or in surrounding bone. It can come from deep decay, a cracked tooth, or gum disease. It will not resolve on its own — it requires treatment.</p><p class="content-p">Treatment typically involves draining the abscess, prescribing antibiotics, and addressing the source — either root canal therapy or extraction. The sooner you're seen, the more options you have.</p>`,
+    faqs:[
+      {q:'Can I treat a dental abscess at home?',a:'No. You can manage pain with ibuprofen and use warm salt water rinses, but these do not treat the infection. Antibiotics from a dentist are required, and the source of infection must be addressed dentally.'},
+      {q:'When should I go to the ER instead of a dentist?',a:'Go to the ER immediately if you have difficulty breathing or swallowing, swelling spreading to your neck or floor of mouth, high fever (above 101°F), confusion or extreme fatigue, or eye swelling.'},
+      {q:'My abscess burst on its own. Am I okay?',a:'The pain may reduce, but the infection is not resolved. Spontaneous rupture means you still need antibiotics and dental treatment to remove the source of infection.'},
+      {q:'Will I need a root canal?',a:'Often yes, if the infection originated inside the tooth. However the dentist will assess whether the tooth is salvageable. Sometimes extraction followed by an implant is recommended.'},
+    ],
+  },
+  {
+    id:'knocked-out', nav:'Tooth Knocked Out', icon:'⚠️',
+    cardSub:'Act within 30 minutes to save it',
+    keywords:['tooth knocked out emergency seattle','avulsed tooth dentist','tooth fell out adult'],
+    badge:'⚠️ Knocked Out',
+    h1:['Tooth knocked out?','<em>You have 30 minutes.</em>'],
+    sub:'A knocked-out permanent tooth can be reimplanted — but only if you act within 30 to 60 minutes. Time is the most critical factor. Get to a dentist now.',
+    chips:['🕐 30-min window','🏃 Move fast','🦷 Can be saved'],
+    warnTitle:'Act within 30 minutes for best chance of saving the tooth',
+    warnBody:'The cells on the root surface die quickly once the tooth dries. Reimplantation within 30 minutes has the highest success rate. After 60 minutes, chances drop significantly. Keep the tooth moist in milk, saliva, or saline — never tap water.',
+    list:['The entire tooth — root and crown — came out of the socket','The socket is bleeding','You still have the tooth and it is intact','The tooth is a permanent (adult) tooth, not a baby tooth'],
+    ctaH:'Every minute matters. Find a dentist now.',ctaP:'We\'ll alert the nearest available dentist immediately.',
+    body:`<p class="content-p"><strong>What to do right now:</strong> Handle the tooth by the crown (white part), never the root. If dirty, gently rinse with milk or water — do not scrub. Try to place it back in the socket and bite down gently on a cloth. If not, store it in milk or hold it between your cheek and gum.</p><p class="content-p"><strong>Baby teeth vs adult teeth:</strong> Do not reimplant a knocked-out baby tooth — this can damage the developing adult tooth underneath. For adult teeth, every minute getting to a dentist matters.</p>`,
+    faqs:[
+      {q:'Should I try to put the tooth back in myself?',a:'If it\'s a permanent tooth and it\'s clean, yes — gently. Place it in the socket and bite down softly on a cloth. This is the best way to preserve the root cells. If you can\'t, store it in milk.'},
+      {q:'What if I can\'t find a dentist fast enough?',a:'Go to an urgent care clinic or hospital ER. They can store the tooth in a solution and consult with an on-call dentist. The ER is the right choice if no dentist is reachable within 30 minutes.'},
+      {q:'The tooth is a baby tooth. What should I do?',a:'Do not reimplant a baby tooth — this risks damage to the adult tooth beneath. Control bleeding with gentle pressure, then see a dentist to assess the socket and surrounding area.'},
+      {q:'Can an implant replace a tooth that can\'t be saved?',a:'Yes. If the tooth cannot be reimplanted successfully, a dental implant is the standard-of-care replacement. This takes several months but results in a permanent, natural-feeling tooth.'},
+    ],
+  },
+  {
+    id:'lost-filling', nav:'Lost Filling / Crown', icon:'🔧',
+    cardSub:'Filling fell out or crown came off',
+    keywords:['lost filling dentist today seattle','crown fell off same day','filling fell out what to do'],
+    badge:'🔧 Lost Filling / Crown',
+    h1:['Filling or crown','<em>fell out?</em>'],
+    sub:'A missing filling or crown exposes your tooth to bacteria, pressure, and pain. Same-day repair prevents infection and avoids a much more expensive fix later.',
+    chips:['🦷 Protect the tooth','💊 Prevent infection','⚡ Same-day repair'],
+    warnTitle:'Don\'t leave a tooth exposed for long',
+    warnBody:'When a filling or crown is missing, the exposed tooth structure is soft and vulnerable, collecting bacteria with every meal. Decay progresses rapidly in exposed dentin. A simple re-cement today could prevent a root canal or extraction tomorrow.',
+    list:['You felt something come out while eating','You can feel a hole or rough edge where the filling was','Your crown has come off and you can see the tooth stub','The exposed tooth is sensitive to temperature or sweets','You still have the crown and it appears intact'],
+    ctaH:'Don\'t wait for the pain to get worse.',ctaP:'Get the tooth covered today.',
+    body:`<p class="content-p">If your crown came off intact, keep it. A dentist can often re-cement it the same day — a quick and inexpensive fix. Do not try to glue it back yourself with super glue. This can trap bacteria and make removal difficult for the dentist.</p><p class="content-p">If a filling fell out, you can buy temporary dental cement at a pharmacy as a short-term measure. However this is a temporary fix only — you still need to see a dentist as soon as possible.</p>`,
+    faqs:[
+      {q:'I still have the crown. Can the dentist put it back?',a:'Often yes. If the crown is undamaged and the underlying tooth structure is intact, re-cementation is a straightforward procedure. Bring the crown with you in a small bag or container.'},
+      {q:'Can I use super glue or dental cement from the pharmacy?',a:'Pharmacy temporary cement (like Dentemp) is acceptable for short-term protection of a lost filling. Do not use super glue — it bonds too permanently and makes the dentist\'s job much harder.'},
+      {q:'Why did my filling or crown fall out?',a:'Common causes include decay forming underneath the restoration, biting on hard food, grinding, or the cement reaching the end of its lifespan. A new, well-fitting restoration will be placed after the dentist assesses the tooth.'},
+      {q:'How much does it cost to replace a lost filling?',a:'A simple filling replacement can range from $100–$300 depending on size and material. If the underlying tooth has decayed significantly, a crown may be needed ($800–$2,000). Seeing the dentist early usually means a simpler, cheaper fix.'},
+    ],
+  },
+  {
+    id:'wisdom-tooth', nav:'Wisdom Tooth Pain', icon:'😣',
+    cardSub:'Impacted or infected, spreading pain',
+    keywords:['wisdom tooth pain relief seattle','impacted wisdom tooth dentist','wisdom tooth swollen gum'],
+    badge:'😣 Wisdom Tooth',
+    h1:['Wisdom tooth pain','<em>that won\'t stop?</em>'],
+    sub:'Impacted or infected wisdom teeth cause some of the most intense dental pain. Swollen gum, pain spreading to your jaw or ear — you need to be seen today.',
+    chips:['😮‍💨 Intense pain relief','🦷 Extraction or treatment','📍 Local dentist now'],
+    warnTitle:'Infected wisdom teeth can spread to the throat',
+    warnBody:'Pericoronitis — infection of the gum flap over an erupting wisdom tooth — can spread rapidly to the throat and neck. If you have difficulty opening your mouth, swallowing, or notice swelling below the jaw, seek emergency care immediately.',
+    list:['Pain in the back of the jaw that has been worsening for days','Swollen, red, or tender gum tissue behind your last molar','Pain spreading to the ear, temple, or neck on the same side','Bad taste or smell in the back of your mouth','Difficulty fully opening your mouth'],
+    ctaH:'Wisdom tooth pain doesn\'t resolve on its own.',ctaP:'Get relief — find a dentist available now.',
+    body:`<p class="content-p">Wisdom tooth pain has two main causes: the tooth is impacted (blocked from fully erupting), or the gum tissue over the partially erupted tooth has become infected. Both require dental attention — pain management alone is not a solution.</p><p class="content-p">A dentist can take an X-ray, assess whether extraction is needed, prescribe antibiotics if there\'s infection, and manage your pain immediately. Many extractions can be done the same day; complex cases may need a referral to an oral surgeon.</p>`,
+    faqs:[
+      {q:'Can wisdom tooth pain go away on its own?',a:'Sometimes temporarily, but the underlying cause — impaction or infection — does not resolve without treatment. Recurring episodes of pain typically get worse each time.'},
+      {q:'Do all wisdom teeth need to be removed?',a:'Not always. Fully erupted, properly aligned wisdom teeth that are easy to clean can stay. However, if they\'re impacted, causing recurrent pain or infection, or damaging adjacent teeth, removal is recommended.'},
+      {q:'Can I get antibiotics without getting the tooth removed?',a:'A dentist can prescribe antibiotics for an active infection, but this is temporary relief. The antibiotics treat the infection, not the cause. Extraction or other definitive treatment is almost always eventually necessary.'},
+      {q:'How long does wisdom tooth extraction recovery take?',a:'Most people recover in 3–5 days for simple extractions. Impacted extractions involving bone removal take 7–10 days. Swelling peaks around day 2–3. You\'ll be on soft foods for about a week.'},
+    ],
+  },
+  {
+    id:'bleeding', nav:'Dental Bleeding', icon:'🩸',
+    cardSub:'Won\'t stop after extraction or injury',
+    keywords:['tooth bleeding won\'t stop seattle','gum bleeding emergency','dental bleeding after extraction'],
+    badge:'🩸 Bleeding Emergency',
+    h1:['Dental bleeding','<em>that won\'t stop?</em>'],
+    sub:'Bleeding after extraction or trauma that doesn\'t stop with pressure within 15–20 minutes is a dental emergency. Consistent pressure and prompt treatment are essential.',
+    chips:['🩸 Act immediately','⏱ 15-min pressure test','🏥 Dentist on call'],
+    warnTitle:'What to do right now while you find a dentist',
+    warnBody:'Fold a clean gauze pad into a thick square. Place it directly over the bleeding site and bite down firmly — maintain continuous pressure for 15–20 minutes without checking. Do not rinse, spit, or use a straw. If bleeding continues after this, seek care immediately.',
+    list:['You had a tooth extracted and bleeding hasn\'t stopped after an hour','You have a cut inside the mouth that won\'t clot','Blood is pooling faster than it clots','You can taste or see heavy, continuous blood flow','The extraction site is losing its blood clot'],
+    ctaH:'Persistent dental bleeding needs professional attention.',ctaP:'Find a dentist available to help you right now.',
+    body:`<p class="content-p">Some bleeding after dental work or oral injury is normal. Heavy, sustained bleeding that does not respond to 20 minutes of firm direct pressure is not. Common causes include a dislodged clot (dry socket risk), torn gum tissue, or a vessel requiring direct treatment.</p><p class="content-p">Avoid aspirin for pain management if you\'re bleeding — it thins the blood. Use ibuprofen or acetaminophen instead. Do not rinse vigorously, smoke, or use a straw — all disrupt clot formation.</p>`,
+    faqs:[
+      {q:'Is it normal to bleed a lot after a tooth extraction?',a:'Some bleeding is expected for the first hour. Bleeding that soaks through multiple gauze pads within 30–45 minutes, or continues beyond 2–3 hours with consistent pressure, is not normal and needs professional attention.'},
+      {q:'What is a dry socket?',a:'Dry socket (alveolar osteitis) occurs when the blood clot in the extraction site is dislodged or dissolves before healing. It causes severe throbbing pain and an empty-looking socket. It is treated by the dentist placing a medicated dressing.'},
+      {q:'Should I go to the ER for dental bleeding?',a:'If you cannot get to a dentist and bleeding is severe or won\'t stop with 20+ minutes of firm pressure, yes. The ER can pack the wound and contact an on-call dentist or oral surgeon.'},
+      {q:'I\'m on blood thinners. Is my situation more serious?',a:'Yes. Blood thinners significantly complicate clotting after dental work. Alert the dentist immediately. Do not stop your blood thinner medication without consulting your physician.'},
+    ],
+  },
+  {
+    id:'swollen-gum', nav:'Swollen Gum', icon:'💢',
+    cardSub:'Painful bump, redness, or swelling',
+    keywords:['swollen gum dentist today seattle','gum swelling urgent seattle','gum abscess same day'],
+    badge:'💢 Swollen Gum',
+    h1:['Swollen gum or','<em>painful bump?</em>'],
+    sub:'A swollen gum can mean infection, an abscess, or gum disease that\'s progressed to an acute stage. Painful, spreading, or has a visible bump — you need to be seen today.',
+    chips:['💊 Antibiotics today','🔬 Identify the cause','📍 Local dentist now'],
+    warnTitle:'Gum infections spread without treatment',
+    warnBody:'A localized gum infection (periodontal abscess) can spread to surrounding teeth and bone. Left untreated, you risk losing otherwise healthy teeth near the infection site, and in rare cases the infection can become systemic.',
+    list:['One area of gum is visibly swollen, red, and tender to touch','White or yellowish bump on the gum that may be draining','Pain when you bite or press on the gum','The swelling has been growing over the past few days','Bad taste or smell from the area'],
+    ctaH:'Swollen gums don\'t heal without treatment.',ctaP:'Get matched to a dentist who can see you today.',
+    body:`<p class="content-p">Gum swelling can originate from two sources: a problem inside the tooth (abscess draining through the gum), or a problem within the gum and bone itself (periodontal abscess). Both require professional treatment — a dentist will take an X-ray to determine the source and recommend treatment.</p><p class="content-p">In the meantime, rinse gently with warm salt water (1/2 tsp salt in 8 oz warm water) to keep the area clean. Avoid poking or squeezing the bump. Take ibuprofen for pain and inflammation if you have no contraindications.</p>`,
+    faqs:[
+      {q:'The bump on my gum is draining. Is that good or bad?',a:'A draining abscess actually reduces acute pressure and pain, but it does NOT mean the infection is clearing. The body is creating a drainage pathway because the infection has nowhere else to go. Treatment is still required.'},
+      {q:'Can gum swelling be caused by something other than infection?',a:'Yes. Hormonal changes, irritation from a new restoration, food impaction, or certain medications can cause gum swelling that isn\'t infection. A dentist will determine the cause and appropriate treatment.'},
+      {q:'Will I need gum surgery?',a:'Probably not for a single-tooth abscess. Simple drainage and antibiotics handle most cases. If the infection involves significant bone loss, a deeper cleaning or periodontal procedure may be recommended after the acute phase resolves.'},
+      {q:'Can swollen gums go away on their own?',a:'Minor irritation-related swelling may improve with improved oral hygiene. Infection-related swelling will not resolve without antibiotics and dental treatment. If swelling has been present for more than 2 days or is increasing, see a dentist.'},
+    ],
+  },
+];
+
+/* ─── TRACKING ──────────────────────────────── */
+const TK = 'mx_track_v1';
+function getTrack(){ try{ return JSON.parse(localStorage.getItem(TK))||{}; }catch(e){ return {}; } }
+function saveTrack(d){ try{ localStorage.setItem(TK,JSON.stringify(d)); }catch(e){} }
+function trackView(id){
+  const d=getTrack(); if(!d[id])d[id]={v:0,s:0};
+  d[id].v++; saveTrack(d);
+  // GA4: gtag('event','page_view',{symptom_page:id});
+}
+function trackSubmit(id){
+  const d=getTrack(); if(!d[id])d[id]={v:0,s:0};
+  d[id].s++; saveTrack(d);
+  // GA4: gtag('event','form_submit',{symptom_page:id});
+  // GAds: gtag('event','conversion',{send_to:'AW-XXXX/XXXX',value:50,currency:'USD'});
+}
+function resetTracking(){ if(confirm('Reset all tracking data?')){ localStorage.removeItem(TK); renderDash(); } }
+
+/* ─── STATE ─────────────────────────────────── */
+let currentView = 'home';
+let currentPage = null;
+let pendingPageId = null;
+const APP_HISTORY = [];
+
+/* ─── NAVIGATION ─────────────────────────────── */
+const VIEWS = ['home','symptom','intake','early','dashboard'];
+function show(id, pageId){
+  VIEWS.forEach(v => document.getElementById('view-'+v).classList.add('hidden'));
+  document.getElementById('view-'+id).classList.remove('hidden');
+  currentView = id;
+  closeDrawer();
+  window.scrollTo({top:0,behavior:'smooth'});
+  updateNavState(pageId||null);
+  if(id==='symptom' && pageId){ renderSymptom(pageId); trackView(pageId); }
+  if(id==='dashboard') renderDash();
+}
+
+function updateNavState(activePageId){
+  document.querySelectorAll('.nav-pill').forEach(el=>{
+    el.classList.toggle('active', el.dataset.id === activePageId);
+  });
+  document.querySelectorAll('.drawer-pill[data-id]').forEach(el=>{
+    el.classList.toggle('active', el.dataset.id === activePageId);
+  });
+}
+
+/* ─── HAMBURGER ─────────────────────────────── */
+function toggleDrawer(){
+  const d=document.getElementById('nav-drawer');
+  const h=document.getElementById('hamburger');
+  const open=d.classList.toggle('open');
+  h.classList.toggle('open',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+function closeDrawer(){
+  document.getElementById('nav-drawer').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+/* ─── BUILD NAV ─────────────────────────────── */
+function buildNav(){
+  const pills = document.getElementById('nav-pills');
+  const drawer = document.getElementById('drawer-pills');
+  pills.innerHTML = PAGES.map(p=>
+    `<button class="nav-pill" data-id="${p.id}" onclick="show('symptom','${p.id}')">${p.nav}</button>`
+  ).join('');
+  drawer.innerHTML = PAGES.map(p=>
+    `<button class="drawer-pill" data-id="${p.id}" onclick="show('symptom','${p.id}');closeDrawer()">${p.icon} ${p.nav}</button>`
+  ).join('');
+}
+
+/* ─── LANDING SYMPTOM CARDS ─────────────────── */
+function buildSymptomGrid(){
+  document.getElementById('symptom-grid-home').innerHTML = PAGES.map(p=>`
+    <div class="symptom-card" onclick="show('symptom','${p.id}')">
+      <div class="symptom-card-icon">${p.icon}</div>
+      <div class="symptom-card-title">${p.nav}</div>
+      <div class="symptom-card-sub">${p.cardSub}</div>
+    </div>
+  `).join('');
+}
+
+/* ─── RENDER SYMPTOM PAGE ────────────────────── */
+function renderSymptom(id){
+  const p = PAGES.find(x=>x.id===id);
+  if(!p) return;
+  currentPage = id;
+  pendingPageId = id;
+
+  const html = `
+    <div class="sym-hero">
+      <div class="sym-badge a1"><div class="sym-badge-dot"></div>${p.badge}</div>
+      <h1 class="sym-h1 a2">${p.h1.map(l=>l+'<br>').join('')}</h1>
+      <p class="sym-sub a3">${p.sub}</p>
+      <div class="chips a4">${p.chips.map(c=>`<div class="chip">${c}</div>`).join('')}</div>
+    </div>
+
+    <div class="warn-card">
+      <div class="warn-title">⚠️ ${p.warnTitle}</div>
+      <div class="warn-body">${p.warnBody}</div>
+    </div>
+
+    <div class="content-block">
+      <div class="content-label">Signs this is your situation</div>
+      <ul class="check-list">${p.list.map(i=>`<li>${i}</li>`).join('')}</ul>
+    </div>
+
+    <div class="mid-cta">
+      <div class="mid-cta-text">
+        <h3>${p.ctaH}</h3>
+        <p>${p.ctaP}</p>
+      </div>
+      <button class="mid-cta-btn" onclick="scrollToSymForm()">Find a Dentist Now →</button>
+    </div>
+
+    <div class="content-block">
+      <div class="content-h2">What you need to know</div>
+      ${p.body}
+    </div>
+
+    <div class="content-block">
+      <div class="content-label">Common questions</div>
+      <div class="content-h2">What patients ask us</div>
+      ${p.faqs.map((f,i)=>`
+        <div class="faq-item" id="faq-${i}">
+          <button class="faq-q" onclick="toggleFaq(${i})">
+            ${f.q}<span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">${f.a}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="sym-form-section" id="sym-form-anchor">
+      <div class="sym-form-title">Get matched to a dentist now.</div>
+      <div class="sym-form-sub">Fill this out. We text the nearest available dentist. First to confirm gets your case.</div>
+      <div id="sym-form-wrap">
+        <form novalidate>
+          <div class="f-row">
+            <div class="fg" id="sfg-name-${id}">
+              <label class="fl">Full Name <span class="fl-req">*</span></label>
+              <input class="fi" id="sf-name-${id}" type="text" placeholder="Jane Smith" autocomplete="name"/>
+              <span class="f-err">Please enter your name</span>
+            </div>
+            <div class="fg" id="sfg-phone-${id}">
+              <label class="fl">Phone <span class="fl-req">*</span></label>
+              <input class="fi" id="sf-phone-${id}" type="tel" placeholder="(555) 000-0000" autocomplete="tel"/>
+              <span class="f-err">Enter a valid phone number</span>
+            </div>
+          </div>
+          <div class="fg" id="sfg-zip-${id}">
+            <label class="fl">Zip Code <span class="fl-req">*</span></label>
+            <input class="fi" id="sf-zip-${id}" type="text" placeholder="e.g. 98101" inputmode="numeric" maxlength="5"/>
+            <span class="f-err">Enter a valid 5-digit zip</span>
+          </div>
+          <input type="hidden" value="${p.nav}"/>
+          <button type="button" class="submit-btn" onclick="handleSymSubmit('${id}','${p.nav}')">Request Emergency Appointment →</button>
+          <p class="form-disclaimer">Free to patients · No insurance required · One SMS confirmation only</p>
+        </form>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('symptom-content').innerHTML = html;
+
+  // clear errors on input
+  ['name','phone','zip'].forEach(f=>{
+    const el = document.getElementById(`sf-${f}-${id}`);
+    if(el) el.addEventListener('input',()=> document.getElementById(`sfg-${f}-${id}`)?.classList.remove('err'));
+  });
+}
+
+function scrollToSymForm(){
+  document.getElementById('sym-form-anchor')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function toggleFaq(i){
+  document.getElementById(`faq-${i}`)?.classList.toggle('open');
+}
+
+/* ─── FORM VALIDATION ─────────────────────── */
+function validate(fields){
+  let ok=true;
+  fields.forEach(({el,fg,test})=>{
+    const fg_el=document.getElementById(fg);
+    if(!fg_el)return;
+    if(!test(el.value)){ fg_el.classList.add('err'); ok=false; }
+    else fg_el.classList.remove('err');
+  });
+  return ok;
+}
+
+function handleSymSubmit(pageId, symptomLabel){
+  const name  = document.getElementById(`sf-name-${pageId}`);
+  const phone = document.getElementById(`sf-phone-${pageId}`);
+  const zip   = document.getElementById(`sf-zip-${pageId}`);
+  const ok = validate([
+    {el:name,  fg:`sfg-name-${pageId}`,  test:v=>v.trim().length>=2},
+    {el:phone, fg:`sfg-phone-${pageId}`, test:v=>/[\d\s\-\(\)]{7,}/.test(v)},
+    {el:zip,   fg:`sfg-zip-${pageId}`,   test:v=>/^\d{5}$/.test(v.trim())},
+  ]);
+  if(!ok){
+    document.querySelector(`#sfg-name-${pageId}.err, #sfg-phone-${pageId}.err, #sfg-zip-${pageId}.err`)
+      ?.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  trackSubmit(pageId);
+  gtag('event', 'conversion', {'send_to': 'AW-17976922373', 'value': 50, 'currency': 'USD'});
+  showEarly(zip.value.trim());
+  // PRODUCTION: POST /api/waitlist with {name,phone,zip,symptom:symptomLabel,source_page:pageId}
+}
+;['mf-name','mf-phone','mf-zip','mf-symptom'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('input',()=>{
+    document.getElementById(id.replace('mf-','mfg-'))?.classList.remove('err');
+  });
+});
+function handleMainSubmit(){
+  const ok=validate([
+    {el:document.getElementById('mf-name'),    fg:'mfg-name',    test:v=>v.trim().length>=2},
+    {el:document.getElementById('mf-phone'),   fg:'mfg-phone',   test:v=>/[\d\s\-\(\)]{7,}/.test(v)},
+    {el:document.getElementById('mf-zip'),     fg:'mfg-zip',     test:v=>/^\d{5}$/.test(v.trim())},
+    {el:document.getElementById('mf-symptom'), fg:'mfg-symptom', test:v=>v!==''},
+  ]);
+  if(!ok){
+    document.querySelector('#view-intake .err')?.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  const zip = document.getElementById('mf-zip').value.trim();
+  gtag('event', 'conversion', {'send_to': 'AW-17976922373', 'value': 50, 'currency': 'USD'});
+  showEarly(zip);
+  // PRODUCTION: POST /api/waitlist with {name,phone,zip,symptom} to capture the lead
+}
+
+/* ─── EARLY ACCESS RESPONSE ─────────────────── */
+function showEarly(zip){
+  document.getElementById('early-zip-display').textContent = zip || '—';
+  show('early');
+}
+
+/* ─── RESET FLOW ─────────────────────────── */
+function resetFlow(){
+  document.getElementById('main-intake-form')?.reset();
+  show('home');
+}
+
+/* ─── DASHBOARD ─────────────────────────────── */
+function renderDash(){
+  const data=getTrack();
+  let tv=0,ts=0;
+  PAGES.forEach(p=>{ const d=data[p.id]||{v:0,s:0}; tv+=d.v; ts+=d.s; });
+  const bcvr=tv>0?((ts/tv)*100).toFixed(1):'0.0';
+  const bcpe=ts>0?Math.round(50/(parseFloat(bcvr)/100)):'—';
+
+  document.getElementById('kpi-row').innerHTML=[
+    {val:tv,        lbl:'Total Page Views',  sub:'All symptom pages'},
+    {val:ts,        lbl:'Form Submits',       sub:'Completed leads'},
+    {val:bcvr+'%',  lbl:'Blended CVR',        sub:'Target: 10%+'},
+    {val:bcpe==='—'?'—':'$'+bcpe, lbl:'Est. CPE', sub:'Target: < $50'},
+  ].map(k=>`
+    <div class="kpi-card">
+      <div class="kpi-val">${k.val}</div>
+      <div class="kpi-lbl">${k.lbl}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>`).join('');
+
+  document.getElementById('dash-tbody').innerHTML=PAGES.map(p=>{
+    const d=data[p.id]||{v:0,s:0};
+    const cvr=d.v>0?((d.s/d.v)*100).toFixed(1):0;
+    const n=parseFloat(cvr);
+    const fillClass=n>=10?'':n>=5?'mid':'low';
+    const fillColor=n>=10?'var(--grn)':n>=5?'var(--amb)':'var(--red)';
+    const bdg=n>=10?'bdg-grn':n>=5?'bdg-amb':'bdg-red';
+    const bdgLbl=n>=10?'✓ Strong':n>=5?'~ Watch':d.v===0?'○ No data':'↓ Low';
+    const kws=p.keywords.map(k=>`<span class="kw-tag">${k}</span>`).join('');
+    return `<tr>
+      <td>
+        <div class="td-main" style="cursor:pointer" onclick="show('symptom','${p.id}')">${p.icon} ${p.nav}</div>
+      </td>
+      <td><div class="td-kws">${kws}</div></td>
+      <td>${d.v}</td>
+      <td>${d.s}</td>
+      <td>
+        <div class="bar-wrap">
+          <div class="bar-bg"><div class="bar-fill" style="width:${Math.min(n*5,100)}%;background:${fillColor}"></div></div>
+          <span class="bar-pct">${cvr}%</span>
+        </div>
+      </td>
+      <td><span class="bdg ${bdg}">${bdgLbl}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ─── INIT ──────────────────────────────────── */
+buildNav();
+buildSymptomGrid();
+show('home');
+</script>
+</body>
+</html>
