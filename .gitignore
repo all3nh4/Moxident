@@ -1,0 +1,8 @@
+.DS_Store
+*.zip
+*.dmg
+frontend/handler.mjs
+frontend/tmp/
+backend/node_modules/
+backend/dist/
+backend/.jest-cache/

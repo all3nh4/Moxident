@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cold Calls — Moxident Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../styles/admin.css"/>
+</head>
+<body>
+
+  <div id="admin-nav-host"></div>
+
+  <main class="page-wrap">
+    <div class="page-header fade-up">
+      <div class="page-title">Cold Calls</div>
+      <div class="page-sub">Log dentist outreach calls. Data is stored locally until the /admin/cold-calls endpoint is deployed.</div>
+    </div>
+
+    <!-- Log Form -->
+    <div class="log-form-panel fade-up">
+      <div class="log-form-title">Log a Call</div>
+      <div class="form-grid">
+        <div class="fg" id="fg-dentist-name">
+          <label class="fl" for="f-dentist-name">Dentist Name <span class="fl-req">*</span></label>
+          <input class="fi" id="f-dentist-name" type="text" placeholder="Dr. Jane Smith" autocomplete="off"/>
+          <span class="f-err">Required</span>
+        </div>
+        <div class="fg" id="fg-phone">
+          <label class="fl" for="f-phone">Phone <span class="fl-req">*</span></label>
+          <input class="fi" id="f-phone" type="tel" placeholder="(206) 555-0000" autocomplete="off"/>
+          <span class="f-err">Required</span>
+        </div>
+        <div class="fg" id="fg-outcome">
+          <label class="fl" for="f-outcome">Outcome <span class="fl-req">*</span></label>
+          <select class="fi" id="f-outcome">
+            <option value="">Select outcome…</option>
+            <option value="interested">Interested</option>
+            <option value="not_interested">Not Interested</option>
+            <option value="voicemail">Voicemail</option>
+            <option value="no_answer">No Answer</option>
+          </select>
+          <span class="f-err">Required</span>
+        </div>
+        <div class="fg">
+          <label class="fl" for="f-followup">Follow-up Date</label>
+          <input class="fi" id="f-followup" type="date"/>
+        </div>
+      </div>
+      <div class="form-grid full">
+        <div class="fg">
+          <label class="fl" for="f-notes">Notes</label>
+          <textarea class="fi" id="f-notes" placeholder="Key points from the call, objections, next steps…" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="log-form-actions">
+        <button class="btn btn-secondary" onclick="clearForm()">Clear</button>
+        <button class="btn btn-primary" id="submit-btn" onclick="handleSubmit()">Log Call →</button>
+      </div>
+    </div>
+
+    <!-- Call Log Table -->
+    <div class="panel fade-up">
+      <div class="panel-header">
+        <div class="panel-title" id="table-title">Call Log</div>
+        <div class="panel-hint" id="table-hint"></div>
+      </div>
+      <div class="tbl-scroll">
+        <div id="table-body">
+          <div class="spinner-wrap"><div class="spinner"></div> Loading…</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Edit Modal -->
+  <div class="modal-backdrop hidden" id="edit-modal" onclick="handleModalBackdropClick(event)">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title">Edit Call</div>
+        <button class="modal-close" onclick="closeModal()" aria-label="Close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="fg" id="mfg-dentist-name">
+            <label class="fl" for="mf-dentist-name">Dentist Name <span class="fl-req">*</span></label>
+            <input class="fi" id="mf-dentist-name" type="text" autocomplete="off"/>
+            <span class="f-err">Required</span>
+          </div>
+          <div class="fg" id="mfg-phone">
+            <label class="fl" for="mf-phone">Phone <span class="fl-req">*</span></label>
+            <input class="fi" id="mf-phone" type="tel" autocomplete="off"/>
+            <span class="f-err">Required</span>
+          </div>
+          <div class="fg" id="mfg-outcome">
+            <label class="fl" for="mf-outcome">Outcome <span class="fl-req">*</span></label>
+            <select class="fi" id="mf-outcome">
+              <option value="interested">Interested</option>
+              <option value="not_interested">Not Interested</option>
+              <option value="voicemail">Voicemail</option>
+              <option value="no_answer">No Answer</option>
+            </select>
+            <span class="f-err">Required</span>
+          </div>
+          <div class="fg">
+            <label class="fl" for="mf-followup">Follow-up Date</label>
+            <input class="fi" id="mf-followup" type="date"/>
+          </div>
+        </div>
+        <div class="form-grid full">
+          <div class="fg">
+            <label class="fl" for="mf-notes">Notes</label>
+            <textarea class="fi" id="mf-notes" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="handleModalSave()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/cold-calls.js"></script>
+</body>
+</html>

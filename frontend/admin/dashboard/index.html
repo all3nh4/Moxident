@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — Moxident Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../styles/admin.css"/>
+</head>
+<body>
+
+  <div id="admin-nav-host"></div>
+
+  <main class="page-wrap">
+    <div class="page-header fade-up">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub">Patient leads and dentist survey submissions.</div>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="kpi-grid fade-up" id="kpi-grid">
+      <div class="kpi-card"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+      <div class="kpi-card"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+      <div class="kpi-card"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+      <div class="kpi-card"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+    </div>
+
+    <!-- Error banner -->
+    <div class="alert alert-warn hidden" id="leads-warn">
+      <strong>Note:</strong> The <code>/admin/leads</code> Lambda endpoint has not been built yet.
+      Patient leads will appear here once that endpoint is deployed.
+      See <code>js/api.js</code> for the required contract.
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('leads', this)">Patient Leads</button>
+      <button class="tab-btn" onclick="switchTab('dentists', this)">Dentist Submissions</button>
+    </div>
+
+    <!-- Patient Leads Tab -->
+    <div class="tab-panel active" id="tab-leads">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title" id="leads-panel-title">Patient Leads</div>
+          <button class="btn btn-secondary" onclick="loadLeads()" style="font-size:12px;padding:6px 12px;">↺ Refresh</button>
+        </div>
+        <div class="tbl-scroll">
+          <div id="leads-body">
+            <div class="spinner-wrap"><div class="spinner"></div> Loading leads…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dentist Submissions Tab -->
+    <div class="tab-panel" id="tab-dentists">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title" id="dentists-panel-title">Dentist Submissions</div>
+          <button class="btn btn-secondary" onclick="loadReport()" style="font-size:12px;padding:6px 12px;">↺ Refresh</button>
+        </div>
+        <div id="dentists-body">
+          <div class="spinner-wrap"><div class="spinner"></div> Loading…</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/dashboard.js"></script>
+
+
+    const session = MxAuth.requireAuth();
+    if (session) MxAuth.renderNav('/dashboard/');
+
+    /* ── State ── */
+    let allLeads = [];
+    let reportData = null;
+
+    /* ── Tabs ── */
+    function switchTab(name, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + name).classList.add('active');
+    }
+
+    /* ── Date helpers ── */
+    function formatDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function isToday(iso) {
+      if (!iso) return false;
+      const d = new Date(iso);
+      const n = new Date();
+      return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate();
+    }
+
+    function isThisWeek(iso) {
+      if (!iso) return false;
+      const d = new Date(iso);
+      const now = new Date();
+      const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+      return d >= weekAgo;
+    }
+
+    /* ── KPI render ── */
+    function renderKpis(leads, dentistCount) {
+      const total   = leads.length;
+      const today   = leads.filter(l => isToday(l.submittedAt)).length;
+      const week    = leads.filter(l => isThisWeek(l.submittedAt)).length;
+      const converted = leads.filter(l => l.status === 'converted').length;
+
+      const cards = [
+        { val: total,       lbl: 'Total Leads',          sub: 'All time' },
+        { val: today,       lbl: 'Leads Today',          sub: 'Last 24 hours' },
+        { val: week,        lbl: 'This Week',            sub: 'Last 7 days' },
+        { val: dentistCount,lbl: 'Dentists Surveyed',    sub: 'Network size' },
+      ];
+
+      document.getElementById('kpi-grid').innerHTML = cards.map(c => `
+        <div class="kpi-card fade-up">
+          <div class="kpi-val">${c.val}</div>
+          <div class="kpi-lbl">${c.lbl}</div>
+          <div class="kpi-delta">${c.sub}</div>
+        </div>
+      `).join('');
+    }
+
+    /* ── Status select ── */
+    const STATUS_OPTIONS = [
+      { value: 'new',         label: 'New'          },
+      { value: 'contacted',   label: 'Contacted'    },
+      { value: 'matched',     label: 'Matched'      },
+      { value: 'converted',   label: 'Converted'    },
+      { value: 'no_answer',   label: 'No Answer'    },
+      { value: 'cancelled',   label: 'Cancelled'    },
+    ];
+
+    function buildStatusSelect(leadId, current) {
+      const opts = STATUS_OPTIONS.map(o =>
+        `<option value="${o.value}"${o.value === current ? ' selected' : ''}>${o.label}</option>`
+      ).join('');
+      return `<select class="status-select s-${current || 'new'}" data-lead-id="${leadId}"
+                onchange="handleStatusChange(this)">${opts}</select>`;
+    }
+
+    async function handleStatusChange(select) {
+      const id     = select.dataset.leadId;
+      const status = select.value;
+      const prev   = select.className.match(/s-(\w+)/)?.[1];
+
+      // Optimistic UI update
+      select.className = select.className.replace(/s-\w+/, `s-${status}`);
+      select.disabled  = true;
+
+      try {
+        await MxApi.leads.updateStatus(id, status);
+        const lead = allLeads.find(l => l.id === id);
+        if (lead) lead.status = status;
+      } catch (err) {
+        // Revert on failure
+        select.value     = prev || 'new';
+        select.className = select.className.replace(/s-\w+/, `s-${prev || 'new'}`);
+        alert('Failed to update status: ' + err.message);
+      } finally {
+        select.disabled = false;
+      }
+    }
+
+    /* ── Leads table ── */
+    function renderLeadsTable(leads) {
+      const title = document.getElementById('leads-panel-title');
+      title.textContent = `Patient Leads (${leads.length})`;
+
+      if (leads.length === 0) {
+        document.getElementById('leads-body').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <div class="empty-title">No leads yet</div>
+            <div class="empty-sub">Patient form submissions will appear here once the /admin/leads endpoint is deployed.</div>
+          </div>`;
+        return;
+      }
+
+      document.getElementById('leads-body').innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Zip</th>
+              <th>Symptom</th>
+              <th>Submitted</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${leads.map(l => `
+              <tr>
+                <td class="td-primary">${escHtml(l.name || '—')}</td>
+                <td class="td-mono">${escHtml(l.phone || '—')}</td>
+                <td class="td-mono">${escHtml(l.zip || '—')}</td>
+                <td>${escHtml(l.symptom || '—')}</td>
+                <td>${formatDate(l.submittedAt)}</td>
+                <td>${buildStatusSelect(l.id, l.status || 'new')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    /* ── Load leads ── */
+    async function loadLeads() {
+      document.getElementById('leads-body').innerHTML =
+        '<div class="spinner-wrap"><div class="spinner"></div> Loading leads…</div>';
+      try {
+        const data = await MxApi.leads.list();
+        allLeads = data.leads || [];
+        renderLeadsTable(allLeads);
+        renderKpis(allLeads, reportData?.submissions?.length || 0);
+      } catch (err) {
+        document.getElementById('leads-warn').classList.remove('hidden');
+        document.getElementById('leads-body').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <div class="empty-title">Endpoint not available</div>
+            <div class="empty-sub">${escHtml(err.message)}</div>
+          </div>`;
+        renderKpis([], reportData?.submissions?.length || 0);
+      }
+    }
+
+    /* ── Dentist report ── */
+    function renderDentistsTable(data) {
+      const submissions = data?.submissions || data?.dentists || [];
+      const title = document.getElementById('dentists-panel-title');
+      title.textContent = `Dentist Submissions (${submissions.length})`;
+
+      if (submissions.length === 0) {
+        document.getElementById('dentists-body').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🦷</div>
+            <div class="empty-title">No submissions yet</div>
+            <div class="empty-sub">Dentist survey responses will appear here.</div>
+          </div>`;
+        return;
+      }
+
+      document.getElementById('dentists-body').innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Practice</th>
+              <th>Phone</th>
+              <th>Zip(s)</th>
+              <th>Capacity</th>
+              <th>Submitted</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${submissions.map(d => `
+              <tr>
+                <td class="td-primary">${escHtml(d.name || d.dentistName || '—')}</td>
+                <td>${escHtml(d.practice || d.practiceName || '—')}</td>
+                <td class="td-mono">${escHtml(d.phone || '—')}</td>
+                <td class="td-mono">${escHtml(Array.isArray(d.zips) ? d.zips.join(', ') : (d.zip || '—'))}</td>
+                <td>${escHtml(String(d.capacity || d.dailyCapacity || '—'))}</td>
+                <td>${formatDate(d.submittedAt || d.createdAt)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    async function loadReport() {
+      document.getElementById('dentists-body').innerHTML =
+        '<div class="spinner-wrap"><div class="spinner"></div> Loading…</div>';
+      try {
+        reportData = await MxApi.report.get();
+        renderDentistsTable(reportData);
+        renderKpis(allLeads, (reportData?.submissions || reportData?.dentists || []).length);
+      } catch (err) {
+        document.getElementById('dentists-body').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <div class="empty-title">Failed to load report</div>
+            <div class="empty-sub">${escHtml(err.message)}</div>
+          </div>`;
+      }
+    }
+
+    /* ── Helpers ── */
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    /* ── Init ── */
+    loadLeads();
+    loadReport();
+  </script>
+</body>
+</html>

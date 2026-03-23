@@ -166,19 +166,25 @@ const PAGES = [
 
 /* ─── TRACKING ──────────────────────────────── */
 const TK = 'mx_track_v1';
-function getTrack()  { try { return JSON.parse(localStorage.getItem(TK)) || {}; } catch(e) { return {}; } }
-function saveTrack(d){ try { localStorage.setItem(TK, JSON.stringify(d)); } catch(e) {} }
+
+function getTrack() {
+  try { return JSON.parse(localStorage.getItem(TK)) || {}; } catch(e) { return {}; }
+}
+
+function saveTrack(d) {
+  try { localStorage.setItem(TK, JSON.stringify(d)); } catch(e) {}
+}
 
 function trackView(id) {
   const d = getTrack();
-  if (!d[id]) d[id] = {v:0, s:0};
+  if (!d[id]) d[id] = {v: 0, s: 0};
   d[id].v++;
   saveTrack(d);
 }
 
 function trackSubmit(id) {
   const d = getTrack();
-  if (!d[id]) d[id] = {v:0, s:0};
+  if (!d[id]) d[id] = {v: 0, s: 0};
   d[id].s++;
   saveTrack(d);
 }
@@ -195,11 +201,11 @@ let currentView = 'home';
 let currentPage = null;
 
 /* ─── NAVIGATION ─────────────────────────────── */
-const VIEWS = ['home','symptom','intake','early','dashboard'];
+const VIEWS = ['home', 'symptom', 'intake', 'early','fallback','dashboard'];
 
 function show(id, pageId) {
-  VIEWS.forEach(v => document.getElementById('view-'+v).classList.add('hidden'));
-  document.getElementById('view-'+id).classList.remove('hidden');
+  VIEWS.forEach(v => document.getElementById('view-' + v).classList.add('hidden'));
+  document.getElementById('view-' + id).classList.remove('hidden');
   currentView = id;
   closeDrawer();
   window.scrollTo({top: 0, behavior: 'smooth'});
@@ -264,7 +270,7 @@ function renderSymptom(id) {
   const html = `
     <div class="sym-hero">
       <div class="sym-badge a1"><div class="sym-badge-dot"></div>${p.badge}</div>
-      <h1 class="sym-h1 a2">${p.h1.map(l => l+'<br>').join('')}</h1>
+      <h1 class="sym-h1 a2">${p.h1.map(l => l + '<br>').join('')}</h1>
       <p class="sym-sub a3">${p.sub}</p>
       <div class="chips a4">${p.chips.map(c => `<div class="chip">${c}</div>`).join('')}</div>
     </div>
@@ -295,7 +301,7 @@ function renderSymptom(id) {
     <div class="content-block">
       <div class="content-label">Common questions</div>
       <div class="content-h2">What patients ask us</div>
-      ${p.faqs.map((f,i) => `
+      ${p.faqs.map((f, i) => `
         <div class="faq-item" id="faq-${i}">
           <button class="faq-q" onclick="toggleFaq(${i})">
             ${f.q}<span class="faq-icon">+</span>
@@ -327,6 +333,13 @@ function renderSymptom(id) {
           <span class="f-err">Enter a valid 5-digit zip</span>
         </div>
         <input type="hidden" value="${p.nav}"/>
+        <div class="fg" id="sfg-consent-${id}">
+          <label class="consent-label">
+            <input class="consent-checkbox" type="checkbox" id="sf-consent-${id}"/>
+            <span>I agree to receive SMS messages from Moxident about my dental request. Message and data rates may apply. Reply STOP to opt out. See our <a class="consent-link" href="/privacy-policy">Privacy Policy</a>.</span>
+          </label>
+          <span class="f-err">You must agree to receive SMS to continue</span>
+        </div>
         <button type="button" class="submit-btn" onclick="handleSymSubmit('${id}','${p.nav}')">Request Emergency Appointment →</button>
         <p class="form-disclaimer">Free to patients · No insurance required · One SMS confirmation only</p>
       </form>
@@ -335,14 +348,25 @@ function renderSymptom(id) {
 
   document.getElementById('symptom-content').innerHTML = html;
 
-  ['name','phone','zip'].forEach(f => {
+  ['name', 'phone', 'zip'].forEach(f => {
     const el = document.getElementById(`sf-${f}-${id}`);
     if (el) el.addEventListener('input', () => document.getElementById(`sfg-${f}-${id}`)?.classList.remove('err'));
   });
+
+  const consentEl = document.getElementById(`sf-consent-${id}`);
+  if (consentEl) {
+    consentEl.addEventListener('change', () => document.getElementById(`sfg-consent-${id}`)?.classList.remove('err'));
+  }
+}
+
+/* ─── HELPERS ────────────────────────────────── */
+function normalizePhone(val) {
+  const digits = val.replace(/\D/g, '');
+  return digits.startsWith('1') ? `+${digits}` : `+1${digits}`;
 }
 
 function scrollToSymForm() {
-  document.getElementById('sym-form-anchor')?.scrollIntoView({behavior:'smooth', block:'start'});
+  document.getElementById('sym-form-anchor')?.scrollIntoView({behavior: 'smooth', block: 'start'});
 }
 
 function toggleFaq(i) {
@@ -361,53 +385,157 @@ function validate(fields) {
   return ok;
 }
 
-function handleSymSubmit(pageId, symptomLabel) {
-  const name  = document.getElementById(`sf-name-${pageId}`);
-  const phone = document.getElementById(`sf-phone-${pageId}`);
-  const zip   = document.getElementById(`sf-zip-${pageId}`);
-  const ok = validate([
+/* ─── SYMPTOM FORM SUBMIT ─────────────────── */
+async function handleSymSubmit(pageId, symptomLabel) {
+  const name    = document.getElementById(`sf-name-${pageId}`);
+  const phone   = document.getElementById(`sf-phone-${pageId}`);
+  const zip     = document.getElementById(`sf-zip-${pageId}`);
+  const consent = document.getElementById(`sf-consent-${pageId}`);
+
+  const fieldsOk = validate([
     {el: name,  fg: `sfg-name-${pageId}`,  test: v => v.trim().length >= 2},
     {el: phone, fg: `sfg-phone-${pageId}`, test: v => /[\d\s\-\(\)]{7,}/.test(v)},
     {el: zip,   fg: `sfg-zip-${pageId}`,   test: v => /^\d{5}$/.test(v.trim())},
   ]);
-  if (!ok) {
-    document.querySelector(`#sfg-name-${pageId}.err, #sfg-phone-${pageId}.err, #sfg-zip-${pageId}.err`)
-      ?.scrollIntoView({behavior:'smooth', block:'center'});
+
+  const consentFg = document.getElementById(`sfg-consent-${pageId}`);
+  const consentOk = consent && consent.checked;
+  if (!consentOk) consentFg?.classList.add('err');
+  else consentFg?.classList.remove('err');
+
+  if (!fieldsOk || !consentOk) {
+    document.querySelector('.fg.err')?.scrollIntoView({behavior: 'smooth', block: 'center'});
     return;
   }
-  trackSubmit(pageId);
-  gtag('event', 'conversion', {'send_to': 'AW-17976922373', 'value': 50, 'currency': 'USD'});
-  showEarly(zip.value.trim());
+
+  const btn = document.querySelector('#sym-form-anchor .submit-btn');
+  btn.textContent = 'Finding a dentist…';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('https://7i7j7c8rx7.execute-api.us-east-2.amazonaws.com/prod/submit', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        name:    name.value.trim(),
+        phone:   normalizePhone(phone.value),
+        zip:     zip.value.trim(),
+        symptom: symptomLabel,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Server error');
+    trackSubmit(pageId);
+    gtag('event', 'conversion', {'send_to': 'AW-17976922373', 'value': 50, 'currency': 'USD'});
+    showConfirmed(zip.value.trim(), data.dentistFound);
+  } catch (err) {
+    btn.textContent = 'Request Emergency Appointment →';
+    btn.disabled = false;
+    alert('Something went wrong. Please try again.');
+  }
 }
 
-['mf-name','mf-phone','mf-zip','mf-symptom'].forEach(id => {
-  document.getElementById(id)?.addEventListener('input', () => {
-    document.getElementById(id.replace('mf-','mfg-'))?.classList.remove('err');
-  });
-});
+/* ─── MAIN INTAKE FORM SUBMIT ─────────────── */
+async function handleMainSubmit() {
+  const name    = document.getElementById('mf-name');
+  const phone   = document.getElementById('mf-phone');
+  const zip     = document.getElementById('mf-zip');
+  const symptom = document.getElementById('mf-symptom');
+  const consent = document.getElementById('mf-consent');
 
-function handleMainSubmit() {
-  const ok = validate([
-    {el: document.getElementById('mf-name'),    fg: 'mfg-name',    test: v => v.trim().length >= 2},
-    {el: document.getElementById('mf-phone'),   fg: 'mfg-phone',   test: v => /[\d\s\-\(\)]{7,}/.test(v)},
-    {el: document.getElementById('mf-zip'),     fg: 'mfg-zip',     test: v => /^\d{5}$/.test(v.trim())},
-    {el: document.getElementById('mf-symptom'), fg: 'mfg-symptom', test: v => v !== ''},
+  const fieldsOk = validate([
+    {el: name,    fg: 'mfg-name',    test: v => v.trim().length >= 2},
+    {el: phone,   fg: 'mfg-phone',   test: v => /[\d\s\-\(\)]{7,}/.test(v)},
+    {el: zip,     fg: 'mfg-zip',     test: v => /^\d{5}$/.test(v.trim())},
+    {el: symptom, fg: 'mfg-symptom', test: v => v !== ''},
   ]);
-  if (!ok) {
-    document.querySelector('#view-intake .err')?.scrollIntoView({behavior:'smooth', block:'center'});
+
+  const consentFg = document.getElementById('mfg-consent');
+  const consentOk = consent && consent.checked;
+  if (!consentOk) consentFg?.classList.add('err');
+  else consentFg?.classList.remove('err');
+
+  if (!fieldsOk || !consentOk) {
+    document.querySelector('#view-intake .fg.err')?.scrollIntoView({behavior: 'smooth', block: 'center'});
     return;
   }
-  const zip = document.getElementById('mf-zip').value.trim();
-  gtag('event', 'conversion', {'send_to': 'AW-17976922373', 'value': 50, 'currency': 'USD'});
-  showEarly(zip);
+
+  const btn = document.querySelector('#view-intake .submit-btn');
+  btn.textContent = 'Finding a dentist…';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('https://7i7j7c8rx7.execute-api.us-east-2.amazonaws.com/prod/submit', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        name:    name.value.trim(),
+        phone:   normalizePhone(phone.value),
+        zip:     zip.value.trim(),
+        symptom: symptom.value,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Server error');
+    trackSubmit('main');
+    gtag('event', 'conversion', {'send_to': 'AW-17976922373', 'value': 50, 'currency': 'USD'});
+    showConfirmed(document.getElementById('mf-zip').value.trim(), data.dentistFound);
+  } catch (err) {
+    btn.textContent = 'Request Emergency Appointment →';
+    btn.disabled = false;
+    alert('Something went wrong. Please try again.');
+  }
 }
 
-/* ─── EARLY ACCESS RESPONSE ─────────────────── */
-function showEarly(zip) {
-  document.getElementById('early-zip-display').textContent = zip || '—';
-  show('early');
+/* ─── CONFIRMATION VIEW ──────────────────── */
+function showConfirmed(zip, dentistFound) {
+  if (dentistFound) {
+    document.getElementById('early-zip-display').textContent = zip || '—';
+    const msg = document.getElementById('early-msg');
+    if (msg) {
+      msg.innerHTML = `We're finding the fastest available dentist near (<span class="early-zip">${zip}</span>). <strong>You'll receive an SMS confirmation shortly.</strong>`;
+    }
+    show('early');
+  } else {
+    document.getElementById('fallback-zip-display').textContent = zip || '—';
+    show('fallback');
+  }
 }
+async function submitFallback() {
+  const email = document.getElementById('fallback-email');
+  const time  = document.getElementById('fallback-time');
+  const fg    = document.getElementById('fg-fallback-email');
 
+  if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+    fg.classList.add('err');
+    return;
+  }
+  fg.classList.remove('err');
+
+  const btn = document.querySelector('#view-fallback .submit-btn');
+  btn.disabled    = true;
+  btn.textContent = 'Saving…';
+
+  try {
+    await fetch('https://7i7j7c8rx7.execute-api.us-east-2.amazonaws.com/prod/waitlist', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        email:         email.value.trim(),
+        preferredTime: time.value,
+        zip:           document.getElementById('fallback-zip-display').textContent,
+      }),
+    });
+  } catch(e) {}
+
+  document.querySelector('#view-fallback .early-card').innerHTML = `
+    <div class="early-icon">✓</div>
+    <div class="early-title">Got it.</div>
+    <div class="early-msg">We'll reach out to <strong>${email.value.trim()}</strong> within 24 hours.</div>
+    <div class="early-divider"></div>
+    <button class="early-restart" onclick="resetFlow()">← Submit another request</button>
+  `;
+}
 /* ─── RESET FLOW ─────────────────────────── */
 function resetFlow() {
   document.getElementById('main-intake-form')?.reset();
@@ -418,15 +546,15 @@ function resetFlow() {
 function renderDash() {
   const data = getTrack();
   let tv = 0, ts = 0;
-  PAGES.forEach(p => { const d = data[p.id] || {v:0, s:0}; tv += d.v; ts += d.s; });
-  const bcvr = tv > 0 ? ((ts/tv)*100).toFixed(1) : '0.0';
-  const bcpe = ts > 0 ? Math.round(50 / (parseFloat(bcvr)/100)) : '—';
+  PAGES.forEach(p => { const d = data[p.id] || {v: 0, s: 0}; tv += d.v; ts += d.s; });
+  const bcvr = tv > 0 ? ((ts / tv) * 100).toFixed(1) : '0.0';
+  const bcpe = ts > 0 ? Math.round(50 / (parseFloat(bcvr) / 100)) : '—';
 
   document.getElementById('kpi-row').innerHTML = [
-    {val: tv,                    lbl: 'Total Page Views', sub: 'All symptom pages'},
-    {val: ts,                    lbl: 'Form Submits',     sub: 'Completed leads'},
-    {val: bcvr+'%',              lbl: 'Blended CVR',      sub: 'Target: 10%+'},
-    {val: bcpe==='—'?'—':'$'+bcpe, lbl: 'Est. CPE',      sub: 'Target: < $50'},
+    {val: tv,                          lbl: 'Total Page Views', sub: 'All symptom pages'},
+    {val: ts,                          lbl: 'Form Submits',     sub: 'Completed leads'},
+    {val: bcvr + '%',                  lbl: 'Blended CVR',      sub: 'Target: 10%+'},
+    {val: bcpe === '—' ? '—' : '$' + bcpe, lbl: 'Est. CPE',    sub: 'Target: < $50'},
   ].map(k => `
     <div class="kpi-card">
       <div class="kpi-val">${k.val}</div>
@@ -436,8 +564,8 @@ function renderDash() {
   `).join('');
 
   document.getElementById('dash-tbody').innerHTML = PAGES.map(p => {
-    const d = data[p.id] || {v:0, s:0};
-    const cvr = d.v > 0 ? ((d.s/d.v)*100).toFixed(1) : 0;
+    const d = data[p.id] || {v: 0, s: 0};
+    const cvr = d.v > 0 ? ((d.s / d.v) * 100).toFixed(1) : 0;
     const n = parseFloat(cvr);
     const fillColor = n >= 10 ? 'var(--grn)' : n >= 5 ? 'var(--amb)' : 'var(--red)';
     const bdg = n >= 10 ? 'bdg-grn' : n >= 5 ? 'bdg-amb' : 'bdg-red';
@@ -445,14 +573,14 @@ function renderDash() {
     const kws = p.keywords.map(k => `<span class="kw-tag">${k}</span>`).join('');
     return `<tr>
       <td>
-        <div class="td-main" style="cursor:pointer" onclick="show('symptom','${p.id}')">${p.icon} ${p.nav}</div>
+        <div class="td-main" onclick="show('symptom','${p.id}')">${p.icon} ${p.nav}</div>
       </td>
       <td><div class="td-kws">${kws}</div></td>
       <td>${d.v}</td>
       <td>${d.s}</td>
       <td>
         <div class="bar-wrap">
-          <div class="bar-bg"><div class="bar-fill" style="width:${Math.min(n*5,100)}%;background:${fillColor}"></div></div>
+          <div class="bar-bg"><div class="bar-fill" style="width:${Math.min(n * 5, 100)}%;background:${fillColor}"></div></div>
           <span class="bar-pct">${cvr}%</span>
         </div>
       </td>

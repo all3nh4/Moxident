@@ -1,0 +1,253 @@
+/* ═══════════════════════════════════════════
+   DENTIST JOIN PAGE — join.css
+   Supplements /styles.css — never overrides it
+═══════════════════════════════════════════ */
+
+/* ── Stat bar ── */
+.stat-bar {
+  background: var(--ink);
+  color: #fff;
+  padding: 32px 20px;
+}
+
+.stat-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  text-align: center;
+}
+
+.stat-num {
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 900;
+  color: #fff;
+}
+
+.stat-lbl {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,.6);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* ── Shared section layout ── */
+.join-section {
+  padding: 64px 20px;
+}
+.join-exclusions 
+{
+   margin-top: 8px; 
+}
+
+.join-section-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ── How it works ── */
+.join-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.join-step {
+  background: var(--white);
+  border: 1px solid var(--bdr);
+  border-radius: var(--rad-lg);
+  padding: 28px 24px;
+  box-shadow: var(--sh);
+}
+
+.join-step-num {
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--bdr2);
+  margin-bottom: 12px;
+}
+
+.join-step-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.join-step-desc {
+  font-size: 0.87rem;
+  color: var(--ink2);
+  line-height: 1.65;
+}
+
+/* ── Value props ── */
+.join-props {
+  background: var(--red-lt);
+  border-top: 1px solid var(--bdr);
+  border-bottom: 1px solid var(--bdr);
+}
+
+.join-prop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.join-prop-card {
+  background: var(--white);
+  border: 1px solid var(--bdr);
+  border-radius: var(--rad-lg);
+  padding: 24px;
+  box-shadow: var(--sh);
+}
+
+.join-prop-icon  { font-size: 1.6rem; margin-bottom: 10px; }
+.join-prop-title { font-size: 0.95rem; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.join-prop-desc  { font-size: 0.87rem; color: var(--ink2); line-height: 1.65; }
+
+/* ── Onboarding form section ── */
+.join-form-section {
+  background: var(--white);
+  border-top: 1px solid var(--bdr);
+}
+
+.join-form-wrap {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.join-form-title {
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.join-form-sub {
+  font-size: 0.95rem;
+  color: var(--ink2);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+/* ── Step progress bar ── */
+.join-step-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 32px;
+}
+
+.join-step-seg {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  background: var(--bdr);
+  transition: background .3s;
+}
+
+.join-step-seg.active { background: var(--red); }
+
+/* ── Form section blocks ── */
+.join-form-section-block {
+  margin-bottom: 28px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--bdr);
+}
+
+.join-form-section-block:last-of-type {
+  border-bottom: none;
+}
+
+.join-form-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 18px;
+}
+
+/* ── Specialties checkbox grid ── */
+.join-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.join-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink2);
+  cursor: pointer;
+  padding: 10px 12px;
+  border: 1.5px solid var(--bdr);
+  border-radius: var(--rad);
+  background: var(--paper);
+  transition: border-color .15s, background .15s;
+  line-height: 1.4;
+}
+
+.join-checkbox-item:hover {
+  border-color: var(--red);
+  background: var(--white);
+}
+
+.join-checkbox-item input[type="checkbox"] {
+  accent-color: var(--red);
+  flex-shrink: 0;
+}
+
+.join-checkbox-item:has(input:checked) {
+  border-color: var(--red);
+  background: var(--red-lt);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ── Success screen ── */
+.join-success {
+  text-align: center;
+  padding: 48px 0;
+  animation: fadeUp .4s ease both;
+}
+
+.join-success-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.join-success-title {
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.join-success-msg {
+  font-size: 0.95rem;
+  color: var(--ink2);
+  line-height: 1.75;
+  max-width: 420px;
+  margin: 0 auto 20px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .stat-inner          { grid-template-columns: 1fr; gap: 32px; }
+  .join-checkbox-grid  { grid-template-columns: 1fr; }
+  .join-step-bar       { gap: 4px; }
+}
+
+@media (max-width: 520px) {
+  .join-form-wrap      { padding: 0; }
+  .join-section        { padding: 44px 20px; }
+}

@@ -132,12 +132,19 @@ body {
   color: var(--ink2); background: transparent; cursor: pointer;
   transition: background .15s, color .15s;
 }
-.drawer-pill:hover        { background: var(--red-lt); color: var(--red); }
-.drawer-pill.active       { background: var(--red); color: #fff; }
+.drawer-pill:hover  { background: var(--red-lt); color: var(--red); }
+.drawer-pill.active { background: var(--red); color: #fff; }
 
 .drawer-section {
   font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
   color: var(--ink3); padding: 16px 16px 8px;
+}
+
+/* replaces the old inline-style divider in the mobile drawer */
+.drawer-divider {
+  height: 1px;
+  background: var(--bdr);
+  margin: 12px 0;
 }
 
 /* ═══════════════════════════════════════════
@@ -149,6 +156,10 @@ body {
 /* ═══════════════════════════════════════════
    LANDING PAGE
 ═══════════════════════════════════════════ */
+
+/* replaces the old inline style="background:var(--paper)" on the hero section */
+.hero-section { background: var(--paper); }
+
 .hero {
   padding: 64px 20px 56px;
   max-width: 700px; margin: 0 auto; text-align: center;
@@ -213,11 +224,16 @@ body {
   font-size: 11px; font-weight: 700; letter-spacing: .1em;
   text-transform: uppercase; color: var(--ink3); margin-bottom: 8px;
 }
+/* replaces inline style="text-align:center" on symptom section eyebrow */
+.section-eyebrow--center { text-align: center; }
+
 .section-title {
   font-family: var(--serif); font-size: clamp(26px, 4vw, 38px);
   letter-spacing: -.02em; color: var(--ink);
   margin-bottom: 36px; line-height: 1.2;
 }
+/* replaces inline style="text-align:center;margin-bottom:0" on symptom section title */
+.section-title--center { text-align: center; margin-bottom: 0; }
 
 .steps-grid {
   display: grid;
@@ -269,6 +285,13 @@ body {
   text-align: center; font-size: 12px; color: var(--ink3);
 }
 .site-footer strong { color: var(--ink2); }
+
+/* replaces inline style on the footer link wrapper div */
+.site-footer-link-row { margin-top: 8px; font-size: 11px; }
+
+/* replaces inline style="cursor:pointer;text-decoration:underline" on footer dashboard link */
+.site-footer-link { cursor: pointer; text-decoration: underline; }
+.site-footer-link:hover { color: var(--ink2); }
 
 /* ═══════════════════════════════════════════
    SYMPTOM PAGES
@@ -414,6 +437,26 @@ select.fi option { background: #fff; }
 .f-err       { font-size: 11px; color: var(--red); display: none; }
 .fg.err .f-err { display: block; }
 
+/* SMS consent block — replaces all inline styles on the consent label/checkbox/link */
+.consent-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.55;
+}
+
+.consent-checkbox {
+  margin-top: 3px;
+  flex-shrink: 0;
+  accent-color: var(--red);
+}
+
+.consent-link { color: var(--red); }
+.consent-link:hover { text-decoration: underline; }
+
 .submit-btn {
   width: 100%; height: 52px; background: var(--red); color: #fff;
   font-family: var(--sans); font-size: 15px; font-weight: 700;
@@ -511,7 +554,8 @@ td { padding: 12px 14px; font-size: 13px; color: var(--ink2); border-bottom: 1px
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: var(--paper); }
 
-.td-main { font-weight: 700; color: var(--ink); font-size: 13px; }
+/* cursor:pointer moved here from inline style in dashboard tbody */
+.td-main { font-weight: 700; color: var(--ink); font-size: 13px; cursor: pointer; }
 .td-kws  { font-size: 11px; color: var(--ink3); margin-top: 2px; }
 
 .bar-wrap { display: flex; align-items: center; gap: 8px; }
