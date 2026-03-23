@@ -1,0 +1,35 @@
+{
+  "name": "moxident-backend",
+  "version": "1.0.0",
+  "description": "Moxident SMS routing backend",
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch"
+  },
+  "jest": {
+    "transform": {},
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.mjs"
+    ],
+    "cacheDirectory": ".jest-cache"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/all3nh4/moxident-backend.git"
+  },
+  "keywords": [],
+  "author": "Allen Hafezipour",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.600.0",
+    "@aws-sdk/client-ses": "^3.1011.0",
+    "twilio": "^5.12.2"
+  },
+  "devDependencies": {
+    "@jest/globals": "^30.3.0",
+    "jest": "^30.3.0"
+  }
+  
+}

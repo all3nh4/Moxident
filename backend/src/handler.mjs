@@ -1,0 +1,351 @@
+// src/handler.mjs
+import { submitRequest, handleDentistReply } from "./router.mjs";
+import { savePatient, findDentistsByZip, findDentistByPhone,
+         updatePatientStatus, findOpenRequestByDentist,
+         saveDentistApplication, saveLead, getLeads, updateLead,
+         getDentistApplications } from "./db.mjs";
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+
+const ses = new SESClient({ region: "us-east-2" });
+const NOTIFY_EMAIL = "admin@moxident.com";
+
+const headers = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+  "Content-Type": "application/json",
+};
+
+async function sendSurveyNotification(data, applicationId) {
+  const subject = `Moxident: New Dentist Survey Submission`;
+  const body = `
+A new dentist survey was submitted.
+
+Application ID: ${applicationId}
+Submitted At:   ${new Date().toISOString()}
+
+--- SURVEY DETAILS ---
+Area:             ${data.area || "—"}
+Open Slots:       ${data.openSlots || "—"}
+Response Time:    ${data.responseTime || "—"}
+Contact Method:   ${data.contactMethod || "—"}
+Willing To Pay:   ${data.willingToPay || "—"}
+Overflow:         ${data.overflow || "—"}
+Staff Required:   ${data.staffRequired || "—"}
+Payment:          ${data.payment || "—"}
+Concerns:         ${data.concerns || "—"}
+Procedures:       ${JSON.stringify(data.procedures || [])}
+Availability:     ${JSON.stringify(data.availability || {})}
+
+---
+Moxident Admin Notification
+  `.trim();
+  try {
+    console.log("Sending SES email to:", NOTIFY_EMAIL);
+    await ses.send(new SendEmailCommand({
+      Source: NOTIFY_EMAIL,
+      Destination: { ToAddresses: [NOTIFY_EMAIL] },
+      Message: {
+        Subject: { Data: subject },
+        Body: { Text: { Data: body } },
+      },
+    }));
+    console.log("SES email sent successfully");
+  } catch (err) {
+    console.error("SES send failed:", err.message);
+    throw err;
+  }
+}
+
+async function sendOnboardingNotification(data, applicationId) {
+  const subject = `Moxident: New Dentist Onboarding Application`;
+  const body = `
+A new dentist onboarding application was submitted.
+
+Application ID:     ${applicationId}
+Submitted At:       ${new Date().toISOString()}
+
+--- DENTIST DETAILS ---
+Name:               ${data.name || "—"}
+Practice:           ${data.practiceName || "—"}
+Phone:              ${data.phone || "—"}
+Email:              ${data.email || "—"}
+Zip Codes:          ${data.zipCodes || "—"}
+Years in Practice:  ${data.yearsInPractice || "—"}
+
+--- AVAILABILITY ---
+Daily Capacity:     ${data.dailyCapacity || "—"}
+Extended Hours:     ${data.extendedHours || "—"}
+Accepts Uninsured:  ${data.acceptsUninsured || "—"}
+Insurance Accepted: ${data.insuranceAccepted || "—"}
+
+--- CLINICAL PROFILE ---
+Specialties:        ${data.specialties || "—"}
+
+---
+Moxident Admin Notification
+  `.trim();
+  try {
+    await ses.send(new SendEmailCommand({
+      Source: NOTIFY_EMAIL,
+      Destination: { ToAddresses: [NOTIFY_EMAIL] },
+      Message: {
+        Subject: { Data: subject },
+        Body: { Text: { Data: body } },
+      },
+    }));
+    console.log("Onboarding notification email sent");
+  } catch (err) {
+    console.error("Onboarding email notification failed:", err.message);
+    // Don't fail the request if email fails
+  }
+}
+
+export const handler = async (event) => {
+  console.log("Event:", JSON.stringify(event));
+
+  const path = (event.rawPath || event.path || "/").replace(/^\/prod/, "");
+  const method = event.requestContext?.http?.method || event.httpMethod || "GET";
+
+  if (method === "OPTIONS") {
+    return { statusCode: 200, headers, body: "" };
+  }
+
+  // POST /submit
+  if (path === "/submit" && method === "POST") {
+    try {
+      const body = JSON.parse(event.body || "{}");
+      const { name, phone, zip, symptom } = body;
+      if (!name || !phone || !zip || !symptom) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: "Missing required fields: name, phone, zip, symptom" }),
+        };
+      }
+      const { requestId, dentistFound } = await submitRequest({ name, phone, zip, symptom });
+      try {
+        await ses.send(new SendEmailCommand({
+          Source: NOTIFY_EMAIL,
+          Destination: { ToAddresses: [NOTIFY_EMAIL] },
+          Message: {
+            Subject: { Data: `Moxident: New Patient Request` },
+            Body: { Text: { Data: `New patient request received.\n\nRequest ID: ${requestId}\nName: ${name}\nPhone: ${phone}\nZip: ${zip}\nSymptom: ${symptom}\nDentist Found: ${dentistFound ? 'Yes' : 'No'}\nSubmitted At: ${new Date().toISOString()}` } },
+          },
+        }));
+        console.log("Patient notification email sent");
+      } catch (emailErr) {
+        console.error("Patient email notification failed:", emailErr.message);
+      }
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ success: true, requestId, dentistFound }),
+      };
+    } catch (err) {
+      console.error("Submit error:", err.message);
+      const status = err.message?.includes("Missing") ? 400 : 500;
+      const message = status === 400 ? err.message : "Something went wrong. Please try again.";
+      return { statusCode: status, headers, body: JSON.stringify({ error: message }) };
+    }
+  }
+
+  // POST /sms-webhook
+  if (path === "/sms-webhook" && method === "POST") {
+    try {
+      const params = new URLSearchParams(event.body || "");
+      const from = params.get("From") || "";
+      const body = params.get("Body") || "";
+      await handleDentistReply(from, body);
+    } catch (err) {
+      console.error("Webhook error:", err.message);
+    }
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "text/xml" },
+      body: `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`,
+    };
+  }
+
+  // GET /health
+  if (path === "/health") {
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ status: "ok", service: "moxident-router" }),
+    };
+  }
+
+  // POST /dentist-survey
+  if (path === "/dentist-survey" && method === "POST") {
+    try {
+      const body = JSON.parse(event.body || "{}");
+      const applicationId = await saveDentistApplication(body);
+      try {
+        await sendSurveyNotification(body, applicationId);
+      } catch (emailErr) {
+        console.error("Email notification failed:", emailErr.message);
+      }
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ success: true, applicationId }),
+      };
+    } catch (err) {
+      console.error("Survey error:", err.message);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: "Something went wrong. Please try again." }),
+      };
+    }
+  }
+
+  // GET /dentist-survey/report
+  if (path === "/dentist-survey/report" && method === "GET") {
+    try {
+      const applications = await getDentistApplications();
+
+      const total = applications.length;
+
+      const byArea = {};
+      applications.forEach(a => {
+        const area = a.area?.S || "Unknown";
+        byArea[area] = (byArea[area] || 0) + 1;
+      });
+
+      const willingToPay = applications.filter(a =>
+        (a.willingToPay?.S || "").toLowerCase().includes("yes")
+      ).length;
+
+      const byResponseTime = {};
+      applications.forEach(a => {
+        const rt = a.responseTime?.S || "Unknown";
+        byResponseTime[rt] = (byResponseTime[rt] || 0) + 1;
+      });
+
+      const byOpenSlots = {};
+      applications.forEach(a => {
+        const slots = a.openSlots?.S || "Unknown";
+        byOpenSlots[slots] = (byOpenSlots[slots] || 0) + 1;
+      });
+
+      const recent = applications
+        .sort((a, b) => new Date(b.submittedAt?.S) - new Date(a.submittedAt?.S))
+        .slice(0, 10)
+        .map(a => ({
+          applicationId:    a.applicationId?.S,
+          name:             a.name?.S,
+          practiceName:     a.practiceName?.S,
+          phone:            a.phone?.S,
+          email:            a.email?.S,
+          zipCodes:         a.zipCodes?.S,
+          dailyCapacity:    a.dailyCapacity?.S,
+          insuranceAccepted:a.insuranceAccepted?.S,
+          yearsInPractice:  a.yearsInPractice?.S,
+          acceptsUninsured: a.acceptsUninsured?.S,
+          extendedHours:    a.extendedHours?.S,
+          specialties:      a.specialties?.S,
+          status:           a.status?.S,
+          // legacy fields
+          area:             a.area?.S,
+          openSlots:        a.openSlots?.S,
+          responseTime:     a.responseTime?.S,
+          willingToPay:     a.willingToPay?.S,
+          concerns:         a.concerns?.S,
+          submittedAt:      a.submittedAt?.S,
+        }));
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          summary: {
+            total,
+            willingToPay,
+            willingToPayPct: total > 0 ? Math.round((willingToPay / total) * 100) : 0,
+            byArea,
+            byResponseTime,
+            byOpenSlots,
+          },
+          recent,
+          submissions: recent, // alias for admin dashboard compatibility
+        }),
+      };
+    } catch (err) {
+      console.error("Report error:", err.message);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: "Failed to generate report" }),
+      };
+    }
+  }
+
+  // POST /leads
+  if (path === "/leads" && method === "POST") {
+    try {
+      const body = JSON.parse(event.body || "{}");
+      const leadId = await saveLead(body);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, leadId }) };
+    } catch (err) {
+      console.error("Lead save error:", err.message);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to save lead" }) };
+    }
+  }
+
+  // GET /leads
+  if (path === "/leads" && method === "GET") {
+    try {
+      const leads = await getLeads();
+      return { statusCode: 200, headers, body: JSON.stringify({ leads }) };
+    } catch (err) {
+      console.error("Leads fetch error:", err.message);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to fetch leads" }) };
+    }
+  }
+
+  // PUT /leads/:id
+  if (path.startsWith("/leads/") && method === "PUT") {
+    try {
+      const leadId = path.split("/")[2];
+      const body = JSON.parse(event.body || "{}");
+      await updateLead(leadId, body);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    } catch (err) {
+      console.error("Lead update error:", err.message);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to update lead" }) };
+    }
+  }
+
+  // POST /dentist-signup
+  if (path === "/dentist-signup" && method === "POST") {
+    try {
+      const body = JSON.parse(event.body || "{}");
+      const { name, phone, email } = body;
+      if (!name || !phone || !email) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: "Missing required fields: name, phone, email" }),
+        };
+      }
+      const applicationId = await saveDentistApplication(body);
+      await sendOnboardingNotification(body, applicationId);
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ success: true, applicationId }),
+      };
+    } catch (err) {
+      console.error("Dentist signup error:", err.message);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: "Something went wrong. Please try again." }),
+      };
+    }
+  }
+
+  return { statusCode: 404, headers, body: JSON.stringify({ error: "Not found" }) };
+};
