@@ -6,6 +6,65 @@
   <title>Moxident — Dentist Survey</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="dentist-survey.css">
+  <style>
+    /* ── Match screen ── */
+    .match-screen { display: none; text-align: center; padding: 48px 0; }
+    .match-screen.visible { display: block; }
+    .match-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #e8fdf0; border: 1px solid #86efac;
+      color: #166534; font-size: 13px; font-weight: 600;
+      padding: 6px 14px; border-radius: 100px; margin-bottom: 24px;
+    }
+    .match-badge-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; }
+    .match-headline { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; margin-bottom: 12px; }
+    .match-subhead { font-size: 1rem; color: #555; line-height: 1.6; margin-bottom: 32px; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .match-card {
+      background: #f9f8f6; border: 1px solid #e5e2db;
+      border-radius: 12px; padding: 28px; margin: 0 auto 32px;
+      max-width: 520px; text-align: left;
+    }
+    .match-card-label {
+      font-size: 10px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: #999; margin-bottom: 20px;
+    }
+    .match-row { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid #e5e2db; }
+    .match-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .match-row-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #999; margin-bottom: 6px; }
+    .match-row-text { font-size: 15px; color: #222; line-height: 1.55; }
+    .match-cta-btn {
+      display: block; width: 100%; max-width: 400px; margin: 0 auto 12px;
+      background: #c8281e; color: #fff; font-size: 17px; font-weight: 700;
+      padding: 16px 28px; border-radius: 10px; border: none; cursor: pointer;
+      transition: background .15s;
+    }
+    .match-cta-btn:hover { background: #a82018; }
+    .match-cta-note { font-size: 13px; color: #888; margin-bottom: 28px; }
+    .match-divider { display: flex; align-items: center; gap: 12px; max-width: 400px; margin: 0 auto 24px; color: #bbb; font-size: 13px; }
+    .match-divider::before, .match-divider::after { content: ''; flex: 1; height: 1px; background: #e5e2db; }
+    .match-secondary-btn {
+      display: block; width: 100%; max-width: 400px; margin: 0 auto;
+      background: transparent; color: #555; font-size: 15px; font-weight: 500;
+      padding: 12px 28px; border-radius: 10px; border: 1.5px solid #ddd; cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    .match-secondary-btn:hover { border-color: #aaa; color: #222; }
+    .reminder-form { display: none; max-width: 400px; margin: 16px auto 0; }
+    .reminder-form.visible { display: block; }
+    .reminder-form-label { font-size: 14px; color: #555; margin-bottom: 10px; }
+    .reminder-input {
+      width: 100%; padding: 12px 16px; border-radius: 8px;
+      border: 1.5px solid #ddd; font-size: 15px; margin-bottom: 10px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .reminder-input:focus { outline: none; border-color: #c8281e; }
+    .reminder-submit-btn {
+      width: 100%; background: #222; color: #fff; font-size: 15px; font-weight: 600;
+      padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer;
+    }
+    .reminder-confirm { font-size: 14px; color: #22c55e; font-weight: 600; margin-top: 10px; display: none; }
+    .reminder-confirm.visible { display: block; }
+  </style>
 </head>
 <body>
 
@@ -16,225 +75,265 @@
       <div class="logo-dot"></div>
       <span class="logo-text">Moxident</span>
     </div>
-    <h1>Help us build something<br><em>dentists actually want.</em></h1>
-    <p>We're developing an emergency dental routing service. Before we build anything, we want to understand how dentists actually work. Takes 3 minutes.</p>
-    <div class="anon-badge">🔒 100% anonymous — no name, no email, no practice info</div>
+    <h1>Patients in your area are looking<br><em>for a dentist right now.</em></h1>
+    <p>We're onboarding a limited number of practices this month. Answer five questions — we'll reach out within 24 hours to confirm fit and get you set up.</p>
   </div>
 </div>
 
 <!-- FORM -->
 <div class="container">
   <div class="card">
-
     <div class="form-content" id="formContent">
 
-      <!-- AVAILABILITY -->
+      <!-- QUESTION 1 -->
       <div class="section">
-        <div class="section-title">When are you open?</div>
-        <div class="section-desc">Check the days you work and set your typical hours.</div>
-
-        <div class="hours-grid">
-          <div class="hours-header">
-            <span>Day</span><span>Open</span><span>Close</span><span>On</span>
-          </div>
-          <div class="hours-row"><span class="day-label">Monday</span><input type="time" id="mon-o" value="08:00"><input type="time" id="mon-c" value="17:00"><input type="checkbox" class="day-toggle" id="mon-a" checked></div>
-          <div class="hours-row"><span class="day-label">Tuesday</span><input type="time" id="tue-o" value="08:00"><input type="time" id="tue-c" value="17:00"><input type="checkbox" class="day-toggle" id="tue-a" checked></div>
-          <div class="hours-row"><span class="day-label">Wednesday</span><input type="time" id="wed-o" value="08:00"><input type="time" id="wed-c" value="17:00"><input type="checkbox" class="day-toggle" id="wed-a" checked></div>
-          <div class="hours-row"><span class="day-label">Thursday</span><input type="time" id="thu-o" value="07:00"><input type="time" id="thu-c" value="13:00"><input type="checkbox" class="day-toggle" id="thu-a" checked></div>
-          <div class="hours-row"><span class="day-label">Friday</span><input type="time" id="fri-o" value="08:00"><input type="time" id="fri-c" value="17:00"><input type="checkbox" class="day-toggle" id="fri-a"></div>
-          <div class="hours-row"><span class="day-label">Saturday</span><input type="time" id="sat-o" value="09:00"><input type="time" id="sat-c" value="14:00"><input type="checkbox" class="day-toggle" id="sat-a"></div>
-          <div class="hours-row"><span class="day-label">Sunday</span><input type="time" id="sun-o" value="10:00"><input type="time" id="sun-c" value="14:00"><input type="checkbox" class="day-toggle" id="sun-a"></div>
-        </div>
-
-        <div class="field" style="margin-top: 20px;">
-          <label class="field-label">How many unfilled slots do you typically have per week?</label>
-          <div class="radio-options">
-            <label class="radio-item"><input type="radio" name="openSlots" value="1-2"><span class="radio-label"><strong>1–2 slots</strong>Almost always fully booked.</span></label>
-            <label class="radio-item"><input type="radio" name="openSlots" value="3-5" checked><span class="radio-label"><strong>3–5 slots</strong>A few gaps most weeks.</span></label>
-            <label class="radio-item"><input type="radio" name="openSlots" value="6-10"><span class="radio-label"><strong>6–10 slots</strong>Regularly have open time.</span></label>
-            <label class="radio-item"><input type="radio" name="openSlots" value="10+"><span class="radio-label"><strong>10+ slots</strong>Actively looking to fill the schedule.</span></label>
-          </div>
+        <div class="section-title">How often do you have same-day or next-day openings that go unfilled?</div>
+        <div class="section-desc">We want to match lead volume to your actual availability — not flood you.</div>
+        <div class="radio-options">
+          <label class="radio-item">
+            <input type="radio" name="openSlots" value="rarely">
+            <span class="radio-label"><strong>Rarely — we're usually booked out</strong>Maybe 1–2 gaps a month</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="openSlots" value="1-2-week">
+            <span class="radio-label"><strong>1–2 times a week</strong>Some openings, not consistently</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="openSlots" value="3-5-week" checked>
+            <span class="radio-label"><strong>3–5 times a week</strong>Regular gaps most weeks</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="openSlots" value="most-days">
+            <span class="radio-label"><strong>Most days have open capacity</strong>Actively looking to fill the schedule</span>
+          </label>
         </div>
       </div>
 
       <hr class="divider">
 
-      <!-- PROCEDURES -->
+      <!-- QUESTION 2 -->
       <div class="section">
-        <div class="section-title">What emergencies do you treat?</div>
-        <div class="section-desc">Select everything you're comfortable handling on short notice.</div>
-
+        <div class="section-title">What types of emergency cases are you comfortable seeing on short notice?</div>
+        <div class="section-desc">Select everything that applies — we'll only route cases you're equipped to handle.</div>
         <div class="check-grid">
-          <label class="check-item"><input type="checkbox" checked><span>Tooth extractions</span></label>
-          <label class="check-item"><input type="checkbox" checked><span>Toothache / pain</span></label>
-          <label class="check-item"><input type="checkbox" checked><span>Broken / chipped tooth</span></label>
-          <label class="check-item"><input type="checkbox" checked><span>Lost filling or crown</span></label>
-          <label class="check-item"><input type="checkbox"><span>Root canals</span></label>
-          <label class="check-item"><input type="checkbox" checked><span>Abscess / infection</span></label>
-          <label class="check-item"><input type="checkbox"><span>Knocked-out tooth</span></label>
-          <label class="check-item"><input type="checkbox" checked><span>Swelling / gum issues</span></label>
-          <label class="check-item"><input type="checkbox"><span>Dental trauma</span></label>
-          <label class="check-item"><input type="checkbox"><span>Wisdom tooth pain</span></label>
-          <label class="check-item"><input type="checkbox" checked><span>Bleeding</span></label>
-          <label class="check-item"><input type="checkbox"><span>Pediatric emergencies</span></label>
-        </div>
-
-        <div class="field" style="margin-top: 20px;">
-          <label class="field-label">Do you need a staff member present for new patients?</label>
-          <div class="radio-options">
-            <label class="radio-item"><input type="radio" name="staffRequired" value="yes" checked><span class="radio-label"><strong>Yes, always</strong>I won't see new patients without staff present.</span></label>
-            <label class="radio-item"><input type="radio" name="staffRequired" value="sometimes"><span class="radio-label"><strong>Depends</strong>Existing patients solo is fine, new ones I prefer staff.</span></label>
-            <label class="radio-item"><input type="radio" name="staffRequired" value="no"><span class="radio-label"><strong>No</strong>I'm comfortable seeing new patients alone.</span></label>
-          </div>
+          <label class="check-item"><input type="checkbox" value="Toothache / pain" checked><span>Toothache / pain</span></label>
+          <label class="check-item"><input type="checkbox" value="Broken / chipped tooth" checked><span>Broken / chipped tooth</span></label>
+          <label class="check-item"><input type="checkbox" value="Lost filling or crown" checked><span>Lost filling or crown</span></label>
+          <label class="check-item"><input type="checkbox" value="Abscess / infection" checked><span>Abscess / infection</span></label>
+          <label class="check-item"><input type="checkbox" value="Tooth extraction"><span>Tooth extraction</span></label>
+          <label class="check-item"><input type="checkbox" value="Root canals"><span>Root canals</span></label>
+          <label class="check-item"><input type="checkbox" value="Knocked-out tooth"><span>Knocked-out tooth</span></label>
+          <label class="check-item"><input type="checkbox" value="Swelling / gum issues"><span>Swelling / gum issues</span></label>
+          <label class="check-item"><input type="checkbox" value="Wisdom tooth pain"><span>Wisdom tooth pain</span></label>
+          <label class="check-item"><input type="checkbox" value="Dental anxiety patients"><span>Dental anxiety patients</span></label>
+          <label class="check-item"><input type="checkbox" value="Pediatric emergencies"><span>Pediatric emergencies</span></label>
         </div>
       </div>
 
       <hr class="divider">
 
-      <!-- WORKFLOW -->
+      <!-- QUESTION 3 -->
       <div class="section">
-        <div class="section-title">How do you prefer to work?</div>
-        <div class="section-desc">We want to fit into how you already operate.</div>
-
-        <div class="field">
-          <label class="field-label">If a patient needed you today, how fast could you respond?</label>
-          <div class="radio-options">
-            <label class="radio-item"><input type="radio" name="responseTime" value="5min"><span class="radio-label"><strong>Within 5 minutes</strong>I check my phone constantly.</span></label>
-            <label class="radio-item"><input type="radio" name="responseTime" value="15min" checked><span class="radio-label"><strong>Within 15 minutes</strong>I reply between patients.</span></label>
-            <label class="radio-item"><input type="radio" name="responseTime" value="30min"><span class="radio-label"><strong>Within 30 minutes</strong>When I get a break.</span></label>
-            <label class="radio-item"><input type="radio" name="responseTime" value="unsure"><span class="radio-label"><strong>Hard to say</strong>Depends on the day.</span></label>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="field-label">Best way to reach you for an urgent patient request?</label>
-          <div class="radio-options">
-            <label class="radio-item"><input type="radio" name="contactMethod" value="sms" checked><span class="radio-label"><strong>Text / SMS</strong>Text me and I'll reply YES or NO.</span></label>
-            <label class="radio-item"><input type="radio" name="contactMethod" value="call"><span class="radio-label"><strong>Phone call</strong>I prefer a quick call first.</span></label>
-            <label class="radio-item"><input type="radio" name="contactMethod" value="frontdesk"><span class="radio-label"><strong>Front desk</strong>Go through my office coordinator.</span></label>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="field-label">How do you handle payment for new emergency patients?</label>
-          <div class="radio-options">
-            <label class="radio-item"><input type="radio" name="payment" value="inoffice" checked><span class="radio-label"><strong>In-office at time of visit</strong>Staff handles it when they arrive.</span></label>
-            <label class="radio-item"><input type="radio" name="payment" value="invoice"><span class="radio-label"><strong>Invoice after visit</strong>I send a bill, they pay online.</span></label>
-            <label class="radio-item"><input type="radio" name="payment" value="deposit"><span class="radio-label"><strong>Deposit upfront</strong>I need something before confirming.</span></label>
-          </div>
+        <div class="section-title">What's your biggest hesitation about receiving emergency referrals?</div>
+        <div class="section-desc">Honest answer helps us design around your real concerns.</div>
+        <div class="radio-options">
+          <label class="radio-item">
+            <input type="radio" name="concerns" value="no-shows">
+            <span class="radio-label"><strong>Patients who don't show up</strong></span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="concerns" value="disruption">
+            <span class="radio-label"><strong>Disrupting scheduled patients</strong></span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="concerns" value="payment-risk">
+            <span class="radio-label"><strong>Uninsured or payment risk</strong></span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="concerns" value="not-sure">
+            <span class="radio-label"><strong>Not sure this will actually send real patients</strong></span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="concerns" value="none">
+            <span class="radio-label"><strong>No major hesitations</strong></span>
+          </label>
         </div>
       </div>
 
       <hr class="divider">
 
-      <!-- INTEREST -->
+      <!-- QUESTION 4 -->
       <div class="section">
-        <div class="section-title">A few more questions</div>
-
-        <div class="field">
-          <label class="field-label">What area do you practice in? (city or zip, no address needed)</label>
-          <input type="text" id="area" placeholder="e.g. Redmond, WA or 98052">
+        <div class="section-title">How do you prefer to be notified when a patient needs you?</div>
+        <div class="section-desc">We'll set up your alerts exactly this way from day one.</div>
+        <div class="radio-options">
+          <label class="radio-item">
+            <input type="radio" name="contactMethod" value="sms-personal" checked>
+            <span class="radio-label"><strong>SMS to my cell</strong>Text me and I'll reply YES or NO</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="contactMethod" value="sms-frontdesk">
+            <span class="radio-label"><strong>SMS to front desk</strong>My coordinator handles incoming requests</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="contactMethod" value="call">
+            <span class="radio-label"><strong>Phone call first</strong>I prefer to speak before confirming</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="contactMethod" value="flexible">
+            <span class="radio-label"><strong>Either SMS or email works</strong>I'm flexible</span>
+          </label>
         </div>
+      </div>
 
-        <div class="field">
-          <label class="field-label">How often do patients call that you can't fit in?</label>
-          <div class="radio-options">
-            <label class="radio-item"><input type="radio" name="overflow" value="rarely"><span class="radio-label"><strong>Rarely</strong>Almost never.</span></label>
-            <label class="radio-item"><input type="radio" name="overflow" value="sometimes" checked><span class="radio-label"><strong>Sometimes</strong>A few times a month.</span></label>
-            <label class="radio-item"><input type="radio" name="overflow" value="often"><span class="radio-label"><strong>Often</strong>Multiple times a week.</span></label>
-          </div>
-        </div>
+      <hr class="divider">
 
-        <div class="field">
-          <label class="field-label">Would you pay a small fee per patient — only when they actually show up?</label>
-          <div class="radio-options">
-            <label class="radio-item"><input type="radio" name="willingToPay" value="yes"><span class="radio-label"><strong>Yes</strong>Pay per completed appointment makes sense.</span></label>
-            <label class="radio-item"><input type="radio" name="willingToPay" value="maybe" checked><span class="radio-label"><strong>Maybe</strong>Depends on the fee and how it works.</span></label>
-            <label class="radio-item"><input type="radio" name="willingToPay" value="no"><span class="radio-label"><strong>No</strong>I wouldn't pay for patient referrals.</span></label>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="field-label">Any concerns or thoughts? (optional)</label>
-          <textarea id="concerns" placeholder="Liability, no-shows, workflow, pricing — anything on your mind."></textarea>
-        </div>
+      <!-- QUESTION 5 -->
+      <div class="section">
+        <div class="section-title">Anything we should know about your practice before we set you up?</div>
+        <div class="section-desc">Hours, specialties, languages spoken, types of patients you prefer — anything useful. Totally optional.</div>
+        <textarea id="notes" placeholder="e.g. we're open Saturdays, we see a lot of anxious patients, Spanish-speaking staff on Tuesdays..."></textarea>
       </div>
 
       <!-- SUBMIT -->
       <div class="submit-area">
-        <button class="btn-submit" id="submitBtn" onclick="submitForm()">Submit Survey</button>
+        <button class="btn-submit" id="submitBtn" onclick="submitForm()">Submit survey</button>
         <div class="error-msg" id="errorMsg">Something went wrong. Please try again.</div>
-        <p class="submit-note">Anonymous. No personal data collected.</p>
+        <p class="submit-note">No commitment by submitting. We'll follow up within 24 hours to confirm fit and walk you through setup.</p>
       </div>
 
-    </div><!-- /form-content -->
-
-    <!-- SUCCESS -->
-    <div class="success-screen" id="successScreen">
-      <div class="success-icon">🦷</div>
-      <h2>Thank you.</h2>
-      <p>Your anonymous response helps us build something dentists actually want. If you'd like to be notified when Moxident launches in your area, tap below — completely optional.</p>
-      <a href="mailto:hello@moxident.com?subject=Notify me when Moxident launches" class="btn-notify">Notify me at launch</a>
     </div>
 
-  </div><!-- /card -->
-</div><!-- /container -->
+    <!-- MATCH SCREEN -->
+    <div class="match-screen" id="matchScreen">
+      <div class="match-badge"><div class="match-badge-dot"></div>Good fit for your area</div>
+      <div class="match-headline">Thank you.</div>
+      <div class="match-subhead">Here's what you told us — we'll be in touch within 24 hours.</div>
+
+      <div class="match-card">
+        <div class="match-card-label">What you told us</div>
+        <div class="match-row">
+          <div class="match-row-label">Availability</div>
+          <div class="match-row-text" id="match-availability">You have regular gaps most weeks — we can start filling those with patients actively looking for care.</div>
+        </div>
+        <div class="match-row">
+          <div class="match-row-label">Cases</div>
+          <div class="match-row-text" id="match-cases">The cases you selected match the most common emergency requests we receive in your area.</div>
+        </div>
+        <div class="match-row">
+          <div class="match-row-label">How we'll reach you</div>
+          <div class="match-row-text" id="match-notification">SMS to your cell — we send patient info and you reply YES or NO. No app, no portal.</div>
+        </div>
+      </div>
+
+      <button class="match-cta-btn" onclick="window.location.href='/dentist/join/'">Complete your setup →</button>
+      <p class="match-cta-note">You pay nothing until a patient walks in. No contracts, no monthly fees.</p>
+
+      <div class="match-divider">or</div>
+
+      <button class="match-secondary-btn" id="notReadyBtn" onclick="showReminderForm()">Not ready yet — send me a reminder</button>
+
+      <div class="reminder-form" id="reminderForm">
+        <div class="reminder-form-label">Where should we send the reminder?</div>
+        <input class="reminder-input" id="reminderContact" type="text" placeholder="Email or phone number"/>
+        <button class="reminder-submit-btn" onclick="submitReminder()">Send reminder</button>
+        <div class="reminder-confirm" id="reminderConfirm">Got it — we'll follow up shortly.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <script>
   const API = "https://7i7j7c8rx7.execute-api.us-east-2.amazonaws.com/prod";
 
+  const availabilityMap = {
+    'rarely':    "You run a full schedule — we'll send high-intent patients only, so every lead is worth your time.",
+    '1-2-week':  "You have occasional openings — we'll match lead volume to your availability, not flood it.",
+    '3-5-week':  "You have regular gaps most weeks — we can start filling those with patients actively looking for care.",
+    'most-days': "You have consistent open capacity — we can route patients to you daily, starting immediately."
+  };
+
+  const notificationMap = {
+    'sms-personal':  "SMS to your cell — we send patient info and you reply YES or NO. No app, no portal.",
+    'sms-frontdesk': "SMS to your front desk — your coordinator handles incoming requests without changing your workflow.",
+    'call':          "We'll call before sending patient details — you stay in control of every referral.",
+    'flexible':      "We'll default to SMS — fast, simple, and no new workflow to learn."
+  };
+
   function collectData() {
-    const days = ['mon','tue','wed','thu','fri','sat','sun'];
-    const dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-    const availability = {};
-    days.forEach((d, i) => {
-      availability[dayNames[i]] = {
-        open:   document.getElementById(`${d}-o`).value,
-        close:  document.getElementById(`${d}-c`).value,
-        active: document.getElementById(`${d}-a`).checked
-      };
-    });
-
-    const procedures = Array.from(document.querySelectorAll('.check-grid input:checked'))
-      .map(el => el.closest('.check-item').querySelector('span').textContent);
-
+    const cases = Array.from(document.querySelectorAll('.check-grid input:checked')).map(el => el.value);
     return {
-      availability,
-      openSlots:     document.querySelector('input[name="openSlots"]:checked')?.value,
-      procedures,
-      staffRequired: document.querySelector('input[name="staffRequired"]:checked')?.value,
-      responseTime:  document.querySelector('input[name="responseTime"]:checked')?.value,
-      contactMethod: document.querySelector('input[name="contactMethod"]:checked')?.value,
-      payment:       document.querySelector('input[name="payment"]:checked')?.value,
-      area:          document.getElementById('area').value,
-      overflow:      document.querySelector('input[name="overflow"]:checked')?.value,
-      willingToPay:  document.querySelector('input[name="willingToPay"]:checked')?.value,
-      concerns:      document.getElementById('concerns').value,
+      openSlots:     document.querySelector('input[name="openSlots"]:checked')?.value || '',
+      procedures:    cases,
+      concerns:      document.querySelector('input[name="concerns"]:checked')?.value || '',
+      contactMethod: document.querySelector('input[name="contactMethod"]:checked')?.value || '',
+      notes:         document.getElementById('notes').value,
+      source:        'dentist-survey',
     };
+  }
+
+  function buildMatchScreen(data) {
+    const availText = availabilityMap[data.openSlots] || availabilityMap['3-5-week'];
+    document.getElementById('match-availability').textContent = availText;
+
+    const topCases = data.procedures.slice(0, 3);
+    if (topCases.length > 0) {
+      const caseList = topCases.join(', ').toLowerCase();
+      document.getElementById('match-cases').textContent =
+        `${caseList.charAt(0).toUpperCase() + caseList.slice(1)} — exactly the cases patients in your area submit most.`;
+    }
+
+    const notifText = notificationMap[data.contactMethod] || notificationMap['flexible'];
+    document.getElementById('match-notification').textContent = notifText;
   }
 
   async function submitForm() {
     const btn = document.getElementById('submitBtn');
     const errMsg = document.getElementById('errorMsg');
-    btn.textContent = 'Submitting...';
+    btn.textContent = 'Checking fit...';
     btn.disabled = true;
     errMsg.classList.remove('visible');
+
+    const data = collectData();
 
     try {
       const res = await fetch(`${API}/dentist-survey`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(collectData())
+        body: JSON.stringify(data)
       });
       if (!res.ok) throw new Error('Server error');
-      document.getElementById('formContent').classList.add('hidden');
-      document.getElementById('successScreen').classList.add('visible');
+      buildMatchScreen(data);
+      document.getElementById('formContent').style.display = 'none';
+      document.getElementById('matchScreen').classList.add('visible');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       errMsg.classList.add('visible');
-      btn.textContent = 'Submit Survey';
+      btn.textContent = "Submit survey";
       btn.disabled = false;
     }
+  }
+
+  function showReminderForm() {
+    document.getElementById('reminderForm').classList.add('visible');
+    document.getElementById('notReadyBtn').style.display = 'none';
+    document.getElementById('reminderContact').focus();
+  }
+
+  async function submitReminder() {
+    const contact = document.getElementById('reminderContact').value.trim();
+    if (!contact) return;
+    try {
+      await fetch(`${API}/waitlist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: contact, source: 'survey-not-ready' })
+      });
+    } catch(e) {}
+    document.getElementById('reminderConfirm').classList.add('visible');
+    document.querySelector('.reminder-submit-btn').style.display = 'none';
+    document.getElementById('reminderContact').disabled = true;
   }
 </script>
 

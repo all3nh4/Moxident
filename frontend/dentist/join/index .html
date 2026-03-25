@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Complete Your Setup — Moxident</title>
+  <meta name="description" content="You're almost live. Fill this out and Allen will confirm your setup within 24 hours."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <link rel="stylesheet" href="/dentist/join/join.css"/>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="main-nav">
+  <a class="nav-logo" href="/">
+    <div class="nav-dot"></div>Moxident
+  </a>
+  <div class="nav-pills">
+    <button class="nav-pill" onclick="window.location.href='/dentist/join/'">Join Network</button>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleDrawer()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile Drawer -->
+<div class="nav-drawer" id="nav-drawer">
+  <div class="drawer-section">For Dentists</div>
+  <button class="drawer-pill" onclick="window.location.href='/dentist/join/';closeDrawer()">🦷 Join the Network</button>
+  <div class="drawer-divider"></div>
+  <button class="drawer-pill" onclick="window.location.href='/';closeDrawer()">← Back to Moxident</button>
+</div>
+
+<!-- HERO -->
+<section class="hero-section">
+  <div class="hero">
+    <div class="eyebrow a1"><div class="eyebrow-dot"></div>For Dentists</div>
+    <h1 class="hero-h1 a2">You're almost live.</h1>
+    <p class="hero-sub a3">Fill this out and we'll confirm your setup within 24 hours — after that, you start receiving patient leads.</p>
+    <p class="hero-note a5">Free to join &nbsp;·&nbsp; No contracts &nbsp;·&nbsp; Seattle area pilot</p>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="join-trust-bar">
+  <div class="join-trust-inner">
+    <div class="join-trust-item"><span class="join-trust-check">✓</span> Free to join — no credit card needed</div>
+    <div class="join-trust-item"><span class="join-trust-check">✓</span> Pay only when a patient shows up</div>
+    <div class="join-trust-item"><span class="join-trust-check">✓</span> No contracts · Cancel anytime</div>
+  </div>
+</div>
+
+<!-- SETUP FORM -->
+<div class="join-section join-form-section" id="signup">
+  <div class="join-section-inner">
+    <div class="join-form-wrap">
+
+      <div id="join-form-content">
+        <div class="join-form-title">Complete your setup.</div>
+        <p class="join-form-sub">Takes 2 minutes. Once submitted, we'll confirm your profile and you go live.</p>
+
+        <div class="join-step-bar">
+          <div class="join-step-seg active" id="seg-1"></div>
+          <div class="join-step-seg" id="seg-2"></div>
+          <div class="join-step-seg" id="seg-3"></div>
+        </div>
+
+        <!-- Section 1: Your Availability -->
+        <div class="join-form-section-block" id="section-1">
+          <div class="join-form-section-label">Your availability</div>
+
+          <div class="fg" id="fg-capacity">
+            <label class="fl">Same-day / next-day openings per week <span class="fl-req">*</span></label>
+            <div class="pill-select" id="capacity-pills">
+              <button type="button" class="pill-option" data-val="rarely" onclick="selectPill(this,'f-capacity','capacity-pills')">Rarely</button>
+              <button type="button" class="pill-option" data-val="1-2" onclick="selectPill(this,'f-capacity','capacity-pills')">1–2 times</button>
+              <button type="button" class="pill-option" data-val="3-5" onclick="selectPill(this,'f-capacity','capacity-pills')">3–5 times</button>
+              <button type="button" class="pill-option" data-val="most-days" onclick="selectPill(this,'f-capacity','capacity-pills')">Most days</button>
+            </div>
+            <input type="hidden" id="f-capacity"/>
+            <span class="f-err">Required</span>
+          </div>
+
+          <div class="fg" id="fg-extended" style="margin-top:20px;">
+            <label class="fl">Available hours <span class="fl-req">*</span></label>
+            <div class="pill-select" id="extended-pills">
+              <button type="button" class="pill-option" data-val="none" onclick="selectPill(this,'f-extended','extended-pills')">Weekdays only</button>
+              <button type="button" class="pill-option" data-val="evenings" onclick="selectPill(this,'f-extended','extended-pills')">+ Evenings</button>
+              <button type="button" class="pill-option" data-val="weekends" onclick="selectPill(this,'f-extended','extended-pills')">+ Weekends</button>
+              <button type="button" class="pill-option" data-val="both" onclick="selectPill(this,'f-extended','extended-pills')">Evenings &amp; Weekends</button>
+            </div>
+            <input type="hidden" id="f-extended"/>
+            <span class="f-err">Required</span>
+          </div>
+
+          <div class="fg" id="fg-years" style="margin-top:20px;">
+            <label class="fl">Practice area <span class="fl-req">*</span></label>
+            <input class="fi" id="f-years" type="text" placeholder="City or zip code — e.g. Redmond, WA or 98052"/>
+            <span class="f-err">Required</span>
+          </div>
+        </div>
+
+        <!-- Section 2: What You Can Handle -->
+        <div class="join-form-section-block" id="section-2">
+          <div class="join-form-section-label">What you can handle</div>
+
+          <div class="fg" id="fg-insurance">
+            <label class="fl">Emergency cases you're comfortable seeing on short notice <span class="fl-req">*</span></label>
+            <div class="join-checkbox-grid" id="insurance-grid">
+              <label class="join-checkbox-item"><input type="checkbox" value="Toothache / pain"/> Toothache / pain</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Broken / chipped tooth"/> Broken / chipped tooth</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Lost filling or crown"/> Lost filling or crown</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Abscess / infection"/> Abscess / infection</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Tooth extraction"/> Tooth extraction</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Root canals"/> Root canals</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Knocked-out tooth"/> Knocked-out tooth</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Swelling / gum issues"/> Swelling / gum issues</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Wisdom tooth pain"/> Wisdom tooth pain</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Dental anxiety patients"/> Dental anxiety patients</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Pediatric emergencies"/> Pediatric emergencies</label>
+            </div>
+            <span class="f-err">Select at least one</span>
+          </div>
+
+          <div class="fg" style="margin-top:20px;">
+            <label class="fl">Insurance accepted <span class="join-optional">(optional)</span></label>
+            <div class="join-checkbox-grid" id="specialties-grid">
+              <label class="join-checkbox-item"><input type="checkbox" value="Delta Dental"/> Delta Dental</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Premera Blue Cross"/> Premera Blue Cross</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Regence BlueShield"/> Regence BlueShield</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Cigna"/> Cigna</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="MetLife"/> MetLife</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Aetna"/> Aetna</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Moda Health"/> Moda Health</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Washington Apple Health"/> Medicaid (Apple Health)</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Fee for service / cash only"/> Cash / self-pay</label>
+              <label class="join-checkbox-item"><input type="checkbox" value="Other"/> Other</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: How You Work -->
+        <div class="join-form-section-block" id="section-3">
+          <div class="join-form-section-label">How you work</div>
+
+          <div class="fg" id="fg-uninsured">
+            <label class="fl">Notification preference <span class="fl-req">*</span></label>
+            <div class="pill-select" id="uninsured-pills">
+              <button type="button" class="pill-option" data-val="sms-personal" onclick="selectPill(this,'f-uninsured','uninsured-pills')">SMS to my cell</button>
+              <button type="button" class="pill-option" data-val="sms-frontdesk" onclick="selectPill(this,'f-uninsured','uninsured-pills')">SMS to front desk</button>
+              <button type="button" class="pill-option" data-val="call" onclick="selectPill(this,'f-uninsured','uninsured-pills')">Phone call first</button>
+              <button type="button" class="pill-option" data-val="flexible" onclick="selectPill(this,'f-uninsured','uninsured-pills')">Flexible</button>
+            </div>
+            <input type="hidden" id="f-uninsured"/>
+            <span class="f-err">Required</span>
+          </div>
+
+          <div class="fg" id="fg-name" style="margin-top:20px;">
+            <label class="fl">Full Name <span class="fl-req">*</span></label>
+            <input class="fi" id="f-name" type="text" placeholder="Dr. Jane Smith" autocomplete="name"/>
+            <span class="f-err">Required</span>
+          </div>
+
+          <div class="fg" id="fg-practice" style="margin-top:16px;">
+            <label class="fl">Practice Name <span class="fl-req">*</span></label>
+            <input class="fi" id="f-practice" type="text" placeholder="Smile Dental Redmond"/>
+            <span class="f-err">Required</span>
+          </div>
+
+          <div class="f-row" style="margin-top:16px;">
+            <div class="fg" id="fg-phone">
+              <label class="fl">Phone <span class="fl-req">*</span></label>
+              <input class="fi" id="f-phone" type="tel" placeholder="(425) 000-0000" autocomplete="tel"/>
+              <span class="f-err">Enter a valid phone number</span>
+            </div>
+            <div class="fg" id="fg-email">
+              <label class="fl">Email <span class="fl-req">*</span></label>
+              <input class="fi" id="f-email" type="email" placeholder="jane@smiledental.com" autocomplete="email"/>
+              <span class="f-err">Enter a valid email</span>
+            </div>
+          </div>
+
+          <div class="fg" id="fg-zip" style="margin-top:16px;">
+            <label class="fl">Coverage Zip Codes <span class="fl-req">*</span></label>
+            <input class="fi" id="f-zip" type="text" placeholder="98101, 98102, 98103"/>
+            <span class="f-err">Enter at least one zip code</span>
+          </div>
+        </div>
+
+        <!-- Section 4: Last Details -->
+        <div class="join-form-section-block" id="section-4">
+          <div class="join-form-section-label">Last details</div>
+
+          <div class="fg join-exclusions">
+            <label class="fl">Anything we should know? <span class="join-optional">(optional)</span></label>
+            <input class="fi" id="f-exclusions" type="text" placeholder="Hours, languages spoken, types of patients you prefer — anything useful"/>
+          </div>
+        </div>
+
+        <button type="button" class="submit-btn" id="join-submit-btn" onclick="submitForm()">
+          Complete Setup →
+        </button>
+        <p class="form-disclaimer">Free to join · No contracts · We'll confirm within 24 hours</p>
+      </div>
+
+      <!-- Success screen -->
+      <div class="join-success hidden" id="join-success">
+        <div class="join-success-icon">🦷</div>
+        <div class="join-success-title">You're all set.</div>
+        <p class="join-success-msg">
+          We'll confirm your setup within 24 hours. Once live, patient alerts will come through exactly as you configured. Reply directly to our email if anything comes up.
+        </p>
+        <div class="early-divider"></div>
+        <div class="early-urgent">
+          <strong>Questions?</strong> Questions? Email us at <a href="mailto:admin@moxident.com" style="color:var(--red);">admin@moxident.com</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <strong>Moxident</strong> — Emergency Dental Routing · Seattle, WA
+  &nbsp;·&nbsp; <span class="site-footer-link" onclick="window.location.href='/privacy-policy'">Privacy Policy</span>
+  &nbsp;·&nbsp; <a href="mailto:admin@moxident.com" class="site-footer-link">admin@moxident.com</a>
+</footer>
+
+<script type="module" src="/dentist/join/join.mjs"></script>
+</body>
+</html>

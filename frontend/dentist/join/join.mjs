@@ -24,6 +24,16 @@ export function normalizePhone(val) {
   return digits.startsWith('1') ? `+${digits}` : `+1${digits}`;
 }
 
+/* ── Pill select ─────────────────────────────────────────────────────────── */
+export function selectPill(btn, hiddenId, gridId) {
+  document.querySelectorAll(`#${gridId} .pill-option`).forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById(hiddenId).value = btn.dataset.val;
+  const fgId = `fg-${hiddenId.replace('f-', '')}`;
+  document.getElementById(fgId)?.classList.remove('err');
+  updateStepBar();
+}
+
 /* ── Validation ──────────────────────────────────────────────────────────── */
 export function validate(fields) {
   let ok = true;
@@ -80,7 +90,7 @@ export function buildPayload() {
     phone:            normalizePhone(document.getElementById('f-phone').value),
     email:            document.getElementById('f-email').value.trim(),
     zipCodes:         document.getElementById('f-zip').value.trim(),
-    yearsInPractice:  document.getElementById('f-years').value.trim(),
+    practiceArea:     document.getElementById('f-years')?.value.trim() || '',
     dailyCapacity:    document.getElementById('f-capacity').value,
     extendedHours:    document.getElementById('f-extended').value,
     insuranceAccepted:collectInsurance(),
@@ -97,14 +107,14 @@ export async function submitForm() {
     { id: 'f-practice', fg: 'fg-practice', test: v => v.trim().length >= 2 },
     { id: 'f-phone',    fg: 'fg-phone',    test: v => v.replace(/\D/g, '').length >= 10 },
     { id: 'f-email',    fg: 'fg-email',    test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
-    { id: 'f-zip',      fg: 'fg-zip',      test: v => v.trim().length >= 5 },
-    { id: 'f-years',    fg: 'fg-years',    test: v => v.trim().length > 0 },
+    { id: 'f-zip',      fg: 'fg-zip',      test: v => v.trim().length >= 3 },
+    { id: 'f-years',    fg: 'fg-years',    test: v => v.trim().length >= 2 },
     { id: 'f-capacity', fg: 'fg-capacity', test: v => v !== '' },
     { id: 'f-extended', fg: 'fg-extended', test: v => v !== '' },
     { id: 'f-uninsured',fg: 'fg-uninsured',test: v => v !== '' },
   ];
 
-  const fieldsOk = validate(fields);
+  const fieldsOk    = validate(fields);
   const insuranceOk = validateInsurance();
 
   if (!fieldsOk || !insuranceOk) {
@@ -113,69 +123,44 @@ export async function submitForm() {
   }
 
   const btn = document.getElementById('join-submit-btn');
-  const originalText = btn.textContent;
-
-  btn.disabled = true;
+  btn.disabled    = true;
   btn.textContent = 'Submitting…';
 
   try {
-    const payload = buildPayload();
-
     const res = await fetch(`${API}/dentist-signup`, {
-      method: 'POST',
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body:    JSON.stringify(buildPayload()),
     });
 
-    const raw = await res.text();
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Server error');
 
-    let data = {};
-    try {
-      data = raw ? JSON.parse(raw) : {};
-    } catch {
-      throw new Error('Invalid server response');
-    }
-
-    if (!res.ok) {
-      throw new Error(data.error || 'Server error');
-    }
-
-    const form = document.getElementById('join-form-content');
-    const success = document.getElementById('join-success');
-
-    if (!form || !success) {
-      throw new Error('UI elements not found');
-    }
-
-    form.classList.add('hidden');
-    success.classList.remove('hidden');
-
-    document.getElementById('signup')?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
+    document.getElementById('join-form-content').classList.add('hidden');
+    document.getElementById('join-success').classList.remove('hidden');
+    document.getElementById('join-success').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   } catch (err) {
-    console.error('Join submit error:', err);
-    alert(err.message || 'Something went wrong. Please try again.');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = originalText;
+    console.error('Join submit error:', err.message);
+    btn.disabled    = false;
+    btn.textContent = 'Join the Network →';
+    alert('Something went wrong. Please try again.');
   }
 }
+
 /* ── Progress bar updater ────────────────────────────────────────────────── */
 function updateStepBar() {
   const section1Fields = ['f-name', 'f-practice', 'f-phone', 'f-email', 'f-zip', 'f-years'];
-  const section2Fields = ['f-capacity', 'f-extended', 'f-uninsured'];
 
   const s1Done = section1Fields.every(id => {
     const el = document.getElementById(id);
     return el && el.value.trim().length > 0;
   });
-  const s2Done = section2Fields.every(id => {
+
+  const s2Done = ['f-capacity', 'f-extended', 'f-uninsured'].every(id => {
     const el = document.getElementById(id);
     return el && el.value !== '';
-  }) && collectInsurance().length > 0;
+  });
 
   document.getElementById('seg-1').classList.toggle('active', true);
   document.getElementById('seg-2').classList.toggle('active', s1Done);
@@ -185,15 +170,12 @@ function updateStepBar() {
 /* ── Wire up input listeners ─────────────────────────────────────────────── */
 function initListeners() {
   const clearOnInput = [
-    ['f-name',      'fg-name'],
-    ['f-practice',  'fg-practice'],
-    ['f-phone',     'fg-phone'],
-    ['f-email',     'fg-email'],
-    ['f-zip',       'fg-zip'],
-    ['f-years',     'fg-years'],
-    ['f-capacity',  'fg-capacity'],
-    ['f-extended',  'fg-extended'],
-    ['f-uninsured', 'fg-uninsured'],
+    ['f-name',     'fg-name'],
+    ['f-practice', 'fg-practice'],
+    ['f-phone',    'fg-phone'],
+    ['f-email',    'fg-email'],
+    ['f-zip',      'fg-zip'],
+    ['f-years',    'fg-years'],
   ];
 
   clearOnInput.forEach(([id, fg]) => {
@@ -203,23 +185,27 @@ function initListeners() {
     el.addEventListener('change', () => { document.getElementById(fg)?.classList.remove('err'); updateStepBar(); });
   });
 
-  // Insurance checkboxes — clear error and update progress bar on any change
   document.querySelectorAll('#insurance-grid input[type="checkbox"]').forEach(cb => {
     cb.addEventListener('change', () => {
       if (collectInsurance()) document.getElementById('fg-insurance')?.classList.remove('err');
       updateStepBar();
     });
   });
-}
 
-/* ── Expose globals for onclick handlers in HTML ─────────────────────────── */
-if (typeof window !== 'undefined') {
-  window.toggleDrawer = toggleDrawer;
-  window.closeDrawer  = closeDrawer;
-  window.submitForm   = submitForm;
-}
-
-/* ── Init ────────────────────────────────────────────────────────────────── */
-if (typeof document !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', initListeners);
+  // Pre-fill from survey if available
+  const survey = sessionStorage.getItem('mox_survey');
+  if (survey) {
+    try {
+      const s = JSON.parse(survey);
+      if (s.cases?.length) {
+        document.querySelectorAll('#insurance-grid input[type="checkbox"]').forEach(cb => {
+          if (s.cases.includes(cb.value)) cb.checked = true;
+        });
+      }
+      if (s.contactMethod) {
+        const pill = document.querySelector(`#uninsured-pills [data-val="${s.contactMethod}"]`);
+        if (pill) selectPill(pill, 'f-uninsured', 'uninsured-pills');
+      }
+    } catch(e) {}
+  }
 }

@@ -10,6 +10,7 @@
   padding: 32px 20px;
 }
 
+
 .stat-inner {
   max-width: 900px;
   margin: 0 auto;
@@ -250,4 +251,8 @@
 @media (max-width: 520px) {
   .join-form-wrap      { padding: 0; }
   .join-section        { padding: 44px 20px; }
+}
+
+.hidden {
+  display: none !important;
 }
