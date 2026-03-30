@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <!-- Google tag (gtag.js) -->
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZSTV1QEQNN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZSTV1QEQNN');
+</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Moxident — Emergency Dental Care, Fast</title>
+  <meta name="description" content="Tooth pain in Seattle? Get matched to a dentist who can see you today. No insurance required. Confirmed in minutes."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="main-nav">
+  <div class="nav-logo" onclick="show('home')" role="button" tabindex="0">
+    <div class="nav-dot"></div>Moxident
+  </div>
+  <div class="nav-pills" id="nav-pills"></div>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleDrawer()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- mobile drawer -->
+<div class="nav-drawer" id="nav-drawer">
+  <div class="drawer-section">Emergency Symptoms</div>
+  <div id="drawer-pills"></div>
+  <div class="drawer-divider"></div>
+  <button class="drawer-pill" onclick="show('intake');closeDrawer()">🦷 Request Appointment</button>
+  <button class="drawer-pill" onclick="show('dashboard');closeDrawer()">📊 Tracking Dashboard</button>
+</div>
+
+<!-- HOME PAGE -->
+<div id="view-home">
+
+  <section class="hero-section">
+    <div class="hero">
+      <div class="eyebrow a1"><div class="eyebrow-dot"></div>Emergency Dental Care</div>
+      <h1 class="hero-h1 a2">Tooth pain<br><em>can't wait.</em></h1>
+      <p class="hero-sub a3">Tell us what's wrong. We'll find the fastest available dentist in the Seattle area — confirmed in minutes, not hours.</p>
+      <button class="hero-cta a4" onclick="show('intake')">
+        Find a Dentist Now
+        <span class="hero-cta-arrow">→</span>
+      </button>
+      <p class="hero-note a5">No insurance required &nbsp;·&nbsp; No app download &nbsp;·&nbsp; Free to patients</p>
+    </div>
+  </section>
+
+  <div class="trust-bar">
+    <div class="trust-inner">
+      <div class="trust-item">⚡ Confirmed in minutes</div>
+      <div class="trust-item">🦷 Verified local dentists</div>
+      <div class="trust-item">💳 No insurance needed</div>
+      <div class="trust-item">📍 Matched by zip code</div>
+      <div class="trust-item">📱 SMS confirmation</div>
+    </div>
+  </div>
+
+  <section class="how">
+    <div class="section-eyebrow">How it works</div>
+    <div class="section-title">From pain to appointment<br>in 3 simple steps.</div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <div class="step-title">Tell us your situation</div>
+        <div class="step-desc">30-second form. Name, phone, zip, and what hurts. That's it — no account needed.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <div class="step-title">We find a dentist fast</div>
+        <div class="step-desc">We text the nearest available dentist. First one to confirm claims your case.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <div class="step-title">You get their details</div>
+        <div class="step-desc">Your confirmation shows dentist name, address, and direct phone number. Done.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="symptom-grid-section">
+    <div class="wide-wrap">
+      <div class="section-eyebrow section-eyebrow--center">What brings you in?</div>
+      <div class="section-title section-title--center">Select your situation.</div>
+      <div class="symptom-grid" id="symptom-grid-home"></div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <strong>Moxident</strong> — Emergency Dental Routing · Seattle, WA &nbsp;·&nbsp; Performance-based &nbsp;·&nbsp; $50 per completed appointment
+    <div class="site-footer-link-row">
+      <span class="site-footer-link" onclick="show('dashboard')">Tracking Dashboard</span>
+    </div>
+  </footer>
+</div>
+
+<!-- SYMPTOM PAGES -->
+<div id="view-symptom" class="hidden">
+  <div class="page-wrap" id="symptom-content"></div>
+</div>
+
+<!-- INTAKE FORM -->
+<div id="view-intake" class="hidden">
+  <div class="form-wrap">
+    <div class="form-card">
+      <button class="back-link" type="button" onclick="show('home')">← Back</button>
+      <div class="form-step-bar">
+        <div class="form-step-seg on"></div>
+        <div class="form-step-seg"></div>
+        <div class="form-step-seg"></div>
+      </div>
+      <div class="form-card-title a1">Tell us what's happening.</div>
+      <div class="form-card-sub a2">We'll find the fastest available dentist and confirm fast.</div>
+      <form id="main-intake-form" novalidate>
+        <div class="f-row">
+          <div class="fg" id="mfg-name">
+            <label class="fl">Full Name <span class="fl-req">*</span></label>
+            <input class="fi" id="mf-name" type="text" placeholder="Jane Smith" autocomplete="name"/>
+            <span class="f-err">Please enter your name</span>
+          </div>
+          <div class="fg" id="mfg-phone">
+            <label class="fl">Phone <span class="fl-req">*</span></label>
+            <input class="fi" id="mf-phone" type="tel" placeholder="(555) 000-0000" autocomplete="tel"/>
+            <span class="f-err">Enter a valid phone number</span>
+          </div>
+        </div>
+        <div class="fg" id="mfg-zip">
+          <label class="fl">Zip Code <span class="fl-req">*</span></label>
+          <input class="fi" id="mf-zip" type="text" placeholder="e.g. 98101" inputmode="numeric" maxlength="5"/>
+          <span class="f-err">Enter a valid 5-digit zip</span>
+        </div>
+        <div class="fg" id="mfg-symptom">
+          <label class="fl">What's the issue? <span class="fl-req">*</span></label>
+          <select class="fi" id="mf-symptom">
+            <option value="">Select your symptom…</option>
+            <option>Severe tooth pain</option>
+            <option>Broken or chipped tooth</option>
+            <option>Swollen gum or jaw</option>
+            <option>Tooth knocked out</option>
+            <option>Lost filling or crown</option>
+            <option>Dental abscess or infection</option>
+            <option>Bleeding that won't stop</option>
+            <option>Wisdom tooth pain</option>
+            <option>Other urgent issue</option>
+          </select>
+          <span class="f-err">Please select a symptom</span>
+        </div>
+        <div class="fg" id="mfg-consent">
+          <label class="consent-label">
+            <input class="consent-checkbox" type="checkbox" id="mf-consent"/>
+            <span>I agree to receive SMS messages from Moxident about my dental request. Message and data rates may apply. Reply STOP to opt out. See our <a class="consent-link" href="/privacy-policy">Privacy Policy</a>.</span>
+          </label>
+          <span class="f-err">You must agree to receive SMS to continue</span>
+        </div>
+        <button type="button" class="submit-btn" onclick="handleMainSubmit()">Request Emergency Appointment →</button>
+        <p class="form-disclaimer">Free to patients · No insurance required · One SMS confirmation only</p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRMATION -->
+<div id="view-early" class="hidden">
+  <div class="early-wrap">
+    <div class="early-shell">
+      <div class="early-card">
+        <div class="early-icon">🦷</div>
+        <div class="early-title">We're on it.</div>
+        <div class="early-msg" id="early-msg">
+          We're finding the fastest available dentist near
+          (<span class="early-zip" id="early-zip-display">—</span>).
+          <strong>You'll receive an SMS confirmation shortly.</strong>
+        </div>
+        <div class="early-divider"></div>
+        <div class="early-urgent">
+          <strong>⚠️ Need help right now?</strong><br/>
+          Please call a local dentist directly, visit an urgent care clinic,
+          or <strong>call 911 if this is a severe emergency</strong> involving
+          difficulty breathing, swallowing, or uncontrolled bleeding.
+        </div>
+        <button class="early-restart" onclick="resetFlow()">← Submit another request</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- FALLBACK FORM — shown when no dentist found -->
+<div id="view-fallback" class="hidden">
+  <div class="early-wrap">
+    <div class="early-shell">
+      <div class="early-card">
+        <div class="early-icon">🦷</div>
+        <div class="early-title">We're on it.</div>
+        <div class="early-msg">
+          We couldn't find an immediate dentist in your area
+          (<span id="fallback-zip-display">—</span>).
+          Can we notify you within 24 hours when one becomes available?
+        </div>
+        <div class="early-divider"></div>
+        <div class="fg" id="fg-fallback-email">
+          <label class="fl">Email <span class="fl-req">*</span></label>
+          <input class="fi" id="fallback-email" type="email" placeholder="you@email.com"/>
+          <span class="f-err">Enter a valid email</span>
+        </div>
+        <div class="fg" style="margin-top:12px;">
+          <label class="fl">Preferred time to be contacted</label>
+          <select class="fi" id="fallback-time">
+            <option value="asap">As soon as possible</option>
+            <option value="morning">Morning (8am–12pm)</option>
+            <option value="afternoon">Afternoon (12pm–5pm)</option>
+            <option value="evening">Evening (5pm–8pm)</option>
+            <option value="weekend">Weekend</option>
+          </select>
+        </div>
+        <button type="button" class="submit-btn" style="margin-top:16px;" onclick="submitFallback()">
+          Notify Me →
+        </button>
+        <div class="early-urgent" style="margin-top:16px;">
+          <strong>⚠️ Need help right now?</strong><br/>
+          Please call a local dentist directly, visit an urgent care clinic,
+          or <strong>call 911 if this is a severe emergency</strong>.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- TRACKING DASHBOARD -->
+<div id="view-dashboard" class="hidden">
+  <div class="dash-wrap">
+    <div class="dash-title a1">Conversion Tracking</div>
+    <div class="dash-sub a2">Live form submit rate per symptom page — use this to decide where to spend ad budget.</div>
+    <div class="kpi-row" id="kpi-row"></div>
+    <div class="tbl-wrap">
+      <div class="tbl-head">
+        <div class="tbl-head-title">Page Performance</div>
+        <div class="tbl-head-hint">CVR = submits ÷ views</div>
+      </div>
+      <table><thead><tr>
+        <th>Symptom Page</th>
+        <th>Target Keywords</th>
+        <th>Views</th>
+        <th>Submits</th>
+        <th>Signal</th>
+      </tr></thead>
+      <tbody id="dash-tbody"></tbody></table>
+    </div>
+    <div class="dash-bottom">
+      <button class="reset-btn" onclick="resetTracking()">↺ Reset data</button>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
