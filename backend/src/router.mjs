@@ -17,7 +17,7 @@ export async function routeToNextDentist(requestId, patient) {
       patient.phone,
       `Hi ${patient.name}, this is Moxident. We received your request near ${patient.zip} and are searching for an available dentist. We will text you shortly. If this is a medical emergency call 911.`
     );
-  
+    
     return false;
   }
 

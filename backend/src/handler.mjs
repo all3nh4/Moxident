@@ -66,21 +66,23 @@ Application ID:     ${applicationId}
 Submitted At:       ${new Date().toISOString()}
 
 --- DENTIST DETAILS ---
-Name:               ${data.name || "—"}
-Practice:           ${data.practiceName || "—"}
-Phone:              ${data.phone || "—"}
-Email:              ${data.email || "—"}
-Zip Codes:          ${data.zipCodes || "—"}
-Years in Practice:  ${data.yearsInPractice || "—"}
+Name:                    ${data.name || "—"}
+Practice:                ${data.practiceName || "—"}
+Phone:                   ${data.phone || "—"}
+Email:                   ${data.email || "—"}
+Zip Codes:               ${data.zipCodes || "—"}
+Practice Area:           ${data.practiceArea || "—"}
 
 --- AVAILABILITY ---
-Daily Capacity:     ${data.dailyCapacity || "—"}
-Extended Hours:     ${data.extendedHours || "—"}
-Accepts Uninsured:  ${data.acceptsUninsured || "—"}
-Insurance Accepted: ${data.insuranceAccepted || "—"}
+Daily Capacity:          ${data.dailyCapacity || "—"}
+Extended Hours:          ${data.extendedHours || "—"}
+Notification Preference: ${data.notificationPreference || "—"}
+Accepts Uninsured:       ${data.acceptsUninsured || "—"}
 
 --- CLINICAL PROFILE ---
-Specialties:        ${data.specialties || "—"}
+Case Types Handled:      ${data.caseTypes || "—"}
+Insurance Accepted:      ${data.insuranceAccepted || "—"}
+Notes:                   ${data.notes || "—"}
 
 ---
 Moxident Admin Notification

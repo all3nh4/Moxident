@@ -81,39 +81,41 @@ export async function saveDentistApplication(data) {
   await db.send(new PutItemCommand({
     TableName: "moxident-dentist-applications",
     Item: {
-      // ── Key ──────────────────────────────────────────
-      applicationId:    { S: applicationId },
+      // ── Key ──────────────────────────────────────────────────────
+      applicationId:          { S: applicationId },
 
       // ── Legacy survey fields (kept for backwards compatibility) ──
-      availability:     { S: JSON.stringify(data.availability || {}) },
-      openSlots:        { S: data.openSlots     || "" },
-      procedures:       { S: JSON.stringify(data.procedures || []) },
-      staffRequired:    { S: data.staffRequired || "" },
-      responseTime:     { S: data.responseTime  || "" },
-      contactMethod:    { S: data.contactMethod || "" },
-      payment:          { S: data.payment       || "" },
-      area:             { S: data.area          || "" },
-      overflow:         { S: data.overflow      || "" },
-      willingToPay:     { S: data.willingToPay  || "" },
-      concerns:         { S: data.concerns      || "" },
+      availability:           { S: JSON.stringify(data.availability || {}) },
+      openSlots:              { S: data.openSlots      || "" },
+      procedures:             { S: JSON.stringify(data.procedures || []) },
+      staffRequired:          { S: data.staffRequired  || "" },
+      responseTime:           { S: data.responseTime   || "" },
+      contactMethod:          { S: data.contactMethod  || "" },
+      payment:                { S: data.payment        || "" },
+      area:                   { S: data.area           || "" },
+      overflow:               { S: data.overflow       || "" },
+      willingToPay:           { S: data.willingToPay   || "" },
+      concerns:               { S: data.concerns       || "" },
 
-      // ── New onboarding fields ─────────────────────────
-      name:             { S: data.name             || "" },
-      practiceName:     { S: data.practiceName     || "" },
-      phone:            { S: data.phone            || "" },
-      email:            { S: data.email            || "" },
-      zipCodes:         { S: data.zipCodes         || "" },
-      dailyCapacity:    { S: data.dailyCapacity    || "" },
-      insuranceAccepted:{ S: data.insuranceAccepted|| "" },
-      yearsInPractice:  { S: data.yearsInPractice  || "" },
-      acceptsUninsured: { S: data.acceptsUninsured || "" },
-      extendedHours:    { S: data.extendedHours    || "" },
-      specialties:      { S: data.specialties      || "" },
-      status:           { S: "pending" },
-      source:           { S: data.source           || "dentist-join-page" },
+      // ── New onboarding fields ─────────────────────────────────────
+      name:                   { S: data.name                   || "" },
+      practiceName:           { S: data.practiceName           || "" },
+      phone:                  { S: data.phone                  || "" },
+      email:                  { S: data.email                  || "" },
+      zipCodes:               { S: data.zipCodes               || "" },
+      practiceArea:           { S: data.practiceArea           || "" },
+      dailyCapacity:          { S: data.dailyCapacity          || "" },
+      extendedHours:          { S: data.extendedHours          || "" },
+      notificationPreference: { S: data.notificationPreference || "" },
+      acceptsUninsured:       { S: data.acceptsUninsured       || "" },
+      caseTypes:              { S: data.caseTypes              || "" },
+      insuranceAccepted:      { S: data.insuranceAccepted      || "" },
+      notes:                  { S: data.notes                  || "" },
+      status:                 { S: "pending" },
+      source:                 { S: data.source                 || "dentist-join-page" },
 
-      // ── Timestamp ────────────────────────────────────
-      submittedAt:      { S: new Date().toISOString() },
+      // ── Timestamp ─────────────────────────────────────────────────
+      submittedAt:            { S: new Date().toISOString() },
     },
   }));
   return applicationId;
@@ -146,6 +148,23 @@ export async function saveLead(data) {
       createdBy:    { S: data.createdBy    || "" },
       createdAt:    { S: now },
       updatedAt:    { S: now },
+    },
+  }));
+  return leadId;
+}
+
+export async function saveWaitlist(data) {
+  const leadId = randomUUID();
+  await db.send(new PutItemCommand({
+    TableName: "moxident-leads",
+    Item: {
+      leadId:        { S: leadId },
+      email:         { S: data.email         || "" },
+      zip:           { S: data.zip           || "" },
+      preferredTime: { S: data.preferredTime || "asap" },
+      source:        { S: "waitlist" },
+      status:        { S: "new" },
+      submittedAt:   { S: new Date().toISOString() },
     },
   }));
   return leadId;

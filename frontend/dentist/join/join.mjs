@@ -18,6 +18,85 @@ export function closeDrawer() {
   document.body.style.overflow = '';
 }
 
+/* ── Funnel step navigation ──────────────────────────────────────────────── */
+export function goFunnelStep(n) {
+  document.querySelectorAll('.funnel-step').forEach(s => {
+    s.classList.add('hidden');
+    s.classList.remove('active');
+  });
+
+  const target = document.getElementById('funnel-step-' + n);
+  if (!target) return;
+  target.classList.remove('hidden');
+  target.classList.add('active');
+
+  if (n === 2) {
+    gtag('event', 'begin_checkout', { event_category: 'dentist_funnel', event_label: 'step2_zip' });
+    if (typeof window.lintrk === 'function') lintrk('track', { conversion_id: 9061468 });
+  }
+
+  if (n === 3) {
+    const zip   = document.getElementById('f-zip-check')?.value.trim() || '98033';
+    const phone = document.getElementById('f-phone-check')?.value.trim() || '';
+
+    // Carry zip forward to display and pre-fill coverage zip
+    const zipDisplay = document.getElementById('zip-display');
+    if (zipDisplay) zipDisplay.textContent = zip;
+
+    const zipField = document.getElementById('f-zip');
+    if (zipField && !zipField.value) zipField.value = zip;
+
+    // Carry phone forward
+    const phoneField = document.getElementById('f-phone');
+    if (phoneField && !phoneField.value) phoneField.value = phone;
+
+    gtag('event', 'add_to_cart', { event_category: 'dentist_funnel', event_label: 'step3_reveal' });
+    if (typeof window.lintrk === 'function') lintrk('track', { conversion_id: 9061468 });
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ── Chip toggles ────────────────────────────────────────────────────────── */
+export function toggleMoreChips() {
+  const more = document.getElementById('chip-more');
+  const btn  = document.getElementById('chip-show-more-btn');
+  if (!more) return;
+  const hidden = more.classList.toggle('hidden');
+  btn.textContent = hidden ? '+ Show more' : '− Show less';
+}
+
+export function toggleInsuranceChips() {
+  const more = document.getElementById('insurance-chip-more');
+  const btn  = document.getElementById('insurance-show-more-btn');
+  if (!more) return;
+  const hidden = more.classList.toggle('hidden');
+  btn.textContent = hidden ? '+ Show more' : '− Show less';
+}
+
+function initChips() {
+  document.querySelectorAll('.case-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      chip.classList.toggle('selected');
+      syncChipValues();
+    });
+  });
+}
+
+function syncChipValues() {
+  const caseVals = Array.from(
+    document.querySelectorAll('#case-chip-grid .case-chip.selected')
+  ).map(c => c.dataset.val).join(', ');
+  const insVals = Array.from(
+    document.querySelectorAll('#insurance-chip-grid .case-chip.selected')
+  ).map(c => c.dataset.val).join(', ');
+  const caseEl = document.getElementById('f-case-types');
+  const insEl  = document.getElementById('f-insurance-types');
+  if (caseEl) caseEl.value = caseVals;
+  if (insEl)  insEl.value  = insVals;
+  if (caseVals) document.getElementById('fg-insurance')?.classList.remove('err');
+}
+
 /* ── Phone normalizer ────────────────────────────────────────────────────── */
 export function normalizePhone(val) {
   const digits = val.replace(/\D/g, '');
@@ -51,24 +130,24 @@ export function validate(fields) {
   return ok;
 }
 
-/* ── Collect specialties from checkboxes ─────────────────────────────────── */
-export function collectSpecialties() {
+/* ── Collect case types from #insurance-grid ─────────────────────────────── */
+export function collectCaseTypes() {
+  const selected = document.querySelectorAll('#case-chip-grid .case-chip.selected');
+  return Array.from(selected).map(c => c.dataset.val).join(', ');
+}
+
+/* ── Collect insurance from #specialties-grid ───────────────────────────── */
+export function collectInsurance() {
   const checked = document.querySelectorAll('#specialties-grid input[type="checkbox"]:checked');
   return Array.from(checked).map(cb => cb.value).join(', ');
 }
 
-/* ── Collect insurance from checkboxes ───────────────────────────────────── */
-export function collectInsurance() {
-  const checked = document.querySelectorAll('#insurance-grid input[type="checkbox"]:checked');
-  return Array.from(checked).map(cb => cb.value).join(', ');
-}
-
-/* ── Validate insurance grid (at least one checked) ─────────────────────── */
-export function validateInsurance() {
-  const insurance = collectInsurance();
+/* ── Validate case types grid ────────────────────────────────────────────── */
+export function validateCaseTypes() {
+  const caseTypes = document.getElementById('f-case-types')?.value;
   const fg = document.getElementById('fg-insurance');
   if (!fg) return true;
-  if (!insurance) {
+  if (!caseTypes) {
     fg.classList.add('err');
     return false;
   }
@@ -78,46 +157,43 @@ export function validateInsurance() {
 
 /* ── Build payload from form ─────────────────────────────────────────────── */
 export function buildPayload() {
-  const exclusions      = document.getElementById('f-exclusions')?.value.trim() || '';
-  const specialties     = collectSpecialties();
-  const specialtiesFull = exclusions
-    ? `${specialties}${specialties ? ' | ' : ''}Excludes: ${exclusions}`
-    : specialties;
+  const exclusions = document.getElementById('f-exclusions')?.value.trim() || '';
 
   return {
-    name:             document.getElementById('f-name').value.trim(),
-    practiceName:     document.getElementById('f-practice').value.trim(),
-    phone:            normalizePhone(document.getElementById('f-phone').value),
-    email:            document.getElementById('f-email').value.trim(),
-    zipCodes:         document.getElementById('f-zip').value.trim(),
-    practiceArea:     document.getElementById('f-years')?.value.trim() || '',
-    dailyCapacity:    document.getElementById('f-capacity').value,
-    extendedHours:    document.getElementById('f-extended').value,
-    insuranceAccepted:collectInsurance(),
-    acceptsUninsured: document.getElementById('f-uninsured').value,
-    specialties:      specialtiesFull,
-    source:           'dentist-join-page',
+    name:                   document.getElementById('f-name').value.trim(),
+    practiceName:           document.getElementById('f-practice').value.trim(),
+    phone:                  normalizePhone(document.getElementById('f-phone').value),
+    email:                  document.getElementById('f-email').value.trim(),
+    zipCodes:               document.getElementById('f-zip').value.trim(),
+    practiceArea:           document.getElementById('f-years')?.value.trim() || '',
+    dailyCapacity:          document.getElementById('f-capacity').value,
+    extendedHours:          document.getElementById('f-extended').value,
+    caseTypes:              document.getElementById('f-case-types')?.value || '',
+    insuranceAccepted:      document.getElementById('f-insurance-types')?.value || '',
+    notificationPreference: document.getElementById('f-notification')?.value || '',
+    acceptsUninsured:       document.getElementById('f-uninsured')?.value || '',
+    notes:                  exclusions,
+    source:                 'dentist-join-page',
   };
 }
 
 /* ── Submit ──────────────────────────────────────────────────────────────── */
 export async function submitForm() {
   const fields = [
-    { id: 'f-name',     fg: 'fg-name',     test: v => v.trim().length >= 2 },
-    { id: 'f-practice', fg: 'fg-practice', test: v => v.trim().length >= 2 },
-    { id: 'f-phone',    fg: 'fg-phone',    test: v => v.replace(/\D/g, '').length >= 10 },
-    { id: 'f-email',    fg: 'fg-email',    test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
-    { id: 'f-zip',      fg: 'fg-zip',      test: v => v.trim().length >= 3 },
-    { id: 'f-years',    fg: 'fg-years',    test: v => v.trim().length >= 2 },
-    { id: 'f-capacity', fg: 'fg-capacity', test: v => v !== '' },
-    { id: 'f-extended', fg: 'fg-extended', test: v => v !== '' },
-    { id: 'f-uninsured',fg: 'fg-uninsured',test: v => v !== '' },
+    { id: 'f-name',         fg: 'fg-name',         test: v => v.trim().length >= 2 },
+    { id: 'f-practice',     fg: 'fg-practice',     test: v => v.trim().length >= 2 },
+    { id: 'f-phone',        fg: 'fg-phone',        test: v => v.replace(/\D/g, '').length >= 10 },
+    { id: 'f-email',        fg: 'fg-email',        test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+    { id: 'f-zip',          fg: 'fg-zip',          test: v => v.trim().length >= 3 },
+    { id: 'f-years',        fg: 'fg-years',        test: v => v.trim().length >= 2 },
+    { id: 'f-capacity',     fg: 'fg-capacity',     test: v => v !== '' },
+    { id: 'f-extended',     fg: 'fg-extended',     test: v => v !== '' },
   ];
 
   const fieldsOk    = validate(fields);
-  const insuranceOk = validateInsurance();
+  const caseTypesOk = validateCaseTypes();
 
-  if (!fieldsOk || !insuranceOk) {
+  if (!fieldsOk || !caseTypesOk) {
     document.querySelector('.fg.err')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
@@ -140,10 +216,22 @@ export async function submitForm() {
     document.getElementById('join-success').classList.remove('hidden');
     document.getElementById('join-success').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
+    if (typeof window.lintrk === 'function') {
+      lintrk('track', { conversion_id: 9061468 });
+    }
+    if (typeof gtag === 'function') {
+      gtag('event', 'purchase', {
+        event_category: 'dentist_funnel',
+        event_label:    'join_complete',
+        value:          1,
+        currency:       'USD',
+      });
+    }
+
   } catch (err) {
     console.error('Join submit error:', err.message);
     btn.disabled    = false;
-    btn.textContent = 'Join the Network →';
+    btn.textContent = 'Start receiving patients →';
     alert('Something went wrong. Please try again.');
   }
 }
@@ -157,19 +245,20 @@ function updateStepBar() {
     return el && el.value.trim().length > 0;
   });
 
-  const s2Done = ['f-capacity', 'f-extended', 'f-uninsured'].every(id => {
+  const s2Done = ['f-capacity', 'f-extended'].every(id => {
     const el = document.getElementById(id);
     return el && el.value !== '';
   });
 
-  document.getElementById('seg-1').classList.toggle('active', true);
-  document.getElementById('seg-2').classList.toggle('active', s1Done);
-  document.getElementById('seg-3').classList.toggle('active', s1Done && s2Done);
+  document.getElementById('seg-1')?.classList.toggle('active', true);
+  document.getElementById('seg-2')?.classList.toggle('active', s1Done);
+  document.getElementById('seg-3')?.classList.toggle('active', s1Done && s2Done);
 }
 
 /* ── Wire up input listeners ─────────────────────────────────────────────── */
 function initListeners() {
-  const clearOnInput = [
+  initChips();
+ const clearOnInput = [
     ['f-name',     'fg-name'],
     ['f-practice', 'fg-practice'],
     ['f-phone',    'fg-phone'],
@@ -185,9 +274,10 @@ function initListeners() {
     el.addEventListener('change', () => { document.getElementById(fg)?.classList.remove('err'); updateStepBar(); });
   });
 
+  // Case types checkboxes
   document.querySelectorAll('#insurance-grid input[type="checkbox"]').forEach(cb => {
     cb.addEventListener('change', () => {
-      if (collectInsurance()) document.getElementById('fg-insurance')?.classList.remove('err');
+      if (collectCaseTypes()) document.getElementById('fg-insurance')?.classList.remove('err');
       updateStepBar();
     });
   });
@@ -203,9 +293,26 @@ function initListeners() {
         });
       }
       if (s.contactMethod) {
-        const pill = document.querySelector(`#uninsured-pills [data-val="${s.contactMethod}"]`);
-        if (pill) selectPill(pill, 'f-uninsured', 'uninsured-pills');
+        const pill = document.querySelector(`#notification-pills [data-val="${s.contactMethod}"]`);
+        if (pill) selectPill(pill, 'f-notification', 'notification-pills');
       }
     } catch(e) {}
   }
+}
+
+/* ── Expose globals ──────────────────────────────────────────────────────── */
+if (typeof window !== 'undefined') {
+  window.toggleDrawer       = toggleDrawer;
+  window.syncChipValues     = syncChipValues;
+  window.closeDrawer        = closeDrawer;
+  window.submitForm         = submitForm;
+  window.selectPill         = selectPill;
+  window.goFunnelStep       = goFunnelStep;
+  window.toggleMoreChips    = toggleMoreChips;
+  window.toggleInsuranceChips = toggleInsuranceChips;
+}
+
+/* ── Init ────────────────────────────────────────────────────────────────── */
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', initListeners);
 }

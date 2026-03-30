@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Join Moxident — Get Emergency Dental Patients</title>
+  <meta name="description" content="We route emergency dental patients directly to your clinic via SMS when you have open slots. Free to join. Pay $50 only when a patient is matched."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <link rel="stylesheet" href="/dentist/join/join.css"/>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZSTV1QEQNN"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ZSTV1QEQNN');
+  </script>
+
+  <!-- LinkedIn Insight Tag -->
+  <script type="text/javascript">
+    _linkedin_partner_id = "9061468";
+    window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+    window._linkedin_data_partner_ids.push(_linkedin_partner_id);
+  </script>
+  <script type="text/javascript">
+    (function(l) {
+      if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])};
+      window.lintrk.q=[]}
+      var s = document.getElementsByTagName("script")[0];
+      var b = document.createElement("script");
+      b.type = "text/javascript"; b.async = true;
+      b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
+      s.parentNode.insertBefore(b, s);
+    })(window.lintrk);
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=9061468&fmt=gif"/>
+  </noscript>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="main-nav">
+  <a class="nav-logo" href="/">
+    <div class="nav-dot"></div>Moxident
+  </a>
+  <div class="nav-pills">
+    <button class="nav-pill" onclick="window.location.href='/'">Back to home</button>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleDrawer()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile Drawer -->
+<div class="nav-drawer" id="nav-drawer">
+  <div class="drawer-section">For Dentists</div>
+  <button class="drawer-pill" onclick="window.location.href='/dentist/join/';closeDrawer()">🦷 Join the Network</button>
+  <div class="drawer-divider"></div>
+  <button class="drawer-pill" onclick="window.location.href='/';closeDrawer()">← Back to Moxident</button>
+</div>
+
+<!-- FUNNEL WRAPPER -->
+<div class="funnel-wrap">
+
+  <!-- ── STEP 1: Value + Proof ── -->
+  <div class="funnel-step active" id="funnel-step-1">
+
+    <div class="funnel-progress">
+      <div class="funnel-seg done" id="fseg-1-1"></div>
+      <div class="funnel-seg" id="fseg-1-2"></div>
+      <div class="funnel-seg" id="fseg-1-3"></div>
+    </div>
+
+    <div class="funnel-scarcity-tag">Seattle pilot — 3 spots left</div>
+
+    <h1 class="funnel-h1">Get emergency patients when you have open slots</h1>
+    <p class="funnel-sub">We route real patients searching for emergency dental care directly to your clinic — via text, in real time.</p>
+
+    <div class="proof-card">
+      <div class="proof-card-label">LAST NIGHT IN SEATTLE</div>
+      <div class="proof-row">
+        <div class="proof-dot"></div>
+        <span class="proof-text">Patient searching for emergency dentist</span>
+        <span class="proof-time">10:15pm</span>
+      </div>
+      <div class="proof-row">
+        <div class="proof-dot"></div>
+        <span class="proof-text">Urgent request submitted</span>
+        <span class="proof-time">7:15am</span>
+      </div>
+      <div class="proof-row">
+        <div class="proof-dot"></div>
+        <span class="proof-text">Match confirmed, dentist notified</span>
+        <span class="proof-time">7:16am</span>
+      </div>
+    </div>
+
+    <div class="funnel-stats-row">
+      <div class="funnel-stat">
+        <div class="funnel-stat-num">$0</div>
+        <div class="funnel-stat-lbl">to join</div>
+      </div>
+      <div class="funnel-stat">
+        <div class="funnel-stat-num">0%</div>
+        <div class="funnel-stat-lbl">risk to join</div>
+      </div>
+      <div class="funnel-stat">
+        <div class="funnel-stat-num">SMS</div>
+        <div class="funnel-stat-lbl">no app needed</div>
+      </div>
+    </div>
+
+    <p class="funnel-trust-line">Clinics only pay when a patient shows up — no risk.</p>
+    <button class="submit-btn" onclick="goFunnelStep(2)">Check if your area has demand →</button>
+    <p class="funnel-fine-print">Takes 30 seconds. No commitment.</p>
+
+  </div>
+
+  <!-- ── STEP 2: Zip only ── -->
+  <div class="funnel-step hidden" id="funnel-step-2">
+
+    <div class="funnel-progress">
+      <div class="funnel-seg done" id="fseg-2-1"></div>
+      <div class="funnel-seg done" id="fseg-2-2"></div>
+      <div class="funnel-seg" id="fseg-2-3"></div>
+    </div>
+
+    <h2 class="funnel-h2">See how many emergency requests are coming from your area</h2>
+    <p class="funnel-sub">You're not signing up — you're checking demand. Enter your zip and we'll show you what's already happening near you.</p>
+
+    <div class="fg" id="fg-zip-check">
+      <label class="fl">Zip code</label>
+      <input class="fi" id="f-zip-check" type="text" placeholder="98033" maxlength="5" inputmode="numeric"/>
+      <span class="f-err">Enter a valid zip code</span>
+    </div>
+
+    <button class="submit-btn" onclick="goFunnelStep(3)">Check emergency demand near me →</button>
+    <p class="funnel-fine-print">No spam. No commitment.</p>
+
+  </div>
+
+  <!-- ── STEP 3: Reveal + Full Form ── -->
+  <div class="funnel-step hidden" id="funnel-step-3">
+
+    <div class="funnel-progress">
+      <div class="funnel-seg done" id="fseg-3-1"></div>
+      <div class="funnel-seg done" id="fseg-3-2"></div>
+      <div class="funnel-seg done" id="fseg-3-3"></div>
+    </div>
+
+    <!-- Demand reveal -->
+    <div class="demand-reveal">
+      <div class="demand-reveal-num" id="demand-count">14</div>
+      <div class="demand-reveal-sub">emergency requests near <strong id="zip-display">98033</strong> this week</div>
+    </div>
+
+    <h2 class="funnel-h2">Let's match you with these patients</h2>
+    <p class="funnel-sub">These patients are actively looking for care. Tell us about your practice so we can start routing the right ones to you.</p>
+
+    <div id="join-form-content">
+
+      <div class="join-step-bar">
+        <div class="join-step-seg active" id="seg-1"></div>
+        <div class="join-step-seg" id="seg-2"></div>
+        <div class="join-step-seg" id="seg-3"></div>
+      </div>
+
+      <!-- Section 1: Your Availability -->
+      <div class="join-form-section-block" id="section-1">
+        <div class="join-form-section-label">Your availability</div>
+        <p class="form-microcopy">Takes ~30 seconds</p>
+
+        <div class="fg" id="fg-capacity">
+          <label class="fl">Same-day / next-day openings per week <span class="fl-req">*</span></label>
+          <div class="pill-select" id="capacity-pills">
+            <button type="button" class="pill-option" data-val="rarely"    onclick="selectPill(this,'f-capacity','capacity-pills')">Rarely</button>
+            <button type="button" class="pill-option" data-val="1-2"       onclick="selectPill(this,'f-capacity','capacity-pills')">1–2 times</button>
+            <button type="button" class="pill-option" data-val="3-5"       onclick="selectPill(this,'f-capacity','capacity-pills')">3–5 times</button>
+            <button type="button" class="pill-option" data-val="most-days" onclick="selectPill(this,'f-capacity','capacity-pills')">Most days</button>
+          </div>
+          <input type="hidden" id="f-capacity"/>
+          <span class="f-err">Required</span>
+        </div>
+
+        <div class="fg" id="fg-extended">
+          <label class="fl">Available hours <span class="fl-req">*</span></label>
+          <div class="pill-select" id="extended-pills">
+            <button type="button" class="pill-option" data-val="none"     onclick="selectPill(this,'f-extended','extended-pills')">Weekdays only</button>
+            <button type="button" class="pill-option" data-val="evenings" onclick="selectPill(this,'f-extended','extended-pills')">+ Evenings</button>
+            <button type="button" class="pill-option" data-val="weekends" onclick="selectPill(this,'f-extended','extended-pills')">+ Weekends</button>
+            <button type="button" class="pill-option" data-val="both"     onclick="selectPill(this,'f-extended','extended-pills')">Evenings &amp; Weekends</button>
+          </div>
+          <input type="hidden" id="f-extended"/>
+          <span class="f-err">Required</span>
+        </div>
+
+        <div class="fg" id="fg-years">
+          <label class="fl">Practice area <span class="fl-req">*</span></label>
+          <input class="fi" id="f-years" type="text" placeholder="City or zip code — e.g. Redmond, WA or 98052"/>
+          <span class="f-err">Required</span>
+        </div>
+      </div>
+
+      <!-- Section 2: What You Can Handle — chip UI -->
+      <div class="join-form-section-block" id="section-2">
+
+       <div class="fg" id="fg-insurance">
+          <div class="join-form-section-label">What can you handle on short notice?</div>
+          <p class="form-microcopy">Select a few — you can change this later</p>
+          <div class="chip-grid" id="case-chip-grid">
+            <button type="button" class="case-chip" data-val="Tooth pain">Tooth pain</button>
+            <button type="button" class="case-chip" data-val="Broken tooth">Broken tooth</button>
+            <button type="button" class="case-chip" data-val="Infection">Infection</button>
+            <button type="button" class="case-chip" data-val="Extraction">Extraction</button>
+            <button type="button" class="case-chip" data-val="Root canal">Root canal</button>
+            <button type="button" class="case-chip" data-val="Wisdom tooth">Wisdom tooth</button>
+            <span class="chip-more hidden" id="chip-more">
+              <button type="button" class="case-chip" data-val="Lost filling or crown">Lost filling or crown</button>
+              <button type="button" class="case-chip" data-val="Knocked-out tooth">Knocked-out tooth</button>
+              <button type="button" class="case-chip" data-val="Swelling / gum issues">Swelling / gum issues</button>
+              <button type="button" class="case-chip" data-val="Dental anxiety patients">Dental anxiety</button>
+              <button type="button" class="case-chip" data-val="Pediatric emergencies">Pediatric emergencies</button>
+            </span>
+          </div>
+          <button class="chip-show-more" id="chip-show-more-btn" onclick="toggleMoreChips()">+ Show more</button>
+          <input type="hidden" id="f-case-types"/>
+          <span class="f-err">Select at least one</span>
+        </div>
+ 
+        <div class="fg chip-subsection">
+          <div class="join-form-section-label">Insurance accepted <span class="join-optional">(optional)</span></div>
+          <p class="form-microcopy">Select what you take — skip if you accept most</p>
+          <div class="chip-grid" id="insurance-chip-grid">
+            <button type="button" class="case-chip" data-val="Delta Dental">Delta Dental</button>
+            <button type="button" class="case-chip" data-val="Premera">Premera</button>
+            <button type="button" class="case-chip" data-val="Regence">Regence</button>
+            <button type="button" class="case-chip" data-val="Cigna" >Cigna</button>
+            <button type="button" class="case-chip" data-val="MetLife">MetLife</button>
+            <button type="button" class="case-chip" data-val="Aetna">Aetna</button>
+            <span class="chip-more hidden" id="insurance-chip-more">
+              <button type="button" class="case-chip" data-val="Moda Health">Moda Health</button>
+              <button type="button" class="case-chip" data-val="Washington Apple Health">Medicaid (Apple Health)</button>
+              <button type="button" class="case-chip" data-val="Fee for service / cash only">Cash / self-pay</button>
+              <button type="button" class="case-chip" data-val="Other">Other</button>
+            </span>
+          </div>
+          <button class="chip-show-more" id="insurance-show-more-btn" onclick="toggleInsuranceChips()">+ Show more</button>
+          <input type="hidden" id="f-insurance-types"/>
+        </div>
+      </div>
+
+      <!-- Section 3: How You Work -->
+      <div class="join-form-section-block" id="section-3">
+        <div class="join-form-section-label">How you work</div>
+
+        <div class="fg" id="fg-uninsured">
+          <label class="fl">Notification preference <span class="fl-req">*</span></label>
+          <div class="pill-select" id="uninsured-pills">
+            <button type="button" class="pill-option" data-val="sms-personal"  onclick="selectPill(this,'f-uninsured','uninsured-pills')">SMS to my cell</button>
+            <button type="button" class="pill-option" data-val="sms-frontdesk" onclick="selectPill(this,'f-uninsured','uninsured-pills')">SMS to front desk</button>
+            <button type="button" class="pill-option" data-val="call"          onclick="selectPill(this,'f-uninsured','uninsured-pills')">Phone call first</button>
+            <button type="button" class="pill-option" data-val="flexible"      onclick="selectPill(this,'f-uninsured','uninsured-pills')">Flexible</button>
+          </div>
+          <input type="hidden" id="f-uninsured"/>
+          <span class="f-err">Required</span>
+        </div>
+
+        <div class="fg" id="fg-name">
+          <label class="fl">Full name <span class="fl-req">*</span></label>
+          <input class="fi" id="f-name" type="text" placeholder="Dr. Jane Smith" autocomplete="name"/>
+          <span class="f-err">Required</span>
+        </div>
+
+        <div class="fg" id="fg-practice">
+          <label class="fl">Practice name <span class="fl-req">*</span></label>
+          <input class="fi" id="f-practice" type="text" placeholder="Smile Dental Redmond"/>
+          <span class="f-err">Required</span>
+        </div>
+
+        <div class="f-row">
+          <div class="fg" id="fg-phone">
+            <label class="fl">Phone <span class="fl-req">*</span></label>
+            <input class="fi" id="f-phone" type="tel" placeholder="(425) 000-0000" autocomplete="tel"/>
+            <span class="f-err">Enter a valid phone number</span>
+          </div>
+          <div class="fg" id="fg-email">
+            <label class="fl">Email <span class="fl-req">*</span></label>
+            <input class="fi" id="f-email" type="email" placeholder="jane@smiledental.com" autocomplete="email"/>
+            <span class="f-err">Enter a valid email</span>
+          </div>
+        </div>
+
+        <div class="fg" id="fg-zip">
+          <label class="fl">Coverage zip codes <span class="fl-req">*</span></label>
+          <input class="fi" id="f-zip" type="text" placeholder="98101, 98102, 98103"/>
+          <span class="f-err">Enter at least one zip code</span>
+        </div>
+      </div>
+
+      <!-- Section 4: Last Details -->
+      <div class="join-form-section-block" id="section-4">
+        <div class="join-form-section-label">Last details</div>
+        <p class="form-microcopy">Last step</p>
+        <div class="fg join-exclusions">
+          <label class="fl">Anything we should know? <span class="join-optional">(optional)</span></label>
+          <input class="fi" id="f-exclusions" type="text" placeholder="Hours, languages spoken, types of patients you prefer"/>
+        </div>
+      </div>
+
+      <p class="sms-consent">By joining the Moxident network you agree to receive SMS notifications for patient referral alerts. Message and data rates may apply. Reply STOP to opt out.</p>
+
+      <p class="funnel-trust-line">We'll review and activate your profile within 24 hours.</p>
+      <button type="button" class="submit-btn" id="join-submit-btn" onclick="submitForm()">
+        Start receiving patients →
+      </button>
+      <p class="form-disclaimer">Free to join · No contracts · We'll confirm within 24 hours</p>
+
+    </div>
+
+    <!-- Success screen -->
+    <div class="join-success hidden" id="join-success">
+      <div class="join-success-icon">🦷</div>
+      <div class="join-success-title">You're all set.</div>
+      <p class="join-success-msg">
+        We'll confirm your setup within 24 hours. Once live, patient alerts will come through exactly as you configured.
+      </p>
+      <div class="early-divider"></div>
+      <div class="early-urgent">
+        <strong>Questions?</strong> Email us at <a href="mailto:admin@moxident.com" class="link-red">admin@moxident.com</a>
+      </div>
+    </div>
+
+  </div>
+  <!-- end funnel-step-3 -->
+
+</div>
+<!-- end funnel-wrap -->
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <strong>Moxident</strong> — Emergency Dental Routing · Seattle, WA
+  &nbsp;·&nbsp; <span class="site-footer-link" onclick="window.location.href='/privacy-policy'">Privacy Policy</span>
+  &nbsp;·&nbsp; <a href="mailto:admin@moxident.com" class="site-footer-link">admin@moxident.com</a>
+</footer>
+
+<script type="module" src="/dentist/join/join.mjs"></script>
+</body>
+</html>

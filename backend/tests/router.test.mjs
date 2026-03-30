@@ -41,9 +41,9 @@ describe("submitRequest", () => {
     findDentistsByZip.mockResolvedValueOnce([mockDentist]);
     updatePatientStatus.mockResolvedValueOnce({});
 
-    const id = await submitRequest({ name: "Jane", phone: "+12065559999", zip: "98033", symptom: "Tooth pain" });
+    const result = await submitRequest({ name: "Jane", phone: "+12065559999", zip: "98033", symptom: "Tooth pain" });
 
-    expect(id).toBe("req-001");
+    expect(result.requestId).toBe("req-001");
     expect(sendSMS).toHaveBeenCalledTimes(1);
     expect(sendSMS.mock.calls[0][0]).toBe("+14255551234"); // texted dentist
   });

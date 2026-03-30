@@ -8,8 +8,8 @@ button, input, select, textarea { font: inherit; }
 
 :root {
   --ink:    #0d1117;
-  --ink2:   #3d4a5c;
-  --ink3:   #8391a6;
+  --lin2:    #2f3b4b;
+  --ink3:   #6b7788;
   --paper:  #f8f7f4;
   --white:  #ffffff;
   --red:    #c8281e;

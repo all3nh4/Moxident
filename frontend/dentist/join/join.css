@@ -3,13 +3,286 @@
    Supplements /styles.css — never overrides it
 ═══════════════════════════════════════════ */
 
+/* ── Funnel wrapper ── */
+.funnel-wrap {
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+/* ── Funnel steps ── */
+.funnel-step {
+  animation: fadeUp .35s ease both;
+}
+
+/* ── Funnel progress bar ── */
+.funnel-progress {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 2rem;
+}
+
+.funnel-seg {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  background: var(--bdr);
+  transition: background .3s;
+}
+
+.funnel-seg.done { background: var(--red); }
+
+/* ── Scarcity tag ── */
+.funnel-scarcity-tag {
+  display: inline-block;
+  background: var(--red-lt);
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--bdr);
+  margin-bottom: 1.25rem;
+}
+
+/* ── Funnel headings ── */
+.funnel-h1 {
+  font-family: var(--serif);
+  font-size: clamp(1.9rem, 4.5vw, 2.6rem);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: .75rem;
+}
+
+.funnel-h2 {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 3.5vw, 2rem);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: .5rem;
+}
+
+.funnel-sub {
+  font-size: .95rem;
+  color: var(--ink2);
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Proof card ── */
+.proof-card {
+  background: var(--paper);
+  border: 1px solid var(--bdr);
+  border-radius: var(--rad-lg);
+  padding: 16px 18px;
+  margin: 1.25rem 0;
+}
+
+.proof-card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  color: var(--ink3);
+  margin-bottom: 10px;
+}
+
+.proof-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.proof-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #1e6b35;
+  flex-shrink: 0;
+}
+
+.proof-text { flex: 1; }
+
+.proof-time {
+  font-size: 12px;
+  color: var(--ink3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── Funnel stats row ── */
+.funnel-stats-row {
+  display: flex;
+  gap: 10px;
+  margin: 1.25rem 0 1.75rem;
+}
+
+.funnel-stat {
+  flex: 1;
+  text-align: center;
+  background: var(--paper);
+  border: 1px solid var(--bdr);
+  border-radius: var(--rad);
+  padding: 14px 8px;
+}
+
+.funnel-stat-num {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.funnel-stat-lbl {
+  font-size: 11px;
+  color: var(--ink2);
+  margin-top: 3px;
+}
+
+/* ── Demand reveal ── */
+.demand-reveal {
+  background: var(--paper);
+  border: 1px solid var(--bdr);
+  border-radius: var(--rad-lg);
+  padding: 2rem 1rem;
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.demand-reveal-num {
+  font-family: var(--serif);
+  font-size: clamp(3rem, 10vw, 4rem);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.demand-reveal-sub {
+  font-size: .9rem;
+  color: var(--ink2);
+  margin-top: 8px;
+}
+
+/* ── Quick-select chips ── */
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.chip-more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.chip-more.hidden {
+  display: none !important;
+}
+
+button.case-chip,
+.case-chip {
+  padding: 10px 16px;
+  border: 1.5px solid var(--bdr);
+  border-radius: 24px !important;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans, inherit);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s;
+  white-space: nowrap;
+  outline: none;
+  box-shadow: none;
+}
+
+button.case-chip:hover,
+.case-chip:hover {
+  border-color: var(--red);
+  background: var(--white);
+  color: var(--ink);
+}
+
+button.case-chip.selected,
+.case-chip.selected {
+  border-color: var(--red);
+  background: var(--red-lt);
+  color: var(--ink);
+  font-weight: 600;
+}
+.case-chip::before,
+.case-chip::after {
+  content: none !important;
+  display: none !important;
+}
+.chip-show-more {
+  background: none;
+  border: none;
+  color: var(--red);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 0 0;
+  display: block;
+}
+
+.chip-show-more:hover { opacity: .75; }
+
+.chip-subsection {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--bdr);
+}
+
+/* ── Trust line (above CTA) ── */
+.funnel-trust-line {
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: center;
+  margin-bottom: 12px;
+  margin-top: 8px;
+}
+
+/* ── Form microcopy ── */
+.form-microcopy {
+  font-size: .82rem;
+  color: var(--ink3);
+  margin-bottom: 14px;
+}
+
+/* ── Fine print below CTA ── */
+.funnel-fine-print {
+  font-size: 12px;
+  color: var(--ink3);
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* ── SMS consent ── */
+.sms-consent {
+  font-size: 12px;
+  color: var(--ink3);
+  text-align: center;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+/* ── Red link ── */
+.link-red { color: var(--red); }
+
 /* ── Stat bar ── */
 .stat-bar {
   background: var(--ink);
   color: #fff;
   padding: 32px 20px;
 }
-
 
 .stat-inner {
   max-width: 900px;
@@ -38,9 +311,9 @@
 .join-section {
   padding: 64px 20px;
 }
-.join-exclusions 
-{
-   margin-top: 8px; 
+
+.join-exclusions {
+  margin-top: 8px;
 }
 
 .join-section-inner {
@@ -135,7 +408,7 @@
   margin-bottom: 28px;
 }
 
-/* ── Step progress bar ── */
+/* ── Step progress bar (inside form) ── */
 .join-step-bar {
   display: flex;
   gap: 6px;
@@ -165,14 +438,14 @@
 
 .join-form-section-label {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: .09em;
   text-transform: uppercase;
-  color: var(--ink3);
+  color: var(--ink);
   margin-bottom: 18px;
 }
 
-/* ── Specialties checkbox grid ── */
+/* ── Specialties checkbox grid (kept for fallback) ── */
 .join-checkbox-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -246,13 +519,59 @@
   .stat-inner          { grid-template-columns: 1fr; gap: 32px; }
   .join-checkbox-grid  { grid-template-columns: 1fr; }
   .join-step-bar       { gap: 4px; }
+  .funnel-stats-row    { gap: 8px; }
+  .funnel-wrap         { padding: 32px 16px 64px; }
 }
 
 @media (max-width: 520px) {
-  .join-form-wrap      { padding: 0; }
-  .join-section        { padding: 44px 20px; }
+  .join-form-wrap   { padding: 0; }
+  .join-section     { padding: 44px 20px; }
 }
 
 .hidden {
   display: none !important;
+}
+
+/* ═══════════════════════════════════════════
+   PILL-SELECT → CHIP STYLE
+   Makes capacity, extended-hours, and
+   notification-preference rows look identical
+   to the case-chip / insurance chip rows.
+═══════════════════════════════════════════ */
+
+/* Container: flex-wrap like chip-grid */
+.pill-select {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* Each button: identical to .case-chip */
+.pill-option {
+  padding: 10px 16px;
+  border: 1.5px solid var(--bdr) !important;
+  border-radius: 24px !important;
+  background: var(--paper);
+  color: var(--ink2);
+  font-family: var(--sans, inherit);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s;
+  white-space: nowrap;
+  outline: none;
+  box-shadow: none !important;
+}
+
+.pill-option:hover {
+  border-color: var(--red) !important;
+  background: var(--white);
+  color: var(--ink);
+}
+
+.pill-option.selected {
+  border-color: var(--red) !important;
+  background: var(--red-lt);
+  color: var(--ink);
+  font-weight: 600;
 }
