@@ -3,7 +3,7 @@ import { submitRequest, handleDentistReply } from "./router.mjs";
 import { savePatient, findDentistsByZip, findDentistByPhone,
          updatePatientStatus, findOpenRequestByDentist,
          saveDentistApplication, saveLead, getLeads, updateLead,
-         getDentistApplications } from "./db.mjs";
+         getDentistApplications,approveDentistApplication } from "./db.mjs";
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 
 const ses = new SESClient({ region: "us-east-2" });
@@ -38,6 +38,8 @@ Procedures:       ${JSON.stringify(data.procedures || [])}
 Availability:     ${JSON.stringify(data.availability || {})}
 
 ---
+APPROVE THIS DENTIST (one click):
+https://7i7j7c8rx7.execute-api.us-east-2.amazonaws.com/prod/approve-dentist?applicationId=${applicationId}
 Moxident Admin Notification
   `.trim();
   try {
@@ -101,6 +103,31 @@ Moxident Admin Notification
     console.error("Onboarding email notification failed:", err.message);
     // Don't fail the request if email fails
   }
+}
+async function sendWelcomeEmail(dentist) {
+  const subject = `You're live on Moxident`;
+  const body = `
+Hi ${dentist.name},
+
+You're now active on the Moxident network. When a patient in your area submits an emergency request, you'll receive an SMS with their name, symptom, and zip code.
+
+Reply YES to accept the case or NO to pass. If you accept, the patient will expect a call from your office shortly.
+
+Questions? Reply to this email.
+
+Allen Hafezipour
+CEO & Founder, Moxident
+allen@moxident.com
+  `.trim();
+
+  await ses.send(new SendEmailCommand({
+    Source: "admin@moxident.com",
+    Destination: { ToAddresses: [dentist.email] },
+    Message: {
+      Subject: { Data: subject },
+      Body: { Text: { Data: body } },
+    },
+  }));
 }
 
 export const handler = async (event) => {
@@ -348,6 +375,41 @@ export const handler = async (event) => {
       };
     }
   }
+  // GET /approve-dentist
+if (path === "/approve-dentist" && method === "GET") {
+  try {
+    const applicationId = event.queryStringParameters?.applicationId;
+    if (!applicationId) {
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "text/html" },
+        body: "<h2>Missing application ID.</h2>",
+      };
+    }
+    const result = await approveDentistApplication(applicationId);
+    await sendWelcomeEmail(result);
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "text/html" },
+      body: `
+        <html>
+          <body style="font-family:sans-serif;max-width:500px;margin:80px auto;text-align:center;">
+            <h2 style="color:#0f1a2e;">✓ Dentist Approved</h2>
+            <p style="color:#555;">${result.practiceName} is now live on the Moxident network.</p>
+            <p style="color:#555;">A welcome email has been sent to ${result.email}.</p>
+          </body>
+        </html>
+      `,
+    };
+  } catch (err) {
+    console.error("Approve dentist error:", err.message);
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "text/html" },
+      body: "<h2>Something went wrong. Please try again.</h2>",
+    };
+  }
+}
 
   return { statusCode: 404, headers, body: JSON.stringify({ error: "Not found" }) };
 };

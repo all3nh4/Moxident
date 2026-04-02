@@ -199,3 +199,50 @@ export async function updateLead(leadId, data) {
     ...(Object.keys(names).length ? { ExpressionAttributeNames: names } : {}),
   }));
 }
+export async function approveDentistApplication(applicationId) {
+  const result = await db.send(new GetItemCommand({
+    TableName: "moxident-dentist-applications",
+    Key: { applicationId: { S: applicationId } },
+  }));
+
+  if (!result.Item) throw new Error("Application not found");
+
+  const item = result.Item;
+
+  const dentistId = `dentist-${randomUUID()}`;
+  await db.send(new PutItemCommand({
+    TableName: "moxident-dentists",
+    Item: {
+      dentistId:              { S: dentistId },
+      name:                   { S: item.name?.S || "" },
+      practiceName:           { S: item.practiceName?.S || "" },
+      phone:                  { S: item.phone?.S || "" },
+      email:                  { S: item.email?.S || "" },
+      zipCodes:               { S: item.zipCodes?.S || "" },
+      practiceArea:           { S: item.practiceArea?.S || "" },
+      dailyCapacity:          { S: item.dailyCapacity?.S || "" },
+      extendedHours:          { S: item.extendedHours?.S || "" },
+      notificationPreference: { S: item.notificationPreference?.S || "" },
+      caseTypes:              { S: item.caseTypes?.S || "" },
+      insuranceAccepted:      { S: item.insuranceAccepted?.S || "" },
+      notes:                  { S: item.notes?.S || "" },
+      active:                 { BOOL: true },
+      approvedAt:             { S: new Date().toISOString() },
+    },
+  }));
+
+  await db.send(new UpdateItemCommand({
+    TableName: "moxident-dentist-applications",
+    Key: { applicationId: { S: applicationId } },
+    UpdateExpression: "SET #s = :s",
+    ExpressionAttributeNames: { "#s": "status" },
+    ExpressionAttributeValues: { ":s": { S: "approved" } },
+  }));
+
+  return {
+    practiceName: item.practiceName?.S || "",
+    email:        item.email?.S || "",
+    name:         item.name?.S || "",
+    phone:        item.phone?.S || "",
+  };
+}
