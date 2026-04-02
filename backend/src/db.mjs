@@ -1,7 +1,8 @@
 // src/db.mjs
 import { DynamoDBClient, PutItemCommand, GetItemCommand,
-         ScanCommand, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
+         ScanCommand, UpdateItemCommand, BatchGetItemCommand } from "@aws-sdk/client-dynamodb";
 import { randomUUID } from "crypto";
+import { BY_ZIP, CITIES } from "./cities.mjs";
 
 const db = new DynamoDBClient({ region: "us-east-2" });
 
@@ -175,6 +176,47 @@ export async function getLeads() {
     TableName: "moxident-leads",
   }));
   return result.Items || [];
+}
+
+export async function getSearchVolume(zipCode) {
+  // Look up primary zip
+  const result = await db.send(new GetItemCommand({
+    TableName: "moxident-search-volume",
+    Key: { zipCode: { S: zipCode } },
+  }));
+
+  const item = result.Item;
+  const monthlySearches = item ? Number(item.monthlySearches?.N || "0") : 0;
+  const city = item?.city?.S || null;
+
+  if (monthlySearches > 0) {
+    return { monthlySearches, city, isAggregated: false };
+  }
+
+  // Find adjacent zips for this zip code
+  const cityEntry = BY_ZIP.get(zipCode)
+    || CITIES.find(c => c.adjacentZips.includes(zipCode));
+
+  if (!cityEntry || !cityEntry.adjacentZips.length) {
+    return { monthlySearches: null, city: cityEntry?.city || city, isAggregated: false };
+  }
+
+  // Batch-get adjacent zips
+  const keys = cityEntry.adjacentZips.map(z => ({ zipCode: { S: z } }));
+  const batchResult = await db.send(new BatchGetItemCommand({
+    RequestItems: {
+      "moxident-search-volume": { Keys: keys },
+    },
+  }));
+
+  const adjacentItems = batchResult.Responses?.["moxident-search-volume"] || [];
+  const total = adjacentItems.reduce((sum, i) => sum + Number(i.monthlySearches?.N || "0"), 0);
+
+  if (total > 0) {
+    return { monthlySearches: total, city: cityEntry.city, isAggregated: true };
+  }
+
+  return { monthlySearches: null, city: cityEntry.city, isAggregated: false };
 }
 
 export async function updateLead(leadId, data) {

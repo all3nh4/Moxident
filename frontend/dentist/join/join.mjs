@@ -57,6 +57,60 @@ export function goFunnelStep(n) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+/* ── Zip check → search volume API → reveal ─────────────────────────────── */
+export async function checkZipAndReveal() {
+  const zipInput = document.getElementById('f-zip-check');
+  const zip = zipInput?.value.trim() || '';
+
+  if (!/^\d{5}$/.test(zip)) {
+    document.getElementById('fg-zip-check')?.classList.add('err');
+    return;
+  }
+  document.getElementById('fg-zip-check')?.classList.remove('err');
+
+  const btn = document.getElementById('zip-check-btn');
+  btn.disabled = true;
+  btn.textContent = 'Checking...';
+
+  // Show step 3 with loading state
+  goFunnelStep(3);
+  const loading = document.getElementById('demand-loading');
+  const content = document.getElementById('demand-content');
+  if (loading) loading.classList.remove('hidden');
+  if (content) content.classList.add('hidden');
+
+  try {
+    const res = await fetch(`${API}/search-volume?zip=${zip}`);
+    const data = await res.json();
+
+    const countEl = document.getElementById('demand-count');
+    const aggregatedEl = document.getElementById('demand-aggregated');
+    const cityEl = document.getElementById('demand-city');
+
+    if (data.monthlySearches != null) {
+      if (countEl) countEl.textContent = data.monthlySearches.toLocaleString();
+    } else {
+      if (countEl) countEl.textContent = '—';
+    }
+
+    if (data.isAggregated && data.city) {
+      if (aggregatedEl) aggregatedEl.classList.remove('hidden');
+      if (cityEl) cityEl.textContent = data.city;
+    } else {
+      if (aggregatedEl) aggregatedEl.classList.add('hidden');
+    }
+  } catch (err) {
+    console.error('Search volume fetch error:', err.message);
+    const countEl = document.getElementById('demand-count');
+    if (countEl) countEl.textContent = '—';
+  } finally {
+    if (loading) loading.classList.add('hidden');
+    if (content) content.classList.remove('hidden');
+    btn.disabled = false;
+    btn.textContent = 'See patients in your area →';
+  }
+}
+
 /* ── Chip toggles ────────────────────────────────────────────────────────── */
 export function toggleMoreChips() {
   const more = document.getElementById('chip-more');
@@ -310,6 +364,7 @@ if (typeof window !== 'undefined') {
   window.goFunnelStep       = goFunnelStep;
   window.toggleMoreChips    = toggleMoreChips;
   window.toggleInsuranceChips = toggleInsuranceChips;
+  window.checkZipAndReveal    = checkZipAndReveal;
 }
 
 /* ── Init ────────────────────────────────────────────────────────────────── */

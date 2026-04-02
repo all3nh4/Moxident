@@ -116,7 +116,7 @@
     </div>
 
     <p class="funnel-trust-line">Clinics only pay when a patient shows up — no risk.</p>
-    <button class="submit-btn" onclick="goFunnelStep(2)">Check if your area has demand →</button>
+    <button class="submit-btn" onclick="goFunnelStep(2)">See patients in your area →</button>
     <p class="funnel-fine-print">Takes 30 seconds. No commitment.</p>
 
   </div>
@@ -139,7 +139,7 @@
       <span class="f-err">Enter a valid zip code</span>
     </div>
 
-    <button class="submit-btn" onclick="goFunnelStep(3)">Check emergency demand near me →</button>
+    <button class="submit-btn" id="zip-check-btn" onclick="checkZipAndReveal()">See patients in your area →</button>
     <p class="funnel-fine-print">No spam. No commitment.</p>
 
   </div>
@@ -154,9 +154,16 @@
     </div>
 
     <!-- Demand reveal -->
-    <div class="demand-reveal">
-      <div class="demand-reveal-num" id="demand-count">14</div>
-      <div class="demand-reveal-sub">emergency requests near <strong id="zip-display">98033</strong> this week</div>
+    <div class="demand-reveal" id="demand-reveal">
+      <div class="demand-loading hidden" id="demand-loading">
+        <div class="demand-spinner"></div>
+        <div class="demand-loading-text">Checking search volume...</div>
+      </div>
+      <div id="demand-content">
+        <div class="demand-reveal-num" id="demand-count">—</div>
+        <div class="demand-reveal-sub">people searched for an emergency dentist in your area last month</div>
+        <div class="demand-aggregated-sub hidden" id="demand-aggregated">across the <strong id="demand-city"></strong> area</div>
+      </div>
     </div>
 
     <h2 class="funnel-h2">Let's match you with these patients</h2>

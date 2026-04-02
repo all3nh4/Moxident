@@ -3,7 +3,7 @@ import { submitRequest, handleDentistReply } from "./router.mjs";
 import { savePatient, findDentistsByZip, findDentistByPhone,
          updatePatientStatus, findOpenRequestByDentist,
          saveDentistApplication, saveLead, getLeads, updateLead,
-         getDentistApplications } from "./db.mjs";
+         getDentistApplications, getSearchVolume } from "./db.mjs";
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 
 const ses = new SESClient({ region: "us-east-2" });
@@ -317,6 +317,40 @@ export const handler = async (event) => {
     } catch (err) {
       console.error("Lead update error:", err.message);
       return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to update lead" }) };
+    }
+  }
+
+  // GET /search-volume?zip=XXXXX
+  if (path === "/search-volume" && method === "GET") {
+    const zip = event.queryStringParameters?.zip
+      || new URLSearchParams(event.rawQueryString || "").get("zip")
+      || "";
+    if (!/^\d{5}$/.test(zip)) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: "Invalid zip code. Must be 5 digits." }),
+      };
+    }
+    try {
+      const result = await getSearchVolume(zip);
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          zip,
+          monthlySearches: result.monthlySearches,
+          isAggregated: result.isAggregated,
+          city: result.city,
+        }),
+      };
+    } catch (err) {
+      console.error("Search volume error:", err.message);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: "Failed to fetch search volume" }),
+      };
     }
   }
 
