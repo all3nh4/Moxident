@@ -13,6 +13,7 @@ jest.unstable_mockModule("../src/db.mjs", () => ({
   saveLead:                 jest.fn(),
   getLeads:                 jest.fn(),
   updateLead:               jest.fn(),
+  getSearchVolume:          jest.fn(),
 }));
 
 // ── Mock router ────────────────────────────────────────────────────

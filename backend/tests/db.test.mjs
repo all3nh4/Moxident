@@ -3,11 +3,12 @@ import { jest, describe, it, beforeEach, expect } from "@jest/globals";
 const mockSend = jest.fn();
 
 jest.unstable_mockModule("@aws-sdk/client-dynamodb", () => ({
-  DynamoDBClient:    jest.fn().mockImplementation(() => ({ send: mockSend })),
-  PutItemCommand:    jest.fn().mockImplementation((p) => ({ type: "PutItem", params: p })),
-  GetItemCommand:    jest.fn().mockImplementation((p) => ({ type: "GetItem", params: p })),
-  UpdateItemCommand: jest.fn().mockImplementation((p) => ({ type: "UpdateItem", params: p })),
-  ScanCommand:       jest.fn().mockImplementation((p) => ({ type: "Scan", params: p })),
+  DynamoDBClient:      jest.fn().mockImplementation(() => ({ send: mockSend })),
+  PutItemCommand:      jest.fn().mockImplementation((p) => ({ type: "PutItem", params: p })),
+  GetItemCommand:      jest.fn().mockImplementation((p) => ({ type: "GetItem", params: p })),
+  UpdateItemCommand:   jest.fn().mockImplementation((p) => ({ type: "UpdateItem", params: p })),
+  ScanCommand:         jest.fn().mockImplementation((p) => ({ type: "Scan", params: p })),
+  BatchGetItemCommand: jest.fn().mockImplementation((p) => ({ type: "BatchGetItem", params: p })),
 }));
 
 jest.unstable_mockModule("crypto", () => ({

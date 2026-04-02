@@ -23,6 +23,7 @@
   "author": "Allen Hafezipour",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-cloudwatch": "^3.1022.0",
     "@aws-sdk/client-dynamodb": "^3.600.0",
     "@aws-sdk/client-ses": "^3.1011.0",
     "twilio": "^5.12.2"
@@ -31,5 +32,4 @@
     "@jest/globals": "^30.3.0",
     "jest": "^30.3.0"
   }
-  
 }

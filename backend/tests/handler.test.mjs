@@ -15,11 +15,12 @@ import { jest } from '@jest/globals';
 
 const mockSend = jest.fn();
 jest.mock('@aws-sdk/client-dynamodb', () => ({
-  DynamoDBClient:    jest.fn(() => ({ send: mockSend })),
-  PutItemCommand:    jest.fn(input => ({ type: 'PutItemCommand', input })),
-  ScanCommand:       jest.fn(input => ({ type: 'ScanCommand', input })),
-  UpdateItemCommand: jest.fn(input => ({ type: 'UpdateItemCommand', input })),
-  GetItemCommand:    jest.fn(input => ({ type: 'GetItemCommand', input })),
+  DynamoDBClient:      jest.fn(() => ({ send: mockSend })),
+  PutItemCommand:      jest.fn(input => ({ type: 'PutItemCommand', input })),
+  ScanCommand:         jest.fn(input => ({ type: 'ScanCommand', input })),
+  UpdateItemCommand:   jest.fn(input => ({ type: 'UpdateItemCommand', input })),
+  GetItemCommand:      jest.fn(input => ({ type: 'GetItemCommand', input })),
+  BatchGetItemCommand: jest.fn(input => ({ type: 'BatchGetItemCommand', input })),
 }));
 
 jest.mock('@aws-sdk/client-ses', () => ({

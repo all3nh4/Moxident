@@ -168,6 +168,37 @@
   margin-top: 8px;
 }
 
+.demand-aggregated-sub {
+  font-size: .82rem;
+  color: var(--ink3);
+  margin-top: 6px;
+}
+
+/* ── Loading state ── */
+.demand-loading {
+  padding: 1.5rem 0;
+  text-align: center;
+}
+
+.demand-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--bdr);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  margin: 0 auto 10px;
+  animation: spin .7s linear infinite;
+}
+
+.demand-loading-text {
+  font-size: .85rem;
+  color: var(--ink3);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ── Quick-select chips ── */
 .chip-grid {
   display: flex;
