@@ -149,7 +149,9 @@ button, input, select, textarea { font: inherit; }
   margin-left: auto;
   margin-right: auto;
 }
-
+.hidden-initial {
+  display: none;
+}
 .success-note {
   font-size: 14px;
   color: var(--ink3);

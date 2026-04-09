@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZSTV1QEQNN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZSTV1QEQNN');
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17976922373"></script>
+<script>
+  gtag('config', 'AW-17976922373');
+</script>
+<title>Emergency Dental Help Near You — Moxident</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,500;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  .hero-section {
+    padding: 28px 20px 12px;
+  }
+
+  .hero {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .hero-h1 {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 12px 0 0;
+  }
+
+  .static-page {
+    padding-top: 8px;
+  }
+
+  .static-card {
+    margin-top: 0;
+  }
+
+  .step-two-copy {
+    display: none;
+    margin: 0 0 18px;
+  }
+
+  .step-two-copy.show {
+    display: block;
+  }
+
+  .step-two-copy .subhead {
+    margin-top: 10px;
+  }
+
+  .step-one-cta {
+    margin-top: 18px;
+  }
+
+  .hidden-initial {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .hero-section {
+      padding: 20px 16px 8px;
+    }
+
+    .hero-h1 {
+      font-size: 28px;
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+      margin-top: 10px;
+    }
+
+    .static-page {
+      padding-top: 4px;
+    }
+
+    .static-card {
+      padding: 28px 24px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav" id="main-nav">
+  <a class="nav-logo" href="/">
+    <div class="nav-dot"></div>Moxident
+  </a>
+
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleDrawer()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="nav-drawer" id="nav-drawer">
+  <button class="drawer-pill" onclick="window.location.href='/dentist/';closeDrawer()">Dentist Portal</button>
+
+  <div class="drawer-divider"></div>
+
+  <button class="drawer-pill" onclick="window.location.href='/about-us.html';closeDrawer()">About</button>
+  <button class="drawer-pill" onclick="window.location.href='/contact.html';closeDrawer()">Contact</button>
+  <button class="drawer-pill" onclick="window.location.href='/privacy-policy.html';closeDrawer()">Privacy</button>
+  <button class="drawer-pill" onclick="window.location.href='/terms.html';closeDrawer()">Terms</button>
+</div>
+
+<div class="landing-page">
+
+  <!-- headline -->
+  <div class="headline-block" id="headline-block">
+    <p class="eyebrow">Emergency dental — Seattle area</p>
+    <h1>
+      Tooth pain?<br>
+      We can help<br>
+      <span class="accent">right now.</span>
+    </h1>
+    <p class="subhead" id="step-one-subhead">
+      We connect you with dentists who have same-day availability near you.
+    </p>
+
+    <button type="button" class="submit-btn step-one-cta" id="step-one-btn" onclick="showStepTwo()">
+      <span class="btn-label">
+        <span>Check availability</span>
+        <span class="cta-arrow">→</span>
+      </span>
+    </button>
+  </div>
+
+  <!-- social proof chips -->
+  <div class="proof-row" id="proof-row">
+    <div class="proof-chip">
+      <div class="dot dot-green"></div>
+      Local dentists notified in minutes
+    </div>
+  </div>
+
+  <!-- form card -->
+  <div class="form-card hidden-initial" id="form-card">
+
+    <div class="step-two-copy" id="step-two-copy">
+      <p class="subhead">
+        Enter your details so we can match you with a dentist.
+      </p>
+    </div>
+
+    <!-- FORM -->
+    <form id="mox-form" novalidate>
+
+      <div class="fg">
+        <div class="fl">
+          <label for="phone">Your phone number</label>
+        </div>
+        <input
+          class="fi"
+          type="tel"
+          id="phone"
+          name="phone"
+          placeholder="(206) 555-0100"
+          inputmode="tel"
+          autocomplete="tel"
+          maxlength="14"
+        >
+
+        <div class="f-err" id="phone-err">Enter a valid 10-digit number.</div>
+      </div>
+
+      <div class="fg">
+        <div class="fl">
+          <label for="zip">Your zip code</label>
+        </div>
+
+        <div class="zip-wrap">
+          <input
+            class="fi"
+            type="text"
+            id="zip"
+            name="zip"
+            placeholder="98033"
+            inputmode="numeric"
+            autocomplete="postal-code"
+            maxlength="5"
+          >
+          <div class="geo-badge" id="geo-badge">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
+            </svg>
+            <span id="geo-badge-text">Detected</span>
+          </div>
+        </div>
+
+        <div class="field-helper" id="zip-helper">So we match you nearby.</div>
+        <div class="f-err" id="zip-err">Enter a valid 5-digit zip code.</div>
+      </div>
+
+      <div class="sep"></div>
+
+      <button type="submit" class="submit-btn" id="submit-btn">
+        <span class="btn-label">
+          <span>Find available dentist now</span>
+          <span class="cta-arrow">→</span>
+        </span>
+        <div class="spinner"></div>
+      </button>
+
+      <p class="consent">
+        A nearby dentist will call you within minutes if available.<br>
+        By submitting you agree to receive a single SMS from Moxident.
+        <a href="#">Privacy policy</a>.
+      </p>
+
+    </form>
+
+    <!-- SUCCESS (hidden) -->
+    <div class="success-screen" id="success-screen">
+      <div class="success-tooth">🦷</div>
+      <p class="success-title">You're all set.</p>
+
+      <p class="success-headline">
+        We’re matching you to an available dentist right now.
+      </p>
+
+      <p class="success-note">
+        If you don’t get a call within a few minutes, try submitting again or double-check your number.
+      </p>
+    </div>
+
+  </div><!-- /.form-card -->
+
+  <!-- trust metrics -->
+  <div class="trust-strip" id="trust-strip">
+    <div class="trust-item">
+      <span class="trust-val">4 min</span>
+      <span class="trust-lbl">avg. match time</span>
+    </div>
+    <div class="trust-item">
+      <span class="trust-val">No app</span>
+      <span class="trust-lbl">just a text</span>
+    </div>
+    <div class="trust-item">
+      <span class="trust-val">Free</span>
+      <span class="trust-lbl">to use</span>
+    </div>
+  </div>
+
+</div><!-- /.page -->
+
+<script>
+// ─────────────────────────────────────────────────────────
+//  STEP TWO REVEAL
+// ─────────────────────────────────────────────────────────
+function showStepTwo() {
+  document.getElementById('step-one-btn').style.display = 'none';
+  document.getElementById('step-two-copy').classList.add('show');
+  document.getElementById('mox-form').classList.remove('hidden-initial');
+  document.getElementById('phone').focus();
+}
+
+
+// ─────────────────────────────────────────────────────────
+//  GEOLOCATION WATERFALL
+//  1. IP-based  → fires immediately, no permission needed
+//  2. GPS-based → fires after IP, overwrites if more accurate
+// ─────────────────────────────────────────────────────────
+
+const zipEl    = document.getElementById('zip');
+const badge    = document.getElementById('geo-badge');
+const badgeTxt = document.getElementById('geo-badge-text');
+const helper   = document.getElementById('zip-helper');
+
+// Only US 5-digit zips are valid
+function isValidUSZip(z) { return /^\d{5}$/.test(z); }
+
+// Apply a detected zip — shows the badge, pre-fills field, updates banner
+function applyZip(zipCode, source) {
+  if (!isValidUSZip(zipCode)) return;
+  if (zipEl.value.length === 5 && source === 'ip') return;
+  zipEl.value = zipCode;
+  clear('zip');
+
+  badge.className = 'geo-badge show' + (source === 'ip' ? ' refining' : '');
+  badgeTxt.textContent = source === 'ip' ? 'Detected' : 'GPS ✓';
+  helper.textContent   = source === 'ip'
+    ? 'Detected from your network — edit if wrong.'
+    : 'Pinpointed from your GPS — looks right?';
+}
+
+// ── Step 1: IP geolocation (instant, zero permission) ───
+async function detectByIP() {
+  try {
+    const r = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) });
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.country_code === 'US' && d.postal) applyZip(d.postal, 'ip');
+  } catch(_) { /* silently skip */ }
+}
+function showStepTwo() {
+  document.getElementById('step-one-btn').style.display = 'none';
+  document.getElementById('form-card').classList.remove('hidden-initial');
+  document.getElementById('step-two-copy').classList.add('show');
+  document.getElementById('phone').focus();
+}
+// ── Step 2: GPS → reverse geocode via OSM Nominatim ─────
+function detectByGPS() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+      try {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`;
+        const r = await fetch(url, {
+          headers: { 'Accept-Language': 'en' },
+          signal: AbortSignal.timeout(5000)
+        });
+        if (!r.ok) return;
+        const d = await r.json();
+        const postal = d?.address?.postcode?.slice(0, 5);
+        if (postal) applyZip(postal, 'gps');
+      } catch(_) { /* silently skip */ }
+    },
+    _err => { /* user denied or timed out — no UI change */ },
+    { timeout: 8000, maximumAge: 60000 }
+  );
+}
+
+// ── If user edits zip, kill the badge ───────────────────
+zipEl.addEventListener('input', () => {
+  badge.classList.remove('show');
+  helper.textContent = 'So we match you with the closest available dentist.';
+});
+
+// ── Fire the waterfall on load ───────────────────────────
+detectByIP().then(() => detectByGPS());
+
+
+// ─────────────────────────────────────────────────────────
+//  PHONE AUTO-FORMAT
+// ─────────────────────────────────────────────────────────
+const phone = document.getElementById('phone');
+phone.addEventListener('input', e => {
+  let d = e.target.value.replace(/\D/g,'').slice(0,10);
+  if      (d.length >= 7) d = `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+  else if (d.length >= 4) d = `(${d.slice(0,3)}) ${d.slice(3)}`;
+  else if (d.length >  0) d = `(${d}`;
+  e.target.value = d;
+  clear('phone');
+});
+
+zipEl.addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/\D/g,'').slice(0,5);
+  clear('zip');
+  badge.classList.remove('show');
+  helper.textContent = 'So we match you nearby.';
+});
+
+
+// ─────────────────────────────────────────────────────────
+//  VALIDATION
+// ─────────────────────────────────────────────────────────
+function validate() {
+  let ok = true;
+  if (phone.value.replace(/\D/g,'').length !== 10) { flag('phone'); ok = false; }
+  if (zipEl.value.length !== 5)                    { flag('zip');   ok = false; }
+  return ok;
+}
+
+function flag(f) {
+  const input = document.getElementById(f);
+  const group = input.closest('.fg');
+  if (group) group.classList.add('err');
+}
+
+function clear(f) {
+  const input = document.getElementById(f);
+  const group = input.closest('.fg');
+  if (group) group.classList.remove('err');
+}
+
+/* ─────────────────────────────────────────────────────────
+//  TICKER ROTATE
+// ─────────────────────────────────────────────────────────
+const ticks = [
+  '4 patients matched in Seattle today',
+  'Dentists available in Kirkland right now',
+  '2 matches made in the last hour',
+  'No waiting rooms. Just a text.',
+];
+let ti = 0;
+const tickEl = document.getElementById('ticker-msg');
+setInterval(() => {
+  ti = (ti + 1) % ticks.length;
+  tickEl.style.opacity = '0';
+  setTimeout(() => { tickEl.textContent = ticks[ti]; tickEl.style.opacity = '1'; }, 250);
+}, 5000);
+tickEl.style.transition = 'opacity 0.25s ease';*/
+
+
+// ─────────────────────────────────────────────────────────
+//  SUBMIT
+// ─────────────────────────────────────────────────────────
+document.getElementById('mox-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!validate()) return;
+
+  const btn = document.getElementById('submit-btn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  const payload = {
+    phone: phone.value.replace(/\D/g,''),
+    zip:   zipEl.value.trim()
+  };
+
+  try {
+    await fetch('https://api.moxident.com/prod/route', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch(_) { /* fail silently */ }
+
+  btn.classList.remove('loading');
+  document.querySelector('.headline-block').style.display = 'none';
+  document.querySelector('.proof-row').style.display = 'none';
+  document.querySelector('.form-card form').style.display = 'none';
+  document.querySelector('.trust-strip').style.display = 'none';
+  document.getElementById('step-two-copy').style.display = 'none';
+  document.getElementById('success-screen').classList.add('show');
+  gtag('event', 'ab_conversion', {
+  variant: 'B'
+});
+
+  gtag('event', 'conversion', {
+    'send_to': 'AW-17976922373/H40YCOnt6ZgcEIWiiPxc'
+  });
+});
+
+function toggleDrawer() {
+  document.getElementById('nav-drawer').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+}
+
+function closeDrawer() {
+  document.getElementById('nav-drawer').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+}
+</script>
+
+</body>
+</html>
