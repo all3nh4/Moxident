@@ -2,6 +2,7 @@
 import { findDentistsByZip, findDentistByPhone, savePatient,
          updatePatientStatus, findOpenRequestByDentist } from "./db.mjs";
 import { sendSMS } from "./sms.mjs";
+import { getAvailability } from "./portal-db.mjs";
 
 export async function submitRequest({ name, phone, zip, symptom }) {
   const requestId   = await savePatient({ name, phone, zip, symptom });
@@ -9,8 +10,9 @@ export async function submitRequest({ name, phone, zip, symptom }) {
   return { requestId, dentistFound };
 }
 
-export async function routeToNextDentist(requestId, patient) {
+export async function routeToNextDentist(requestId, patient, excluded = []) {
   const dentists = await findDentistsByZip(patient.zip);
+  
 
   if (dentists.length === 0) {
     await sendSMS(
@@ -21,7 +23,27 @@ export async function routeToNextDentist(requestId, patient) {
     return false;
   }
 
-  const dentist = dentists[0];
+let dentist = null;
+
+for (const d of dentists) {
+  const dentistId = d.dentistId.S;
+  if (excluded.includes(dentistId)) continue;
+
+  try {
+    const availability = await getAvailability(dentistId);
+
+    if (availability && Object.keys(availability).length > 0) {
+      dentist = d;
+      break;
+    }
+  } catch (err) {
+    console.error("Availability check failed:", err.message);
+  }
+}
+
+if (!dentist) {
+  dentist = dentists[0];
+}
 
   await sendSMS(
     dentist.phone.S,
@@ -71,11 +93,16 @@ export async function handleDentistReply(from, replyBody) {
 
   } else if (reply === "NO") {
     await updatePatientStatus(requestId, "pending");
-    await routeToNextDentist(requestId, {
-      name:    patient.name.S,
-      phone:   patient.phone.S,
-      zip:     patient.zip.S,
-      symptom: patient.symptom.S,
-    });
+
+    await routeToNextDentist(
+      requestId,
+      {
+        name: patient.name.S,
+        phone: patient.phone.S,
+        zip: patient.zip.S,
+        symptom: patient.symptom.S,
+      },
+      [dentist.dentistId.S]
+    );
   }
 }
