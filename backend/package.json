@@ -26,6 +26,8 @@
     "@aws-sdk/client-cloudwatch": "^3.1022.0",
     "@aws-sdk/client-dynamodb": "^3.600.0",
     "@aws-sdk/client-ses": "^3.1011.0",
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.3",
     "twilio": "^5.12.2"
   },
   "devDependencies": {

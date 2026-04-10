@@ -1,0 +1,412 @@
+/* ═══════════════════════════════════════════
+   DENTIST PORTAL — portal.css
+   Supplements /styles.css — never overrides it
+═══════════════════════════════════════════ */
+
+/* ── Portal wrapper ── */
+.portal-wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: calc(var(--nav-h) + 40px) 20px 80px;
+}
+
+.portal-wrap-wide {
+  max-width: 900px;
+}
+
+/* ── Portal card ── */
+.portal-card {
+  background: var(--white);
+  border: 1px solid var(--bdr);
+  border-radius: var(--rad-lg);
+  box-shadow: var(--sh);
+  padding: 36px 28px;
+}
+
+.portal-card-center {
+  text-align: center;
+}
+
+/* ── Headings ── */
+.portal-h1 {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.portal-h2 {
+  font-family: var(--serif);
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 6px;
+}
+
+.portal-sub {
+  font-size: .9rem;
+  color: var(--ink2);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Form elements ── */
+.portal-label {
+  display: block;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
+  margin-top: 16px;
+}
+
+.portal-label:first-of-type {
+  margin-top: 0;
+}
+
+.portal-input {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  font-size: .9rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1.5px solid var(--bdr);
+  border-radius: var(--rad);
+  outline: none;
+  transition: border-color .15s;
+}
+
+.portal-input:focus {
+  border-color: var(--red);
+}
+
+.portal-input:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+/* ── Buttons ── */
+.portal-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  margin-top: 24px;
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--white);
+  background: var(--red);
+  border: none;
+  border-radius: var(--rad);
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.portal-btn:hover {
+  background: var(--red-h);
+}
+
+.portal-btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.portal-btn-save {
+  max-width: 240px;
+  margin-top: 20px;
+}
+
+.portal-btn-link {
+  display: inline-block;
+  padding: 12px 28px;
+  margin-top: 16px;
+  font-size: .9rem;
+  font-weight: 700;
+  color: var(--white);
+  background: var(--red);
+  border-radius: var(--rad);
+  text-decoration: none;
+  transition: background .15s;
+}
+
+.portal-btn-link:hover {
+  background: var(--red-h);
+}
+
+/* ── Links ── */
+.portal-links {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.portal-link {
+  font-size: .85rem;
+  color: var(--red);
+  text-decoration: none;
+}
+
+.portal-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Messages ── */
+.portal-error {
+  margin-top: 16px;
+  padding: 12px 16px;
+  font-size: .85rem;
+  color: var(--red);
+  background: var(--red-lt);
+  border: 1px solid var(--red);
+  border-radius: var(--rad);
+}
+
+.portal-success {
+  margin-top: 16px;
+  padding: 12px 16px;
+  font-size: .85rem;
+  color: var(--grn);
+  background: var(--grn-lt);
+  border: 1px solid var(--grn);
+  border-radius: var(--rad);
+}
+
+/* ── Spinner ── */
+.portal-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--bdr);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  margin: 24px auto 16px;
+  animation: portalSpin .7s linear infinite;
+}
+
+@keyframes portalSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Check icon ── */
+.portal-icon-check {
+  width: 48px;
+  height: 48px;
+  line-height: 48px;
+  font-size: 24px;
+  color: var(--white);
+  background: var(--grn);
+  border-radius: 50%;
+  margin: 0 auto 16px;
+}
+
+/* ── Nav right links ── */
+.portal-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.portal-nav-link {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--ink2);
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.portal-nav-link:hover {
+  color: var(--red);
+}
+
+/* ── Dashboard header ── */
+.portal-dash-header {
+  margin-bottom: 28px;
+}
+
+/* ── Stats row ── */
+.portal-stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.portal-stat-card {
+  background: var(--white);
+  border: 1px solid var(--bdr);
+  border-radius: var(--rad);
+  padding: 20px 16px;
+  text-align: center;
+  box-shadow: var(--sh);
+}
+
+.portal-stat-num {
+  font-family: var(--serif);
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.portal-stat-lbl {
+  font-size: .75rem;
+  color: var(--ink3);
+  margin-top: 6px;
+}
+
+/* ── Sections ── */
+.portal-section {
+  background: var(--white);
+  border: 1px solid var(--bdr);
+  border-radius: var(--rad-lg);
+  box-shadow: var(--sh);
+  padding: 28px 24px;
+  margin-bottom: 24px;
+}
+
+/* ── Availability grid ── */
+.portal-avail-grid {
+  display: grid;
+  grid-template-columns: auto repeat(7, 1fr);
+  gap: 0;
+  border: 1px solid var(--bdr);
+  border-radius: var(--rad);
+  overflow: hidden;
+}
+
+.portal-avail-header {
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--ink2);
+  text-align: center;
+  padding: 10px 4px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--bdr);
+}
+
+.portal-avail-label {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 12px 12px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--bdr);
+  border-right: 1px solid var(--bdr);
+  display: flex;
+  align-items: center;
+}
+
+.portal-avail-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-bottom: 1px solid var(--bdr);
+  border-right: 1px solid var(--bdr);
+}
+
+.portal-avail-cell:last-child {
+  border-right: none;
+}
+
+.portal-avail-cell input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--red);
+  cursor: pointer;
+}
+
+/* ── Table ── */
+.portal-table-wrap {
+  overflow-x: auto;
+}
+
+.portal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+
+.portal-table th {
+  text-align: left;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--bdr);
+}
+
+.portal-table td {
+  padding: 12px;
+  color: var(--ink2);
+  border-bottom: 1px solid var(--bdr);
+}
+
+.portal-table-empty {
+  text-align: center;
+  color: var(--ink3);
+  padding: 24px 12px;
+}
+
+/* ── Status badges ── */
+.portal-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: .75rem;
+  font-weight: 600;
+}
+
+.portal-status-matched {
+  background: var(--grn-lt);
+  color: var(--grn);
+}
+
+.portal-status-pending {
+  background: var(--amb-lt);
+  color: var(--amb);
+}
+
+.portal-status-offered {
+  background: var(--red-lt);
+  color: var(--red);
+}
+
+/* ── Settings sections ── */
+.portal-settings-section {
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--bdr);
+}
+
+.portal-settings-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* ── Hidden utility ── */
+.hidden {
+  display: none !important;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .portal-wrap { padding: calc(var(--nav-h) + 24px) 16px 56px; }
+  .portal-card { padding: 28px 20px; }
+  .portal-stats-row { grid-template-columns: repeat(2, 1fr); }
+  .portal-section { padding: 20px 16px; }
+  .portal-avail-header { font-size: .65rem; padding: 8px 2px; }
+  .portal-avail-label { font-size: .72rem; padding: 10px 8px; }
+}
+
+@media (max-width: 420px) {
+  .portal-stats-row { grid-template-columns: 1fr; }
+}

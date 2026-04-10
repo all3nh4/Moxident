@@ -5,13 +5,19 @@ import { savePatient, findDentistsByZip, findDentistByPhone,
          saveDentistApplication, saveLead, getLeads, updateLead,
          getDentistApplications, approveDentistApplication, getSearchVolume } from "./db.mjs";
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+import { generateToken, hashPassword, comparePassword,
+         generateVerificationToken, authenticateRequest } from "./portal-auth.mjs";
+import { createPortalAccount, getPortalAccount, verifyPortalAccount,
+         setPortalPassword, updateLastLogin, setResetToken, clearResetToken,
+         getDentistByEmail, saveAvailability, getAvailability,
+         getDentistProfile, getRecentRequests, getDentistStats } from "./portal-db.mjs";
 
 const ses = new SESClient({ region: "us-east-2" });
 const NOTIFY_EMAIL = "admin@moxident.com";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
   "Content-Type": "application/json",
 };
@@ -128,6 +134,68 @@ allen@moxident.com
       Body: { Text: { Data: body } },
     },
   }));
+}
+
+const PORTAL_BASE_URL = "https://moxident.com/dentist/portal";
+
+async function sendPortalVerificationEmail(email, token) {
+  const link = `https://7i7j7c8rx7.execute-api.us-east-2.amazonaws.com/prod/dentist-portal/verify?token=${token}`;
+  await ses.send(new SendEmailCommand({
+    Source: NOTIFY_EMAIL,
+    Destination: { ToAddresses: [email] },
+    Message: {
+      Subject: { Data: "Verify your Moxident portal email" },
+      Body: { Text: { Data: `Hi,\n\nPlease verify your email to access your Moxident dentist portal:\n\n${link}\n\nThis link will expire in 24 hours.\n\n— The Moxident Team` } },
+    },
+  }));
+}
+
+async function sendPortalWelcomeEmail(email) {
+  await ses.send(new SendEmailCommand({
+    Source: NOTIFY_EMAIL,
+    Destination: { ToAddresses: [email] },
+    Message: {
+      Subject: { Data: "You're live on Moxident" },
+      Body: { Text: { Data: `Welcome to the Moxident dentist portal!\n\nYou can now log in to manage your availability, view patient requests, and track your performance.\n\nLog in here: ${PORTAL_BASE_URL}/index.html\n\n— The Moxident Team` } },
+    },
+  }));
+}
+
+async function sendPortalResetEmail(email, token) {
+  const link = `${PORTAL_BASE_URL}/reset-password.html?token=${token}`;
+  await ses.send(new SendEmailCommand({
+    Source: NOTIFY_EMAIL,
+    Destination: { ToAddresses: [email] },
+    Message: {
+      Subject: { Data: "Reset your Moxident password" },
+      Body: { Text: { Data: `Hi,\n\nWe received a request to reset your Moxident portal password.\n\nReset your password here:\n${link}\n\nThis link expires in 1 hour. If you didn't request this, ignore this email.\n\n— The Moxident Team` } },
+    },
+  }));
+}
+
+import { DynamoDBClient, ScanCommand as PortalScanCommand } from "@aws-sdk/client-dynamodb";
+const portalDb = new DynamoDBClient({ region: "us-east-2" });
+
+async function findPortalAccountByVerificationToken(token) {
+  const result = await portalDb.send(new PortalScanCommand({
+    TableName: "moxident-dentist-portal",
+    FilterExpression: "verificationToken = :t",
+    ExpressionAttributeValues: { ":t": { S: token } },
+  }));
+  const item = result.Items?.[0];
+  if (!item) return null;
+  return { email: item.email?.S };
+}
+
+async function findPortalAccountByResetToken(token) {
+  const result = await portalDb.send(new PortalScanCommand({
+    TableName: "moxident-dentist-portal",
+    FilterExpression: "resetToken = :t",
+    ExpressionAttributeValues: { ":t": { S: token } },
+  }));
+  const item = result.Items?.[0];
+  if (!item) return null;
+  return item;
 }
 
 export const handler = async (event) => {
@@ -395,6 +463,17 @@ export const handler = async (event) => {
       }
       const applicationId = await saveDentistApplication(body);
       await sendOnboardingNotification(body, applicationId);
+      // Auto-create portal account
+      try {
+        const existing = await getPortalAccount(email);
+        if (!existing) {
+          const verificationToken = generateVerificationToken();
+          await createPortalAccount(email, verificationToken);
+          await sendPortalVerificationEmail(email, verificationToken);
+        }
+      } catch (portalErr) {
+        console.error("Portal auto-registration failed:", portalErr.message);
+      }
       return {
         statusCode: 200,
         headers,
@@ -444,6 +523,230 @@ if (path === "/approve-dentist" && method === "GET") {
     };
   }
 }
+
+  // ═══════════════════════════════════════════
+  // DENTIST PORTAL ROUTES
+  // ═══════════════════════════════════════════
+
+  // POST /dentist-portal/register
+  if (path === "/dentist-portal/register" && method === "POST") {
+    try {
+      const body = JSON.parse(event.body || "{}");
+      const { email } = body;
+      if (!email) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing required field: email" }) };
+      }
+      const existing = await getPortalAccount(email);
+      if (existing) {
+        return { statusCode: 409, headers, body: JSON.stringify({ error: "Account already exists" }) };
+      }
+      const verificationToken = generateVerificationToken();
+      await createPortalAccount(email, verificationToken);
+      await sendPortalVerificationEmail(email, verificationToken);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    } catch (err) {
+      console.error("Portal register error:", err.message);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Registration failed" }) };
+    }
+  }
+
+  // GET /dentist-portal/verify
+  if (path === "/dentist-portal/verify" && method === "GET") {
+    try {
+      const token = event.queryStringParameters?.token
+        || new URLSearchParams(event.rawQueryString || "").get("token") || "";
+      if (!token) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing verification token" }) };
+      }
+      const accounts = await findPortalAccountByVerificationToken(token);
+      if (!accounts) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid or expired verification token" }) };
+      }
+      await verifyPortalAccount(accounts.email);
+      return {
+        statusCode: 302,
+        headers: { Location: `/dentist/portal/set-password.html?email=${encodeURIComponent(accounts.email)}` },
+        body: "",
+      };
+    } catch (err) {
+      console.error("Portal verify error:", err.message);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Verification failed" }) };
+    }
+  }
+
+  // POST /dentist-portal/set-password
+  if (path === "/dentist-portal/set-password" && method === "POST") {
+    try {
+      const body = JSON.parse(event.body || "{}");
+      const { email, password } = body;
+      if (!email || !password) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing email or password" }) };
+      }
+      if (password.length < 8) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Password must be at least 8 characters" }) };
+      }
+      const account = await getPortalAccount(email);
+      if (!account) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: "Account not found" }) };
+      }
+      if (!account.verified?.BOOL) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Email not verified" }) };
+      }
+      const dentist = await getDentistByEmail(email);
+      const dentistId = dentist?.dentistId?.S || "";
+      const hashed = await hashPassword(password);
+      await setPortalPassword(email, hashed, dentistId);
+      await sendPortalWelcomeEmail(email);
+      const token = generateToken(email, dentistId);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, token }) };
+    } catch (err) {
+      console.error("Set password error:", err.message);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to set password" }) };
+    }
+  }
+
+  // POST /dentist-portal/login
+  if (path === "/dentist-portal/login" && method === "POST") {
+    try {
+      const body = JSON.parse(event.body || "{}");
+      const { email, password } = body;
+      if (!email || !password) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing email or password" }) };
+      }
+      const account = await getPortalAccount(email);
+      if (!account || !account.passwordHash?.S) {
+        return { statusCode: 401, headers, body: JSON.stringify({ error: "Invalid email or password" }) };
+      }
+      if (!account.verified?.BOOL) {
+        return { statusCode: 401, headers, body: JSON.stringify({ error: "Email not verified" }) };
+      }
+      const valid = await comparePassword(password, account.passwordHash.S);
+      if (!valid) {
+        return { statusCode: 401, headers, body: JSON.stringify({ error: "Invalid email or password" }) };
+      }
+      const dentistId = account.dentistId?.S || "";
+      await updateLastLogin(email);
+      const token = generateToken(email, dentistId);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, token }) };
+    } catch (err) {
+      console.error("Login error:", err.message);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Login failed" }) };
+    }
+  }
+
+  // POST /dentist-portal/forgot-password
+  if (path === "/dentist-portal/forgot-password" && method === "POST") {
+    try {
+      const body = JSON.parse(event.body || "{}");
+      const { email } = body;
+      if (!email) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing email" }) };
+      }
+      const account = await getPortalAccount(email);
+      if (!account) {
+        return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+      }
+      const resetToken = generateVerificationToken();
+      await setResetToken(email, resetToken);
+      await sendPortalResetEmail(email, resetToken);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    } catch (err) {
+      console.error("Forgot password error:", err.message);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to process request" }) };
+    }
+  }
+
+  // POST /dentist-portal/reset-password
+  if (path === "/dentist-portal/reset-password" && method === "POST") {
+    try {
+      const body = JSON.parse(event.body || "{}");
+      const { token, password } = body;
+      if (!token || !password) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing token or password" }) };
+      }
+      if (password.length < 8) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Password must be at least 8 characters" }) };
+      }
+      const account = await findPortalAccountByResetToken(token);
+      if (!account) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid or expired reset token" }) };
+      }
+      if (account.resetTokenExpiry?.S && new Date(account.resetTokenExpiry.S) < new Date()) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Reset token has expired" }) };
+      }
+      const hashed = await hashPassword(password);
+      await setPortalPassword(account.email, hashed, account.dentistId?.S || "");
+      await clearResetToken(account.email);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    } catch (err) {
+      console.error("Reset password error:", err.message);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to reset password" }) };
+    }
+  }
+
+  // GET /dentist-portal/dashboard
+  if (path === "/dentist-portal/dashboard" && method === "GET") {
+    const user = authenticateRequest(event);
+    if (!user) {
+      return { statusCode: 401, headers, body: JSON.stringify({ error: "Unauthorized" }) };
+    }
+    try {
+      const profile = user.dentistId ? await getDentistProfile(user.dentistId) : null;
+      const availability = user.dentistId ? await getAvailability(user.dentistId) : {};
+      const recentRequests = user.dentistId ? await getRecentRequests(user.dentistId) : [];
+      const stats = user.dentistId ? await getDentistStats(user.dentistId) : {};
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          dentistName:          profile?.name?.S || "",
+          practiceName:         profile?.practiceName?.S || "",
+          email:                user.email,
+          thisWeekAvailability: availability || {},
+          recentRequests,
+          stats,
+        }),
+      };
+    } catch (err) {
+      console.error("Dashboard error:", err.message);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to load dashboard" }) };
+    }
+  }
+
+  // POST /dentist-portal/availability
+  if (path === "/dentist-portal/availability" && method === "POST") {
+    const user = authenticateRequest(event);
+    if (!user) {
+      return { statusCode: 401, headers, body: JSON.stringify({ error: "Unauthorized" }) };
+    }
+    try {
+      const body = JSON.parse(event.body || "{}");
+      const { availability } = body;
+      if (!availability || typeof availability !== "object") {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing availability data" }) };
+      }
+      await saveAvailability(user.dentistId, availability);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    } catch (err) {
+      console.error("Availability save error:", err.message);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to save availability" }) };
+    }
+  }
+
+  // GET /dentist-portal/availability
+  if (path === "/dentist-portal/availability" && method === "GET") {
+    const user = authenticateRequest(event);
+    if (!user) {
+      return { statusCode: 401, headers, body: JSON.stringify({ error: "Unauthorized" }) };
+    }
+    try {
+      const availability = await getAvailability(user.dentistId);
+      return { statusCode: 200, headers, body: JSON.stringify({ availability: availability || {} }) };
+    } catch (err) {
+      console.error("Availability fetch error:", err.message);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to fetch availability" }) };
+    }
+  }
 
   return { statusCode: 404, headers, body: JSON.stringify({ error: "Not found" }) };
 };

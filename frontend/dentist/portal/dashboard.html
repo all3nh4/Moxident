@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Moxident</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <span class="nav-logo-dot"></span> Moxident
+      </a>
+      <div class="portal-nav-right">
+        <a href="settings.html" class="portal-nav-link">Settings</a>
+        <button class="portal-nav-link" id="logout-btn" onclick="handleLogout()">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="portal-wrap portal-wrap-wide">
+    <!-- Header -->
+    <div class="portal-dash-header">
+      <div>
+        <h1 class="portal-h1" id="dash-greeting">Welcome back</h1>
+        <p class="portal-sub" id="dash-practice"></p>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="portal-stats-row" id="dash-stats">
+      <div class="portal-stat-card">
+        <div class="portal-stat-num" id="stat-received">—</div>
+        <div class="portal-stat-lbl">Requests Received</div>
+      </div>
+      <div class="portal-stat-card">
+        <div class="portal-stat-num" id="stat-accepted">—</div>
+        <div class="portal-stat-lbl">Accepted</div>
+      </div>
+      <div class="portal-stat-card">
+        <div class="portal-stat-num" id="stat-missed">—</div>
+        <div class="portal-stat-lbl">Missed</div>
+      </div>
+      <div class="portal-stat-card">
+        <div class="portal-stat-num" id="stat-completed">—</div>
+        <div class="portal-stat-lbl">Completed</div>
+      </div>
+      <div class="portal-stat-card">
+        <div class="portal-stat-num" id="stat-response">—</div>
+        <div class="portal-stat-lbl">Avg Response (min)</div>
+      </div>
+    </div>
+
+    <!-- Availability -->
+    <section class="portal-section">
+      <h2 class="portal-h2">Weekly Availability</h2>
+      <p class="portal-sub">Check the slots you're available for emergency patients this week.</p>
+
+      <div class="portal-avail-grid" id="avail-grid"></div>
+
+      <button class="portal-btn portal-btn-save" id="save-avail-btn" onclick="handleSaveAvailability()">Save Availability</button>
+      <div id="avail-success" class="portal-success hidden">Availability saved.</div>
+    </section>
+
+    <!-- Recent requests -->
+    <section class="portal-section">
+      <h2 class="portal-h2">Recent Requests</h2>
+      <div class="portal-table-wrap">
+        <table class="portal-table" id="requests-table">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Symptom</th>
+              <th>Zip</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="requests-body">
+            <tr><td colspan="5" class="portal-table-empty">No requests yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="portal.mjs"></script>
+</body>
+</html>

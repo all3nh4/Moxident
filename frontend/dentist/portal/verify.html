@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Email — Moxident</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <span class="nav-logo-dot"></span> Moxident
+      </a>
+    </div>
+  </nav>
+
+  <main class="portal-wrap">
+    <div class="portal-card portal-card-center">
+      <div id="verify-loading">
+        <div class="portal-spinner"></div>
+        <p class="portal-sub">Verifying your email...</p>
+      </div>
+      <div id="verify-success" class="hidden">
+        <div class="portal-icon-check">&#10003;</div>
+        <h1 class="portal-h1">Email Verified</h1>
+        <p class="portal-sub">Redirecting you to set your password...</p>
+      </div>
+      <div id="verify-error" class="hidden">
+        <h1 class="portal-h1">Verification Failed</h1>
+        <p class="portal-sub" id="verify-error-msg">This link may be invalid or expired.</p>
+        <a href="index.html" class="portal-btn-link">Back to Login</a>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="portal.mjs"></script>
+</body>
+</html>

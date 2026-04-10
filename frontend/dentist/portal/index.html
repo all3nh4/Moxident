@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dentist Portal — Moxident</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <span class="nav-logo-dot"></span> Moxident
+      </a>
+    </div>
+  </nav>
+
+  <main class="portal-wrap">
+    <div class="portal-card">
+      <h1 class="portal-h1">Dentist Portal</h1>
+      <p class="portal-sub">Sign in to manage your availability and view patient requests.</p>
+
+      <form id="login-form" onsubmit="return handleLogin(event)">
+        <label class="portal-label" for="login-email">Email</label>
+        <input class="portal-input" type="email" id="login-email" required placeholder="you@practice.com">
+
+        <label class="portal-label" for="login-password">Password</label>
+        <input class="portal-input" type="password" id="login-password" required placeholder="Enter your password" minlength="8">
+
+        <button class="portal-btn" type="submit" id="login-btn">Sign In</button>
+      </form>
+
+      <div class="portal-links">
+        <a href="forgot-password.html" class="portal-link">Forgot password?</a>
+      </div>
+
+      <div id="login-error" class="portal-error hidden"></div>
+    </div>
+  </main>
+
+  <script type="module" src="portal.mjs"></script>
+</body>
+</html>

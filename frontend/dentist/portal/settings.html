@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — Moxident</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <span class="nav-logo-dot"></span> Moxident
+      </a>
+      <div class="portal-nav-right">
+        <a href="dashboard.html" class="portal-nav-link">Dashboard</a>
+        <button class="portal-nav-link" id="logout-btn" onclick="handleLogout()">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="portal-wrap">
+    <div class="portal-card">
+      <h1 class="portal-h1">Account Settings</h1>
+      <p class="portal-sub">Update your contact information and preferences.</p>
+
+      <div class="portal-settings-section">
+        <h2 class="portal-h2">Contact Info</h2>
+        <label class="portal-label" for="settings-email">Email</label>
+        <input class="portal-input" type="email" id="settings-email" disabled>
+
+        <label class="portal-label" for="settings-practice">Practice Name</label>
+        <input class="portal-input" type="text" id="settings-practice" disabled>
+      </div>
+
+      <div class="portal-settings-section">
+        <h2 class="portal-h2">Change Password</h2>
+
+        <form id="change-pw-form" onsubmit="return handleChangePassword(event)">
+          <label class="portal-label" for="settings-current-pw">Current Password</label>
+          <input class="portal-input" type="password" id="settings-current-pw" required minlength="8">
+
+          <label class="portal-label" for="settings-new-pw">New Password</label>
+          <input class="portal-input" type="password" id="settings-new-pw" required minlength="8">
+
+          <label class="portal-label" for="settings-confirm-pw">Confirm New Password</label>
+          <input class="portal-input" type="password" id="settings-confirm-pw" required minlength="8">
+
+          <button class="portal-btn" type="submit" id="change-pw-btn">Update Password</button>
+        </form>
+
+        <div id="settings-success" class="portal-success hidden">Password updated.</div>
+        <div id="settings-error" class="portal-error hidden"></div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="portal.mjs"></script>
+</body>
+</html>
