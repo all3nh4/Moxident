@@ -30,6 +30,27 @@ button, input, select, textarea { font: inherit; }
   --sh-lg:  0 12px 40px rgba(0,0,0,.10), 0 3px 12px rgba(0,0,0,.06);
   --nav-h:  58px;
 }
+
+/* ABOUT PAGE FIX */
+
+.hero-section h1 {
+  font-size: 48px;   /* was too big */
+  line-height: 1.1;
+}
+
+.about-card h1 {
+  font-size: 36px;   /* "Emergency dental access is broken." */
+  line-height: 1.2;
+}
+
+/* reduce padding */
+.hero-section {
+  padding: 48px 16px;   /* reduce top spacing */
+}
+
+.about-card {
+  padding: 32px;        /* was too padded */
+}
 /* ═══════════════════════════════════════════
    LANDING PAGE - MOXIDENT EMERGENCY INTAKE
 ═══════════════════════════════════════════ */

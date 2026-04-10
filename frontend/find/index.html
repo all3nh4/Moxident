@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <!-- Google tag (gtag.js) -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZSTV1QEQNN"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -15,144 +15,255 @@
 <script>
   gtag('config', 'AW-17976922373');
 </script>
-  <title>Emergency Dental Help Near You — Moxident</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
-  <style>
-    /* 3 things not in styles.css */
-    .zip-wrap         { position:relative; display:flex; align-items:center; }
-    .zip-wrap .fi     { padding-right:96px; }
-    .geo-badge        { display:none; align-items:center; gap:5px; position:absolute; right:10px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:100px; pointer-events:none; white-space:nowrap; color:var(--amb); background:var(--amb-lt); border:1px solid rgba(180,92,15,.2); }
-    .geo-badge.show   { display:flex; }
-    .geo-badge.gps    { color:var(--grn); background:var(--grn-lt); border-color:rgba(21,119,79,.2); }
-    .success-screen         { display:none; }
-    .success-screen.show { display:block; }  </style>
+<title>Emergency Dental Help Near You — Moxident</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,500;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  .hero-section {
+    padding: 28px 20px 12px;
+  }
+
+  .hero {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .hero-h1 {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 12px 0 0;
+  }
+
+  .static-page {
+    padding-top: 8px;
+  }
+
+  .static-card {
+    margin-top: 0;
+  }
+
+  .step-two-copy {
+    display: none;
+    margin: 0 0 18px;
+  }
+
+  .step-two-copy.show {
+    display: block;
+  }
+
+  .step-two-copy .subhead {
+    margin-top: 10px;
+  }
+
+  .step-one-cta {
+    margin-top: 18px;
+  }
+
+  .hidden-initial {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .hero-section {
+      padding: 20px 16px 8px;
+    }
+
+    .hero-h1 {
+      font-size: 28px;
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+      margin-top: 10px;
+    }
+
+    .static-page {
+      padding-top: 4px;
+    }
+
+    .static-card {
+      padding: 28px 24px;
+    }
+  }
+</style>
 </head>
 <body>
 
-  <!-- nav: logo only, no pills (ad landing page — no exit links) -->
-  <nav class="nav">
-    <a href="/" class="nav-logo">
-      <span class="nav-dot"></span>
-      Moxident
-    </a>
-  </nav>
+<nav class="nav" id="main-nav">
+  <a class="nav-logo" href="/">
+    <div class="nav-dot"></div>Moxident
+  </a>
 
-  <!-- .form-wrap centers the card — from styles.css -->
-  <div class="form-wrap">
-    <div class="form-card a1">
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleDrawer()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
 
-      <!-- step bar — .form-step-bar / .form-step-seg / .form-step-seg.on from styles.css -->
-            <!-- headline -->
-      <div class="headline-block">
-        <p class="eyebrow">Emergency dental — Seattle area</p>
-        <h1>
-          Tooth pain?<br>
-          We can help<br>
-          <span class="accent">right now.</span>
-        </h1>
-        <p class="subhead">
-          Enter your number — we notify nearby dentists and one may call you if available.
-        </p>
-      </div>
-
-      <!-- social proof chips -->
-      <div class="proof-row">
-        <div class="proof-chip">
-          <div class="dot dot-green"></div>
-          Local dentists notified in minutes
-        </div>
-      </div>
-
-      <!-- FORM -->
-      <form id="mox-form" novalidate>
-
-        <div class="fg">
-          <div class="fl">
-            <label for="phone">Your phone number</label>
-          </div>
-          <input
-            class="fi"
-            type="tel"
-            id="phone"
-            name="phone"
-            placeholder="(206) 555-0100"
-            inputmode="tel"
-            autocomplete="tel"
-            maxlength="14"
-          >
-          <div class="f-err" id="phone-err">Enter a valid 10-digit number.</div>
-        </div>
-
-        <div class="fg">
-          <div class="fl">
-            <label for="zip">Your zip code</label>
-          </div>
-
-          <div class="zip-wrap">
-            <input
-              class="fi"
-              type="text"
-              id="zip"
-              name="zip"
-              placeholder="98033"
-              inputmode="numeric"
-              autocomplete="postal-code"
-              maxlength="5"
-            >
-            <div class="geo-badge" id="geo-badge">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
-              </svg>
-              <span id="geo-badge-text">Detected</span>
-            </div>
-          </div>
-
-          <div class="field-helper" id="zip-helper">So we match you nearby.</div>
-          <div class="f-err" id="zip-err">Enter a valid 5-digit zip code.</div>
-        </div>
-
-        <div class="sep"></div>
-
-        <button type="submit" class="submit-btn" id="submit-btn">
-          <span class="btn-label">
-            <span>Check Availability</span>
-            <span class="cta-arrow">→</span>
-          </span>
-          <div class="spinner"></div>
-        </button>
-
-        <p class="consent">
-          A nearby dentist will call you within minutes if available.<br>
-          By submitting you agree to receive a single SMS from Moxident.
-          <a href="#">Privacy policy</a>.
-        </p>
-
-      </form>
-
-      <!-- SUCCESS (hidden) -->
-    <!-- SUCCESS (hidden) -->
-<div class="success-screen" id="success-screen">
-  <div class="success-tooth">🦷</div>
-  <p class="success-title">You're all set.</p>
-
-  <p class="success-headline">
-    We’re matching you to an available dentist right now.
-  </p>
-
-  <p class="success-sub">
-    A clinic will contact you shortly to set up your appointment — usually within a few minutes.
-  </p>
-
-  <p class="success-note">
-    If no one reaches out within a few minutes, you can try again — or make sure your phone number was entered correctly.
-  </p>
+<div class="nav-drawer" id="nav-drawer">
+ 
+  <button class="drawer-pill" onclick="window.location.href='/about-us.html';closeDrawer()">About</button>
+  <button class="drawer-pill" onclick="window.location.href='/contact.html';closeDrawer()">Contact</button>
+  <button class="drawer-pill" onclick="window.location.href='/privacy-policy.html';closeDrawer()">Privacy</button>
+  <button class="drawer-pill" onclick="window.location.href='/terms.html';closeDrawer()">Terms</button>
 </div>
+
+<div class="landing-page">
+
+  <!-- headline -->
+  <div class="headline-block" id="headline-block">
+    <p class="eyebrow">Emergency dental — Seattle area</p>
+    <h1>
+      Tooth pain?<br>
+      We can help<br>
+      
+      <span class="accent">right now.</span>
+    </h1>
+    <p class="subhead" id="step-one-subhead">
+      We connect you with dentists who have same-day availability near you.
+    </p>
+
+    <button type="button" class="submit-btn step-one-cta" id="step-one-btn" onclick="showStepTwo()">
+      <span class="btn-label">
+        <span>Check availability</span>
+        <span class="cta-arrow">→</span>
+      </span>
+    </button>
+  </div>
+
+  <!-- social proof chips -->
+  <div class="proof-row" id="proof-row">
+    <div class="proof-chip">
+      <div class="dot dot-green"></div>
+      Local dentists notified in minutes
     </div>
   </div>
-  <script>
+
+  <!-- form card -->
+  <div class="form-card hidden-initial" id="form-card">
+
+    <div class="step-two-copy" id="step-two-copy">
+      <p class="subhead">
+        Enter your details so we can match you with a dentist.
+      </p>
+      <p class="subhead" style="margin-top:10px; font-weight:500;">
+        No calls, no signup.   We’ll send your request to nearby dentists. If one is available, they’ll contact you — often within minutes.
+
+  </div>
+    <!-- FORM -->
+    <form id="mox-form" novalidate>
+
+      <div class="fg">
+        <div class="fl">
+          <label for="phone">Your phone number</label>
+        </div>
+        <input
+          class="fi"
+          type="tel"
+          id="phone"
+          name="phone"
+          placeholder="(206) 555-0100"
+          inputmode="tel"
+          autocomplete="tel"
+          maxlength="14"
+        >
+
+        <div class="f-err" id="phone-err">Enter a valid 10-digit number.</div>
+      </div>
+
+      <div class="fg">
+        <div class="fl">
+          <label for="zip">Your zip code</label>
+        </div>
+
+        <div class="zip-wrap">
+          <input
+            class="fi"
+            type="text"
+            id="zip"
+            name="zip"
+            placeholder="98033"
+            inputmode="numeric"
+            autocomplete="postal-code"
+            maxlength="5"
+          >
+          <div class="geo-badge" id="geo-badge">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
+            </svg>
+            <span id="geo-badge-text">Detected</span>
+          </div>
+        </div>
+
+        <div class="field-helper" id="zip-helper">So we match you nearby.</div>
+        <div class="f-err" id="zip-err">Enter a valid 5-digit zip code.</div>
+      </div>
+
+      <div class="sep"></div>
+
+      <button type="submit" class="submit-btn" id="submit-btn">
+        <span class="btn-label">
+          <span>Find available dentist now</span>
+          <span class="cta-arrow">→</span>
+        </span>
+        <div class="spinner"></div>
+      </button>
+
+      <p class="consent">
+        A nearby dentist will call you within minutes if available.<br>
+        By submitting you agree to receive a single SMS from Moxident.
+        <a href="#">Privacy policy</a>.
+      </p>
+
+    </form>
+
+    <!-- SUCCESS (hidden) -->
+    <div class="success-screen" id="success-screen">
+      <div class="success-tooth">🦷</div>
+      <p class="success-title">You're all set.</p>
+
+      <p class="success-headline">
+        We’re reaching out to nearby dentists
+      </p>
+
+      <p class="success-note">
+      If a clinic is available, they may contact you. If not, we’ll keep your request on file for the earliest available response.        </p>
+    </div>
+
+  </div><!-- /.form-card -->
+
+  <!-- trust metrics -->
+  <div class="trust-strip" id="trust-strip">
+    <div class="trust-item">
+      <span class="trust-val">4 min</span>
+      <span class="trust-lbl">avg. match time</span>
+    </div>
+    <div class="trust-item">
+      <span class="trust-val">No app</span>
+      <span class="trust-lbl">just a text</span>
+    </div>
+    <div class="trust-item">
+      <span class="trust-val">Free</span>
+      <span class="trust-lbl">to use</span>
+    </div>
+  </div>
+
+</div><!-- /.page -->
+
+<script>
+// ─────────────────────────────────────────────────────────
+//  STEP TWO REVEAL
+// ─────────────────────────────────────────────────────────
+function showStepTwo() {
+  document.getElementById('step-one-btn').style.display = 'none';
+  document.getElementById('step-two-copy').classList.add('show');
+  document.getElementById('mox-form').classList.remove('hidden-initial');
+  document.getElementById('phone').focus();
+}
+
+
 // ─────────────────────────────────────────────────────────
 //  GEOLOCATION WATERFALL
 //  1. IP-based  → fires immediately, no permission needed
@@ -184,14 +295,18 @@ function applyZip(zipCode, source) {
 // ── Step 1: IP geolocation (instant, zero permission) ───
 async function detectByIP() {
   try {
-    // ipapi.co: free, 1 000 req/day, returns { postal, city, country_code }
     const r = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) });
     if (!r.ok) return;
     const d = await r.json();
     if (d.country_code === 'US' && d.postal) applyZip(d.postal, 'ip');
   } catch(_) { /* silently skip */ }
 }
-
+function showStepTwo() {
+  document.getElementById('step-one-btn').style.display = 'none';
+  document.getElementById('form-card').classList.remove('hidden-initial');
+  document.getElementById('step-two-copy').classList.add('show');
+  document.getElementById('phone').focus();
+}
 // ── Step 2: GPS → reverse geocode via OSM Nominatim ─────
 function detectByGPS() {
   if (!navigator.geolocation) return;
@@ -268,6 +383,23 @@ function clear(f) {
   if (group) group.classList.remove('err');
 }
 
+/* ─────────────────────────────────────────────────────────
+//  TICKER ROTATE
+// ─────────────────────────────────────────────────────────
+const ticks = [
+  '4 patients matched in Seattle today',
+  'Dentists available in Kirkland right now',
+  '2 matches made in the last hour',
+  'No waiting rooms. Just a text.',
+];
+let ti = 0;
+const tickEl = document.getElementById('ticker-msg');
+setInterval(() => {
+  ti = (ti + 1) % ticks.length;
+  tickEl.style.opacity = '0';
+  setTimeout(() => { tickEl.textContent = ticks[ti]; tickEl.style.opacity = '1'; }, 250);
+}, 5000);
+tickEl.style.transition = 'opacity 0.25s ease';*/
 
 
 // ─────────────────────────────────────────────────────────
@@ -297,22 +429,28 @@ document.getElementById('mox-form').addEventListener('submit', async e => {
   btn.classList.remove('loading');
   document.querySelector('.headline-block').style.display = 'none';
   document.querySelector('.proof-row').style.display = 'none';
-  document.getElementById('mox-form').style.display = 'none';
+  document.querySelector('.form-card form').style.display = 'none';
+  document.querySelector('.trust-strip').style.display = 'none';
+  document.getElementById('step-two-copy').style.display = 'none';
   document.getElementById('success-screen').classList.add('show');
+  gtag('event', 'ab_conversion', {
+  variant: 'B'
+});
 
   gtag('event', 'conversion', {
     'send_to': 'AW-17976922373/H40YCOnt6ZgcEIWiiPxc'
   });
 });
- function toggleDrawer() {
-    document.getElementById('nav-drawer').classList.toggle('open');
-    document.getElementById('hamburger').classList.toggle('open');
-  }
 
-  function closeDrawer() {
-    document.getElementById('nav-drawer').classList.remove('open');
-    document.getElementById('hamburger').classList.remove('open');
-  }
+function toggleDrawer() {
+  document.getElementById('nav-drawer').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+}
+
+function closeDrawer() {
+  document.getElementById('nav-drawer').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+}
 </script>
 
 </body>
