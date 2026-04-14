@@ -1121,3 +1121,7 @@ tr:hover td { background: var(--paper); }
   .symptom-grid { grid-template-columns: 1fr 1fr; }
   .kpi-row      { grid-template-columns: 1fr 1fr; }
 }
+.symptom-card.selected {
+  border-color: var(--ink);
+  background: #fafafa;
+}
