@@ -136,11 +136,11 @@ allen@moxident.com
   }));
 }
 
-const PORTAL_BASE_URL = "https://moxident.com/dentist/portal";
+const PORTAL_BASE_URL =
+  process.env.PORTAL_BASE_URL || "https://moxident.com/dentist/portal";
 
 async function sendPortalVerificationEmail(email, token) {
-  const link = `https://7i7j7c8rx7.execute-api.us-east-2.amazonaws.com/prod/dentist-portal/verify?token=${token}`;
-  await ses.send(new SendEmailCommand({
+const link = `${PORTAL_BASE_URL}/verify.html?token=${token}`;  await ses.send(new SendEmailCommand({
     Source: NOTIFY_EMAIL,
     Destination: { ToAddresses: [email] },
     Message: {
@@ -180,7 +180,7 @@ async function findPortalAccountByVerificationToken(token) {
   const result = await portalDb.send(new PortalScanCommand({
     TableName: "moxident-dentist-portal",
     FilterExpression: "verificationToken = :t",
-    ExpressionAttributeValues: { ":t": { S: token } },
+    ExpressionAttributeValues:  { ":t": { S: token } },
   }));
   const item = result.Items?.[0];
   if (!item) return null;
@@ -466,13 +466,24 @@ export const handler = async (event) => {
       // Auto-create portal account
       try {
         const existing = await getPortalAccount(email);
-        if (!existing) {
-          const verificationToken = generateVerificationToken();
-          await createPortalAccount(email, verificationToken);
-          await sendPortalVerificationEmail(email, verificationToken);
-        }
+          console.log("RESEND_FIX_DEPLOYED");
+          console.log("existing portal account:", existing);
+
+          if (!existing) {
+            console.log("Creating new portal account for email:", email);
+            const verificationToken = generateVerificationToken();
+            await createPortalAccount(email, verificationToken);
+            await sendPortalVerificationEmail(email, verificationToken);
+
+          } else if (!existing.verified?.BOOL) {
+            console.log("Resending verification email for:", email);
+            const token = existing.verificationToken?.S;
+      if (token) {
+        await sendPortalVerificationEmail(email, token);
+      }
+    }
       } catch (portalErr) {
-        console.error("Portal auto-registration failed:", portalErr.message);
+        console.error("Portal auto-registration failed:", portalErr);
       }
       return {
         statusCode: 200,
@@ -562,14 +573,16 @@ if (path === "/approve-dentist" && method === "GET") {
       if (!accounts) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid or expired verification token" }) };
       }
-      await verifyPortalAccount(accounts.email);
-      return {
-        statusCode: 302,
-        headers: { Location: `/dentist/portal/set-password.html?email=${encodeURIComponent(accounts.email)}` },
-        body: "",
-      };
+      console.log("verify route token:", token);
+      console.log("verify route account email:", accounts.email);
+     await verifyPortalAccount(accounts.email);
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ success: true, email: accounts.email }),
+        };
     } catch (err) {
-      console.error("Portal verify error:", err.message);
+      console.error("Portal verify error:", err);
       return { statusCode: 500, headers, body: JSON.stringify({ error: "Verification failed" }) };
     }
   }

@@ -20,10 +20,12 @@ export function closeDrawer() {
 
 /* ── Funnel step navigation ──────────────────────────────────────────────── */
 export function goFunnelStep(n) {
+  const top = document.getElementById('join-top-content');
   document.querySelectorAll('.funnel-step').forEach(s => {
     s.classList.add('hidden');
     s.classList.remove('active');
   });
+  window.goFunnelStep = goFunnelStep;
 
   const target = document.getElementById('funnel-step-' + n);
   if (!target) return;
@@ -233,6 +235,7 @@ export function buildPayload() {
 
 /* ── Submit ──────────────────────────────────────────────────────────────── */
 export async function submitForm() {
+  console.log('SUBMIT START');
   const fields = [
     { id: 'f-name',         fg: 'fg-name',         test: v => v.trim().length >= 2 },
     { id: 'f-practice',     fg: 'fg-practice',     test: v => v.trim().length >= 2 },
@@ -246,6 +249,10 @@ export async function submitForm() {
 
   const fieldsOk    = validate(fields);
   const caseTypesOk = validateCaseTypes();
+
+  console.log('fieldsOk:', fieldsOk);
+  console.log('caseTypesOk:', caseTypesOk);
+  
 
   if (!fieldsOk || !caseTypesOk) {
     document.querySelector('.fg.err')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -265,8 +272,11 @@ export async function submitForm() {
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Server error');
-
-    document.getElementById('join-form-content').classList.add('hidden');
+    console.log('REACHING SUCCESS BLOCK');
+    document.querySelectorAll('#join-form-content > *:not(#join-success)')
+      .forEach(el => el.style.display = 'none');
+    document.getElementById('join-form-content').style.display = 'none';;
+    document.getElementById('join-success').style.display = 'block';
     document.getElementById('join-success').classList.remove('hidden');
     document.getElementById('join-success').scrollIntoView({ behavior: 'smooth', block: 'start' });
 

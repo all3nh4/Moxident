@@ -34,13 +34,13 @@ export async function getPortalAccount(email) {
 }
 
 export async function verifyPortalAccount(email) {
+  console.log("verifyPortalAccount email:", email);
   await db.send(new UpdateItemCommand({
     TableName: PORTAL_TABLE,
     Key: { email: { S: email } },
-    UpdateExpression: "SET verified = :v, verificationToken = :t",
+    UpdateExpression: "SET verified = :v REMOVE verificationToken",
     ExpressionAttributeValues: {
       ":v": { BOOL: true },
-      ":t": { S: "" },
     },
   }));
 }

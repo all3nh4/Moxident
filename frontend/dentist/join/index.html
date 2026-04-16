@@ -60,7 +60,7 @@
 <!-- Mobile Drawer -->
 <div class="nav-drawer" id="nav-drawer">
   <div class="drawer-section">For Dentists</div>
-  <button class="drawer-pill" onclick="window.location.href='/dentist/join/';closeDrawer()">🦷 Join the Network</button>
+  <button class="drawer-pill" onclick="window.location.href='/dentist/portal/join/';closeDrawer()">🦷 Join the Network</button>
   <div class="drawer-divider"></div>
   <button class="drawer-pill" onclick="window.location.href='/';closeDrawer()">← Back to Moxident</button>
 </div>
@@ -69,7 +69,7 @@
 <div class="funnel-wrap">
 
   <!-- ── STEP 1: Value + Proof ── -->
-  <div class="funnel-step active" id="funnel-step-1">
+  <div class="funnel-step hidden" id="funnel-step-1">
 
     
     <h1 class="funnel-h1">Get emergency patients when you have open slots</h1>
@@ -111,8 +111,6 @@
     </div>
 
     <p class="funnel-trust-line">Clinics only pay when a patient shows up — no risk.</p>
-    <button class="submit-btn" onclick="goFunnelStep(3)">Get Started →</button>
-    <p class="funnel-fine-print">Takes 30 seconds. No commitment.</p>
 
   </div>
 
@@ -134,13 +132,13 @@
       <span class="f-err">Enter a valid zip code</span>
     </div>
 
-    <button class="submit-btn" id="zip-check-btn" onclick="checkZipAndReveal()">See patients in your area →</button>
+    <button class="submit-btn" id="zip-check-btn" onclick="checkZipAndReveal()">See emergency demand near you →</button>
     <p class="funnel-fine-print">No spam. No commitment.</p>
 
   </div>
 
   <!-- ── STEP 3: Reveal + Full Form ── -->
-  <div class="funnel-step hidden" id="funnel-step-3">
+  <div class="funnel-step active" id="funnel-step-3">
 
     <div class="funnel-progress">
       <div class="funnel-seg done" id="fseg-3-1"></div>
@@ -160,119 +158,57 @@
         <div class="demand-aggregated-sub hidden" id="demand-aggregated">across the <strong id="demand-city"></strong> area</div>
       </div>
     </div>
+    <section class="how-it-works-section">
+  <div class="how-it-works-inner">
 
-    <h2 class="funnel-h2">Let's match you with these patients</h2>
-    <p class="funnel-sub">These patients are actively looking for care. Tell us about your practice so we can start routing the right ones to you.</p>
+    <div class="how-it-works-eyebrow">HOW IT WORKS</div>
+    <h2 class="how-it-works-title">Three steps. That’s it.</h2>
 
+    <div class="how-it-works-grid">
+
+      <!-- Step 1 -->
+      <div class="how-card">
+        <div class="how-card-num">1</div>
+        <div class="how-card-title">You set your availability</div>
+        <div class="how-card-sub">
+          Tell us when you have openings and how you want to be contacted — cell, front desk, or both. You can update this anytime.
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="how-card">
+        <div class="how-card-num">2</div>
+        <div class="how-card-title">We notify your office</div>
+        <div class="how-card-sub">
+          When a patient nearby needs care, we send the request based on your settings — so it reaches the right person at the right time.
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="how-card">
+        <div class="how-card-num">3</div>
+        <div class="how-card-title">You decide to accept or ignore</div>
+        <div class="how-card-sub">
+          If you're available, your office contacts the patient directly. If not, you ignore the request — no obligation.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+    <div class="join-form-shell">
+      <div id="join-top-content">
+      <div class="form-divider"></div>
+        <p class="join-hero-subtitle">Tell us when you have availability and how you want to be contacted. You can update this later.</p>
+        <p class="form-microcopy">
+        We only notify you when you have availability. You can ignore any request — no obligation.
+      </p>
+    </div>
+  </div>
+
+      
     <div id="join-form-content">
-
-      <div class="join-step-bar">
-        <div class="join-step-seg active" id="seg-1"></div>
-        <div class="join-step-seg" id="seg-2"></div>
-        <div class="join-step-seg" id="seg-3"></div>
-      </div>
-
-      <!-- Section 1: Your Availability -->
-      <div class="join-form-section-block" id="section-1">
-        <div class="join-form-section-label">Your availability</div>
-        <p class="form-microcopy">Takes ~30 seconds</p>
-
-        <div class="fg" id="fg-capacity">
-          <label class="fl">Same-day / next-day openings per week <span class="fl-req">*</span></label>
-          <div class="pill-select" id="capacity-pills">
-            <button type="button" class="pill-option" data-val="rarely"    onclick="selectPill(this,'f-capacity','capacity-pills')">Rarely</button>
-            <button type="button" class="pill-option" data-val="1-2"       onclick="selectPill(this,'f-capacity','capacity-pills')">1–2 times</button>
-            <button type="button" class="pill-option" data-val="3-5"       onclick="selectPill(this,'f-capacity','capacity-pills')">3–5 times</button>
-            <button type="button" class="pill-option" data-val="most-days" onclick="selectPill(this,'f-capacity','capacity-pills')">Most days</button>
-          </div>
-          <input type="hidden" id="f-capacity"/>
-          <span class="f-err">Required</span>
-        </div>
-
-        <div class="fg" id="fg-extended">
-          <label class="fl">Available hours <span class="fl-req">*</span></label>
-          <div class="pill-select" id="extended-pills">
-            <button type="button" class="pill-option" data-val="none"     onclick="selectPill(this,'f-extended','extended-pills')">Weekdays only</button>
-            <button type="button" class="pill-option" data-val="evenings" onclick="selectPill(this,'f-extended','extended-pills')">+ Evenings</button>
-            <button type="button" class="pill-option" data-val="weekends" onclick="selectPill(this,'f-extended','extended-pills')">+ Weekends</button>
-            <button type="button" class="pill-option" data-val="both"     onclick="selectPill(this,'f-extended','extended-pills')">Evenings &amp; Weekends</button>
-          </div>
-          <input type="hidden" id="f-extended"/>
-          <span class="f-err">Required</span>
-        </div>
-
-        <div class="fg" id="fg-years">
-          <label class="fl">Practice area <span class="fl-req">*</span></label>
-          <input class="fi" id="f-years" type="text" placeholder="City or zip code — e.g. Redmond, WA or 98052"/>
-          <span class="f-err">Required</span>
-        </div>
-      </div>
-
-      <!-- Section 2: What You Can Handle — chip UI -->
-      <div class="join-form-section-block" id="section-2">
-
-       <div class="fg" id="fg-insurance">
-          <div class="join-form-section-label">What can you handle on short notice?</div>
-          <p class="form-microcopy">Select a few — you can change this later</p>
-          <div class="chip-grid" id="case-chip-grid">
-            <button type="button" class="case-chip" data-val="Tooth pain">Tooth pain</button>
-            <button type="button" class="case-chip" data-val="Broken tooth">Broken tooth</button>
-            <button type="button" class="case-chip" data-val="Infection">Infection</button>
-            <button type="button" class="case-chip" data-val="Extraction">Extraction</button>
-            <button type="button" class="case-chip" data-val="Root canal">Root canal</button>
-            <button type="button" class="case-chip" data-val="Wisdom tooth">Wisdom tooth</button>
-            <span class="chip-more hidden" id="chip-more">
-              <button type="button" class="case-chip" data-val="Lost filling or crown">Lost filling or crown</button>
-              <button type="button" class="case-chip" data-val="Knocked-out tooth">Knocked-out tooth</button>
-              <button type="button" class="case-chip" data-val="Swelling / gum issues">Swelling / gum issues</button>
-              <button type="button" class="case-chip" data-val="Dental anxiety patients">Dental anxiety</button>
-              <button type="button" class="case-chip" data-val="Pediatric emergencies">Pediatric emergencies</button>
-            </span>
-          </div>
-          <button class="chip-show-more" id="chip-show-more-btn" onclick="toggleMoreChips()">+ Show more</button>
-          <input type="hidden" id="f-case-types"/>
-          <span class="f-err">Select at least one</span>
-        </div>
- 
-        <div class="fg chip-subsection">
-          <div class="join-form-section-label">Insurance accepted <span class="join-optional">(optional)</span></div>
-          <p class="form-microcopy">Select what you take — skip if you accept most</p>
-          <div class="chip-grid" id="insurance-chip-grid">
-            <button type="button" class="case-chip" data-val="Delta Dental">Delta Dental</button>
-            <button type="button" class="case-chip" data-val="Premera">Premera</button>
-            <button type="button" class="case-chip" data-val="Regence">Regence</button>
-            <button type="button" class="case-chip" data-val="Cigna" >Cigna</button>
-            <button type="button" class="case-chip" data-val="MetLife">MetLife</button>
-            <button type="button" class="case-chip" data-val="Aetna">Aetna</button>
-            <span class="chip-more hidden" id="insurance-chip-more">
-              <button type="button" class="case-chip" data-val="Moda Health">Moda Health</button>
-              <button type="button" class="case-chip" data-val="Washington Apple Health">Medicaid (Apple Health)</button>
-              <button type="button" class="case-chip" data-val="Fee for service / cash only">Cash / self-pay</button>
-              <button type="button" class="case-chip" data-val="Other">Other</button>
-            </span>
-          </div>
-          <button class="chip-show-more" id="insurance-show-more-btn" onclick="toggleInsuranceChips()">+ Show more</button>
-          <input type="hidden" id="f-insurance-types"/>
-        </div>
-      </div>
-
-      <!-- Section 3: How You Work -->
-      <div class="join-form-section-block" id="section-3">
-        <div class="join-form-section-label">How you work</div>
-
-        <div class="fg" id="fg-uninsured">
-          <label class="fl">Notification preference <span class="fl-req">*</span></label>
-          <div class="pill-select" id="uninsured-pills">
-            <button type="button" class="pill-option" data-val="sms-personal"  onclick="selectPill(this,'f-uninsured','uninsured-pills')">SMS to my cell</button>
-            <button type="button" class="pill-option" data-val="sms-frontdesk" onclick="selectPill(this,'f-uninsured','uninsured-pills')">SMS to front desk</button>
-            <button type="button" class="pill-option" data-val="call"          onclick="selectPill(this,'f-uninsured','uninsured-pills')">Phone call first</button>
-            <button type="button" class="pill-option" data-val="flexible"      onclick="selectPill(this,'f-uninsured','uninsured-pills')">Flexible</button>
-          </div>
-          <input type="hidden" id="f-uninsured"/>
-          <span class="f-err">Required</span>
-        </div>
-
-        <div class="fg" id="fg-name">
+      <div class="fg" id="fg-name">
           <label class="fl">Full name <span class="fl-req">*</span></label>
           <input class="fi" id="f-name" type="text" placeholder="Dr. Jane Smith" autocomplete="name"/>
           <span class="f-err">Required</span>
@@ -298,31 +234,155 @@
         </div>
 
         <div class="fg" id="fg-zip">
-          <label class="fl">Coverage zip codes <span class="fl-req">*</span></label>
-          <input class="fi" id="f-zip" type="text" placeholder="98101, 98102, 98103"/>
+          <label class="fl">Your clinic zip code <span class="fl-req">*</span></label>
+          <input class="fi" id="f-zip" type="text" placeholder="e.g. 98033"/>
           <span class="f-err">Enter at least one zip code</span>
         </div>
+      
+
+      <div class="join-step-bar">
+        <div class="join-step-seg active" id="seg-1"></div>
+        <div class="join-step-seg" id="seg-2"></div>
+        <div class="join-step-seg" id="seg-3"></div>
+      </div>
+
+      <!-- Section 1: Your Availability -->
+      <div class="join-form-section-block" id="section-1">
+        <div class="join-form-section-label">When do you have openings?</div>
+        <p class="form-microcopy">Takes about 30 seconds. You can update this later.</p>  
+        <div class="fg" id="fg-capacity">
+          <label class="fl">Same-day / next-day openings per week <span class="fl-req">*</span></label>
+          <div class="pill-select" id="capacity-pills">
+            <button type="button" class="pill-option" data-val="rarely"    onclick="selectPill(this,'f-capacity','capacity-pills')">Rarely</button>
+            <button type="button" class="pill-option" data-val="1-2"       onclick="selectPill(this,'f-capacity','capacity-pills')">1–2 times</button>
+            <button type="button" class="pill-option" data-val="3-5"       onclick="selectPill(this,'f-capacity','capacity-pills')">3–5 times</button>
+            <button type="button" class="pill-option" data-val="most-days" onclick="selectPill(this,'f-capacity','capacity-pills')">Most days</button>
+          </div>
+          <input type="hidden" id="f-capacity"/>
+          <span class="f-err">Required</span>
+        </div>
+
+        <div class="fg" id="fg-extended">
+          <label class="fl">Available hours <span class="fl-req">*</span></label>
+          <div class="pill-select" id="extended-pills">
+            <button type="button" class="pill-option" data-val="none"     onclick="selectPill(this,'f-extended','extended-pills')">Weekdays only</button>
+            <button type="button" class="pill-option" data-val="evenings" onclick="selectPill(this,'f-extended','extended-pills')">+ Evenings</button>
+            <button type="button" class="pill-option" data-val="weekends" onclick="selectPill(this,'f-extended','extended-pills')">+ Weekends</button>
+            <button type="button" class="pill-option" data-val="both"     onclick="selectPill(this,'f-extended','extended-pills')">Evenings &amp; Weekends</button>
+          </div>
+          <input type="hidden" id="f-extended"/>
+          <span class="f-err">Required</span>
+        </div>
+
+        <div class="fg" id="fg-years">
+          <label class="fl">Where is your clinic located? <span class="fl-req">*</span></label>
+          <input class="fi" id="f-years" type="text" placeholder="e.g. Redmond, WA or 98052"/>
+          <span class="f-err">Required</span>
+        </div>
+      </div>
+
+      <!-- Section 2: What You Can Handle — chip UI -->
+      <div class="join-form-section-block" id="section-2">
+
+       <div class="fg" id="fg-insurance">
+  <div class="join-form-section-label">What types of emergency cases can you take?</div>
+  <p class="form-microcopy">Select one or more.</p>
+
+  <label class="fl">Emergency case types <span class="fl-req">*</span></label>
+
+  <div class="multi-select" id="case-types-multi">
+    <button type="button" class="multi-select-trigger" onclick="toggleMultiSelect('case-types-multi')">
+      <span id="case-types-label">Select case types</span>
+      <span class="multi-select-arrow">▾</span>
+    </button>
+
+    <div class="multi-select-menu">
+      <label class="multi-select-option"><input type="checkbox" value="Tooth pain" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types')"> Tooth pain</label>
+      <label class="multi-select-option"><input type="checkbox" value="Broken tooth" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types')"> Broken tooth</label>
+      <label class="multi-select-option"><input type="checkbox" value="Infection" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types')"> Infection</label>
+      <label class="multi-select-option"><input type="checkbox" value="Extraction" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types')"> Extraction</label>
+      <label class="multi-select-option"><input type="checkbox" value="Root canal" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types')"> Root canal</label>
+      <label class="multi-select-option"><input type="checkbox" value="Wisdom tooth" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types')"> Wisdom tooth</label>
+      <label class="multi-select-option"><input type="checkbox" value="Lost filling or crown" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types')"> Lost filling or crown</label>
+      <label class="multi-select-option"><input type="checkbox" value="Knocked-out tooth" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types')"> Knocked-out tooth</label>
+      <label class="multi-select-option"><input type="checkbox" value="Swelling / gum issues" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types')"> Swelling / gum issues</label>
+      <label class="multi-select-option"><input type="checkbox" value="Dental anxiety" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types')"> Dental anxiety</label>
+      <label class="multi-select-option"><input type="checkbox" value="Pediatric emergencies" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types')"> Pediatric emergencies</label>
+    </div>
+  </div>
+
+  <input type="hidden" id="f-case-types">
+  <span class="f-err">Select at least one</span>
+</div>
+ 
+        <div class="fg chip-subsection">
+  <div class="join-form-section-label">Insurance accepted <span class="join-optional">(optional)</span></div>
+  <p class="form-microcopy">Select one or more.</p>
+
+  <label class="fl">Insurance</label>
+
+  <div class="multi-select" id="insurance-multi">
+    <button type="button" class="multi-select-trigger" onclick="toggleMultiSelect('insurance-multi')">
+      <span id="insurance-label">Select insurance</span>
+      <span class="multi-select-arrow">▾</span>
+    </button>
+
+    <div class="multi-select-menu">
+      <label class="multi-select-option"><input type="checkbox" value="Delta Dental" onchange="syncMultiSelect('insurance-multi','f-insurance-types','insurance-label','Select insurance')"> Delta Dental</label>
+      <label class="multi-select-option"><input type="checkbox" value="Premera" onchange="syncMultiSelect('insurance-multi','f-insurance-types','insurance-label','Select insurance')"> Premera</label>
+      <label class="multi-select-option"><input type="checkbox" value="Regence" onchange="syncMultiSelect('insurance-multi','f-insurance-types','insurance-label','Select insurance')"> Regence</label>
+      <label class="multi-select-option"><input type="checkbox" value="Cigna" onchange="syncMultiSelect('insurance-multi','f-insurance-types','insurance-label','Select insurance')"> Cigna</label>
+      <label class="multi-select-option"><input type="checkbox" value="MetLife" onchange="syncMultiSelect('insurance-multi','f-insurance-types','insurance-label','Select insurance')"> MetLife</label>
+      <label class="multi-select-option"><input type="checkbox" value="Aetna" onchange="syncMultiSelect('insurance-multi','f-insurance-types','insurance-label','Select insurance')"> Aetna</label>
+      <label class="multi-select-option"><input type="checkbox" value="Moda Health" onchange="syncMultiSelect('insurance-multi','f-insurance-types','insurance-label','Select insurance')"> Moda Health</label>
+      <label class="multi-select-option"><input type="checkbox" value="Washington Apple Health" onchange="syncMultiSelect('insurance-multi','f-insurance-types','insurance-label','Select insurance')"> Medicaid (Apple Health)</label>
+      <label class="multi-select-option"><input type="checkbox" value="Cash / self-pay" onchange="syncMultiSelect('insurance-multi','f-insurance-types','insurance-label','Select insurance')"> Cash / self-pay</label>
+      <label class="multi-select-option"><input type="checkbox" value="Other"> Other</label>
+    </div>
+  </div>
+
+  <input type="hidden" id="f-insurance-types">
+</div>
+
+      </div>
+      <!-- Section 3: How You Work -->
+      <div class="join-form-section-block" id="section-3">
+        <div class="join-form-section-label">How should we contact you?</div>
+
+        <div class="fg" id="fg-uninsured">
+          <label class="fl">Notification preference <span class="fl-req">*</span></label>
+          <div class="pill-select" id="uninsured-pills">
+            <button type="button" class="pill-option" data-val="sms-personal"  onclick="selectPill(this,'f-uninsured','uninsured-pills')">SMS to my cell</button>
+            <button type="button" class="pill-option" data-val="sms-frontdesk" onclick="selectPill(this,'f-uninsured','uninsured-pills')">SMS to front desk</button>
+            <button type="button" class="pill-option" data-val="call"          onclick="selectPill(this,'f-uninsured','uninsured-pills')">Phone call first</button>
+            <button type="button" class="pill-option" data-val="flexible"      onclick="selectPill(this,'f-uninsured','uninsured-pills')">Flexible</button>
+          </div>
+          <input type="hidden" id="f-uninsured"/>
+          <span class="f-err">Required</span>
+        </div>
+
       </div>
 
       <!-- Section 4: Last Details -->
       <div class="join-form-section-block" id="section-4">
-        <div class="join-form-section-label">Last details</div>
-        <p class="form-microcopy">Last step</p>
+        <div class="join-form-section-label">Final step</div>
+        <p class="form-microcopy">Optional — you can leave this blank.</p>
         <div class="fg join-exclusions">
-          <label class="fl">Anything we should know? <span class="join-optional">(optional)</span></label>
+    <label class="fl">Anything we should know? <span class="join-optional">(optional)</span></label>
           <input class="fi" id="f-exclusions" type="text" placeholder="Hours, languages spoken, types of patients you prefer"/>
         </div>
       </div>
 
+  <div class="join-submit-block">
       <p class="sms-consent">By joining the Moxident network you agree to receive SMS notifications for patient referral alerts. Message and data rates may apply. Reply STOP to opt out.</p>
-
-      <p class="funnel-trust-line">We'll review and activate your profile within 24 hours.</p>
+      <p class="form-microcopy"> No contracts. No commitment. You can ignore any request.
+      </p>
+      <p class="funnel-trust-line">You can start receiving requests today. No obligation to accept.</p>
       <button type="button" class="submit-btn" id="join-submit-btn" onclick="submitForm()">
-        Start receiving patients →
+        Start getting emergency requests →
       </button>
-      <p class="form-disclaimer">Free to join · No contracts · We'll confirm within 24 hours</p>
-
-    </div>
+      <p class="form-disclaimer">Free to join · No contracts · Start receiving requests today</p>
+  </div>
 
     <!-- Success screen -->
     <div class="join-success hidden" id="join-success">
@@ -367,6 +427,26 @@ const submitBtn = document.getElementById('join-submit-btn');
 
 submitBtn.addEventListener('click', () => {
   gtag('event', 'form_submitted');
+});
+</script>
+<script>
+function toggleMultiSelect(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function syncMultiSelect(wrapperId, inputId, labelId, placeholder) {
+  const wrapper = document.getElementById(wrapperId);
+  const checked = wrapper.querySelectorAll('input[type="checkbox"]:checked');
+  const values = Array.from(checked).map(cb => cb.value);
+
+  document.getElementById(inputId).value = values.join(', ');
+  document.getElementById(labelId).textContent = values.length ? values.join(', ') : placeholder;
+}
+
+document.addEventListener('click', function (e) {
+  document.querySelectorAll('.multi-select').forEach(function (el) {
+    if (!el.contains(e.target)) el.classList.remove('open');
+  });
 });
 </script>
 </body>

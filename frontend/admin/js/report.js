@@ -54,7 +54,7 @@ function renderCards(submissions) {
       '<div class="empty-state">'
       + '<div class="empty-icon">🦷</div>'
       + '<div class="empty-title">No submissions yet</div>'
-      + '<div class="empty-sub">Dentist survey responses will appear here once dentists complete the onboarding form at moxident.com/dentist/join.</div>'
+      + '<div class="empty-sub">Dentist survey responses will appear here once dentists complete the onboarding form at moxident.com/dentist/portal/join.</div>'
       + '</div>';
     return;
   }

@@ -985,11 +985,47 @@ select.fi option { background: #fff; }
 .sym-form-section {
   background: var(--white); border: 1px solid var(--bdr);
   border-radius: var(--rad-lg); padding: 32px;
-  box-shadow: var(--sh-lg); margin-top: 40px;
+  box-shadow: var(--sh-lg); margin-top: 0;
 }
 .sym-form-title { font-family: var(--serif); font-size: 22px; letter-spacing: -.01em; margin-bottom: 4px; }
 .sym-form-sub   { font-size: 13px; color: var(--ink2); margin-bottom: 22px; }
+.symptom-card {
+  position: relative;
+}
 
+.symptom-hover {
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 12px);
+  transform: translateX(-50%);
+  width: 300px;
+  max-width: calc(100vw - 32px);
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #111;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.55;
+  text-align: left;
+  box-shadow: 0 12px 30px rgba(0,0,0,.18);
+  z-index: 30;
+}
+
+.symptom-hover::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px;
+  border-style: solid;
+  border-color: #111 transparent transparent transparent;
+}
+
+.symptom-card:hover .symptom-hover {
+  display: block;
+}
 /* ═══════════════════════════════════════════
    EARLY ACCESS RESPONSE
 ═══════════════════════════════════════════ */

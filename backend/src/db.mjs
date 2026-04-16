@@ -7,7 +7,9 @@ import { BY_ZIP, CITIES } from "./cities.mjs";
 const db = new DynamoDBClient({ region: "us-east-2" });
 
 export async function savePatient({ name, phone, zip, symptom }) {
+  console.log('savePatient input:', { name, phone, zip, symptom });
   const requestId = randomUUID();
+  console.log('savePatient generated requestId:', requestId);
   await db.send(new PutItemCommand({
     TableName: "moxident-patients",
     Item: {

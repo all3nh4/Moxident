@@ -5,8 +5,11 @@ import { sendSMS } from "./sms.mjs";
 import { getAvailability } from "./portal-db.mjs";
 
 export async function submitRequest({ name, phone, zip, symptom }) {
+  console.log('submitRequest input:', { name, phone, zip, symptom });
   const requestId   = await savePatient({ name, phone, zip, symptom });
+    console.log('savePatient returned requestId:', requestId);
   const dentistFound = await routeToNextDentist(requestId, { name, phone, zip, symptom });
+  console.log('routeToNextDentist returned:', dentistFound);
   return { requestId, dentistFound };
 }
 

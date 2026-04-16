@@ -440,8 +440,37 @@ if (page === "dashboard.html") {
   loadDashboard();
 } else if (page === "settings.html") {
   loadSettings();
+} else if (page === "verify.html") {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("token");
+
+  const loading = document.getElementById("verify-loading");
+  const success = document.getElementById("verify-success");
+  const error = document.getElementById("verify-error");
+  const errorMsg = document.getElementById("verify-error-msg");
+
+  if (!token) {
+    loading?.classList.add("hidden");
+    error?.classList.remove("hidden");
+    if (errorMsg) errorMsg.textContent = "Missing verification token.";
+  } else {
+    fetch(`${API}/dentist-portal/verify?token=${encodeURIComponent(token)}`)
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "Verification failed.");
+        loading?.classList.add("hidden");
+        success?.classList.remove("hidden");
+        setTimeout(() => {
+          window.location.href = `set-password.html?email=${encodeURIComponent(data.email || "")}`;
+        }, 1500);
+      })
+      .catch((err) => {
+        loading?.classList.add("hidden");
+        error?.classList.remove("hidden");
+        if (errorMsg) errorMsg.textContent = err.message || "This link may be invalid or expired.";
+      });
+  }
 } else if (page === "index.html" || page === "") {
-  // If already logged in, redirect to dashboard
   if (getToken()) {
     window.location.href = "dashboard.html";
   }
