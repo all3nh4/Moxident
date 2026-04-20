@@ -8,3 +8,5 @@ backend/dist/
 backend/.jest-cache/
 .DS_Store
 .claude/
+
+.claude/
