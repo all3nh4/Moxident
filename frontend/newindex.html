@@ -324,7 +324,27 @@
             Your number goes to local dentists only — no spam, no sales calls, no nonsense.                                                          
           </div>                                                                                                                                     
    
-          <input type="hidden" id="selected-symptom" name="symptom">                                                                                 
+          <input type="hidden" id="selected-symptom" name="symptom">   
+          
+          <div class="fg" id="fg-symptom">
+            <label class="fl" for="symptom">
+                What’s bothering you? <span class="fl-req">*</span>
+            </label>
+
+            <select class="fi" id="symptom" name="symptom">
+                <option value="">Select a symptom</option>
+                <option value="Severe Tooth Pain">Severe Tooth Pain</option>
+                <option value="Swelling">Swelling</option>
+                <option value="Cracked or Broken Tooth">Cracked or Broken Tooth</option>
+                <option value="Possible Infection">Possible Infection</option>
+                <option value="Lost Filling or Crown">Lost Filling or Crown</option>
+                <option value="Sharp Sensitivity">Sharp Sensitivity</option>
+                <option value="Post-Procedure Pain">Post-Procedure Pain</option>
+                <option value="Pain Getting Worse">Pain Getting Worse</option>
+            </select>
+
+  <span class="f-err"> what’s bothering you?</span>
+</div>
                                                             
           <div class="fg" id="fg-phone">                                                                                                             
             <label class="fl" for="phone">                  

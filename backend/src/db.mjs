@@ -5,8 +5,8 @@ import { randomUUID } from "crypto";
 import { BY_ZIP, CITIES } from "./cities.mjs";
 
 const db = new DynamoDBClient({ region: "us-east-2" });
-
-export async function savePatient({ name, phone, zip, symptom }) {
+ 
+export async function savePatient({ name, phone, zip, symptom, otpCode, otpExpiresAt, isVerified }) {
   console.log('savePatient input:', { name, phone, zip, symptom });
   const requestId = randomUUID();
   console.log('savePatient generated requestId:', requestId);
@@ -21,6 +21,9 @@ export async function savePatient({ name, phone, zip, symptom }) {
       status:    { S: "pending" },
       createdAt: { S: new Date().toISOString() },
       dentistId: { S: "" },
+      otpCode:      { S: otpCode },
+      otpExpiresAt: { N: String(otpExpiresAt) },
+      isVerified:   { BOOL: isVerified },
     },
   }));
   return requestId;

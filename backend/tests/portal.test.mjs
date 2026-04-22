@@ -26,9 +26,13 @@ jest.mock("@aws-sdk/client-ses", () => ({
   SendEmailCommand: jest.fn((input) => ({ type: "SendEmailCommand", input })),
 }));
 
-jest.mock("crypto", () => ({
-  randomUUID: jest.fn(() => "test-uuid-1234"),
-}));
+jest.mock("crypto", () => {
+  const actual = jest.requireActual("crypto");
+  return {
+    ...actual,
+    randomUUID: jest.fn(() => "test-uuid-1234"),
+  };
+});
 
 jest.unstable_mockModule("../src/router.mjs", () => ({
   submitRequest:      jest.fn(),
@@ -174,6 +178,12 @@ describe("POST /dentist-portal/register", () => {
     const res = await handler(event);
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.body).success).toBe(true);
+
+    const portalWrites = mockSend.mock.calls
+      .map(([cmd]) => cmd?.input)
+      .filter((input) => input?.TableName === "moxident-dentist-portal" && input?.Item);
+    expect(portalWrites.length).toBe(1);
+    expect(portalWrites[0].Item.dentistId.S).toBeTruthy();
   });
 
   test("returns 400 when email is missing", async () => {
@@ -192,6 +202,44 @@ describe("POST /dentist-portal/register", () => {
     const res = await handler(event);
     expect(res.statusCode).toBe(409);
     expect(JSON.parse(res.body).error).toMatch(/already exists/i);
+  });
+});
+
+describe("Portal email links", () => {
+  afterEach(() => jest.clearAllMocks());
+
+  test("verification email points directly to set-password page with token", async () => {
+    mockSend.mockResolvedValueOnce({ Item: null });
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({});
+
+    const event = makeEvent("POST", "/dentist-portal/register", { email: "new@dental.com" });
+    await handler(event);
+
+    const emailCall = mockSend.mock.calls.find(
+      ([cmd]) => cmd?.input?.Message?.Subject?.Data === "Verify your Moxident portal email"
+    );
+    const body = emailCall?.[0]?.input?.Message?.Body?.Text?.Data || "";
+
+    expect(body).toContain("/dentist-portal/verify?token=");
+    expect(body).not.toContain("/set-password.html?token=");
+  });
+
+  test("verification email uses API verify route", async () => {
+    mockSend.mockResolvedValueOnce({ Item: null });
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({});
+
+    const event = makeEvent("POST", "/dentist-portal/register", { email: "new@dental.com" });
+    event.headers = { origin: "https://stage.moxident.com" };
+    await handler(event);
+
+    const emailCall = mockSend.mock.calls.find(
+      ([cmd]) => cmd?.input?.Message?.Subject?.Data === "Verify your Moxident portal email"
+    );
+    const body = emailCall?.[0]?.input?.Message?.Body?.Text?.Data || "";
+
+    expect(body).toContain("https://7i7j7c8rx7.execute-api.us-east-2.amazonaws.com/prod/dentist-portal/verify?token=");
   });
 });
 
@@ -223,6 +271,27 @@ describe("GET /dentist-portal/verify", () => {
     const res = await handler(event);
     expect(res.statusCode).toBe(302);
     expect(res.headers.Location).toContain("set-password.html");
+    expect(res.headers.Location).toContain("email=test%40dental.com");
+  });
+
+  test("returns stage redirect when request origin is stage", async () => {
+    mockSend.mockResolvedValueOnce({
+      Items: [{ email: { S: "test@dental.com" }, verificationToken: { S: "valid-verify-token" } }],
+    });
+    mockSend.mockResolvedValueOnce({});
+
+    const event = {
+      rawPath: "/prod/dentist-portal/verify",
+      requestContext: { http: { method: "GET" } },
+      body: "",
+      headers: { origin: "https://stage.moxident.com" },
+      queryStringParameters: { token: "valid-verify-token" },
+      rawQueryString: "token=valid-verify-token",
+    };
+
+    const res = await handler(event);
+    expect(res.statusCode).toBe(302);
+    expect(res.headers.Location).toContain("https://stage.moxident.com/dentist/portal/set-password.html");
     expect(res.headers.Location).toContain("email=test%40dental.com");
   });
 
@@ -291,6 +360,65 @@ describe("POST /dentist-portal/set-password", () => {
     expect(body.token).toBeTruthy();
   });
 
+  test("returns 200 with token when verification token is used for first-time setup", async () => {
+    mockSend.mockResolvedValueOnce({
+      Items: [{ email: { S: "test@dental.com" }, verificationToken: { S: "valid-verify-token" } }],
+    });
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({
+      Item: { email: { S: "test@dental.com" }, verified: { BOOL: true }, passwordHash: { S: "" } },
+    });
+    mockSend.mockResolvedValueOnce({
+      Items: [{ dentistId: { S: "dentist-123" }, email: { S: "test@dental.com" } }],
+    });
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({});
+
+    const event = makeEvent("POST", "/dentist-portal/set-password", {
+      token: "valid-verify-token",
+      password: "securepass123",
+    });
+    const res = await handler(event);
+
+    expect(res.statusCode).toBe(200);
+    const body = JSON.parse(res.body);
+    expect(body.success).toBe(true);
+    expect(body.email).toBe("test@dental.com");
+  });
+
+  test("returns 200 when reset token is used on set-password path", async () => {
+    const futureExpiry = new Date(Date.now() + 3600000).toISOString();
+    mockSend.mockResolvedValueOnce({ Items: [] });
+    mockSend.mockResolvedValueOnce({
+      Items: [{
+        email: { S: "test@dental.com" },
+        resetToken: { S: "valid-reset-token" },
+        resetTokenExpiry: { S: futureExpiry },
+        dentistId: { S: "dentist-123" },
+      }],
+    });
+    mockSend.mockResolvedValueOnce({
+      Item: { email: { S: "test@dental.com" }, verified: { BOOL: true }, passwordHash: { S: "" } },
+    });
+    mockSend.mockResolvedValueOnce({
+      Items: [{ dentistId: { S: "dentist-123" }, email: { S: "test@dental.com" } }],
+    });
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({});
+
+    const event = makeEvent("POST", "/dentist-portal/set-password", {
+      token: "valid-reset-token",
+      password: "securepass123",
+    });
+    const res = await handler(event);
+
+    expect(res.statusCode).toBe(200);
+    const body = JSON.parse(res.body);
+    expect(body.success).toBe(true);
+    expect(body.email).toBe("test@dental.com");
+  });
+
   test("returns 400 when password is too short", async () => {
     const event = makeEvent("POST", "/dentist-portal/set-password", {
       email: "test@dental.com",
@@ -338,6 +466,9 @@ describe("POST /dentist-portal/login", () => {
         dentistId:    { S: "dentist-123" },
       },
     });
+    mockSend.mockResolvedValueOnce({
+      Item: { dentistId: { S: "dentist-123" }, email: { S: "test@dental.com" } },
+    });
     // updateLastLogin
     mockSend.mockResolvedValueOnce({});
 
@@ -382,7 +513,7 @@ describe("POST /dentist-portal/login", () => {
     expect(res.statusCode).toBe(401);
   });
 
-  test("returns 401 when email not verified", async () => {
+  test("returns 403 when email not verified", async () => {
     mockSend.mockResolvedValueOnce({
       Item: {
         email:        { S: "test@dental.com" },
@@ -397,8 +528,64 @@ describe("POST /dentist-portal/login", () => {
       password: "pass",
     });
     const res = await handler(event);
-    expect(res.statusCode).toBe(401);
+    expect(res.statusCode).toBe(403);
     expect(JSON.parse(res.body).error).toMatch(/not verified/i);
+  });
+
+  test("returns 400 when passwordHash is missing", async () => {
+    mockSend.mockResolvedValueOnce({
+      Item: {
+        email: { S: "test@dental.com" },
+        verified: { BOOL: true },
+        dentistId: { S: "dentist-123" },
+      },
+    });
+
+    const event = makeEvent("POST", "/dentist-portal/login", {
+      email: "test@dental.com",
+      password: "securepass123",
+    });
+    const res = await handler(event);
+    expect(res.statusCode).toBe(400);
+  });
+
+  test("returns 409 when dentistId is missing", async () => {
+    mockSend.mockResolvedValueOnce({
+      Item: {
+        email: { S: "test@dental.com" },
+        passwordHash: { S: "hashed_securepass123" },
+        verified: { BOOL: true },
+        dentistId: { S: "" },
+      },
+    });
+
+    const event = makeEvent("POST", "/dentist-portal/login", {
+      email: "test@dental.com",
+      password: "securepass123",
+    });
+    const res = await handler(event);
+    expect(res.statusCode).toBe(409);
+    expect(JSON.parse(res.body).error).toBe("Account is not fully initialized. Dentist profile missing.");
+  });
+
+  test("returns 409 when dentist profile is not found", async () => {
+    mockSend.mockResolvedValueOnce({
+      Item: {
+        email: { S: "test@dental.com" },
+        passwordHash: { S: "hashed_securepass123" },
+        verified: { BOOL: true },
+        dentistId: { S: "dentist-123" },
+      },
+    });
+    mockSend.mockResolvedValueOnce({ Item: null });
+
+    const event = makeEvent("POST", "/dentist-portal/login", {
+      email: "test@dental.com",
+      password: "securepass123",
+    });
+    const res = await handler(event);
+    expect(res.statusCode).toBe(409);
+    expect(JSON.parse(res.body).error).toBe("Dentist profile not found for this account.");
   });
 
   test("returns 400 when email or password missing", async () => {
@@ -443,6 +630,39 @@ describe("POST /dentist-portal/forgot-password", () => {
     const event = makeEvent("POST", "/dentist-portal/forgot-password", {});
     const res = await handler(event);
     expect(res.statusCode).toBe(400);
+  });
+
+  test("returns 200 even if reset email delivery fails", async () => {
+    mockSend.mockResolvedValueOnce({
+      Item: { email: { S: "test@dental.com" }, verified: { BOOL: true } },
+    });
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockRejectedValueOnce(new Error("SES unavailable"));
+
+    const event = makeEvent("POST", "/dentist-portal/forgot-password", { email: "test@dental.com" });
+    const res = await handler(event);
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body).success).toBe(true);
+  });
+
+  test("reset email points to reset-password page with reset flow", async () => {
+    mockSend.mockResolvedValueOnce({
+      Item: { email: { S: "test@dental.com" }, verified: { BOOL: true } },
+    });
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({});
+
+    const event = makeEvent("POST", "/dentist-portal/forgot-password", { email: "test@dental.com" });
+    await handler(event);
+
+    const emailCall = mockSend.mock.calls.find(
+      ([cmd]) => cmd?.input?.Message?.Subject?.Data === "Reset your Moxident password"
+    );
+    const body = emailCall?.[0]?.input?.Message?.Body?.Text?.Data || "";
+
+    expect(body).toContain("/reset-password.html?token=");
+    expect(body).toContain("flow=reset");
   });
 });
 
@@ -596,7 +816,11 @@ describe("POST /dentist-portal/availability", () => {
   afterEach(() => jest.clearAllMocks());
 
   test("returns 200 on successful save", async () => {
-    mockSend.mockResolvedValue({});
+    mockSend
+      .mockResolvedValueOnce({
+        Item: { dentistId: { S: "dentist-123" }, email: { S: "test@dental.com" } },
+      })
+      .mockResolvedValueOnce({});
 
     const event = makeAuthEvent("POST", "/dentist-portal/availability", {
       availability: {
@@ -624,10 +848,34 @@ describe("POST /dentist-portal/availability", () => {
   });
 
   test("returns 400 when availability data is missing", async () => {
+    mockSend.mockResolvedValueOnce({
+      Item: { dentistId: { S: "dentist-123" }, email: { S: "test@dental.com" } },
+    });
     const event = makeAuthEvent("POST", "/dentist-portal/availability", {});
     const res = await handler(event);
     expect(res.statusCode).toBe(400);
     expect(JSON.parse(res.body).error).toMatch(/availability/i);
+  });
+
+  test("returns 409 when token has no dentistId", async () => {
+    const event = makeEvent("POST", "/dentist-portal/availability", {
+      availability: { Mon: { morning: true } },
+    }, {
+      Authorization: "Bearer no-dentist-token",
+    });
+    const res = await handler(event);
+    expect(res.statusCode).toBe(409);
+    expect(JSON.parse(res.body).error).toBe("Account is not fully initialized. Dentist profile missing.");
+  });
+
+  test("returns 409 when dentist profile is missing", async () => {
+    mockSend.mockResolvedValueOnce({ Item: null });
+    const event = makeAuthEvent("POST", "/dentist-portal/availability", {
+      availability: { Mon: { morning: true } },
+    });
+    const res = await handler(event);
+    expect(res.statusCode).toBe(409);
+    expect(JSON.parse(res.body).error).toBe("Dentist profile not found for this account.");
   });
 });
 

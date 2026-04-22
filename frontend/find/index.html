@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="/styles.css" />
   <!-- Start VWO Async SmartCode -->
 <link rel="preconnect" href="https://dev.visualwebsiteoptimizer.com" />
 <script type='text/javascript' id='vwoCode'>
@@ -63,8 +63,8 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
   <button class="drawer-pill" onclick="window.location.href='/privacy-policy.html';closeDrawer()">Privacy</button>
   <button class="drawer-pill" onclick="window.location.href='/terms.html';closeDrawer()">Terms</button>
 </div>
-
-  <!-- ── HERO ── -->
+ <!-- ── HERO + FORM (SPLIT) ── -->
+  <div class="hero-split">
   <section class="hero-section">
     <div class="hero">
 
@@ -82,11 +82,17 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
       <p class="hero-sub a3">
             We connect you with nearby dentists who can help you today.
       </p>
+      <ul class="hero-bullets a4">
+      <li>Licensed local dentists — not marketers</li>
+      <li>No account, no signup, no fee to use</li>
+      <li>Your number only goes to the dentist responding</li>
+      <li>Most patients hear back the same day</li>
+</ul>
 
     </div>
   </section>
   <!----INTAKE FORM -->
-<section class="page-wrap" id="intake-form" style="padding-top:0;padding-bottom:80px;margin-top:-120px;">
+<section class="page-wrap" id="intake-form">  
     <div class="sym-form-section">
 
       <!-- Form state -->
@@ -190,23 +196,35 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
       </div>
 
       <!-- Success state -->
-      <div class="success-screen" id="successScreen">
-        <div class="success-icon-wrap">
-          <span style="font-size:26px;color:var(--grn);">✓</span>
-        </div>
-        <div class="success-headline">You're all set.</div>
-        <div class="success-sub">
-          We've notified local dentists in your area.<br>
-          If one is available, they'll call you directly — usually within the hour.
-          At night, we line things up so you can wake up with an appointment.
-        </div>
-        <div class="success-note">
-          Keep your phone nearby. The call will come from a local dental office number.<br>
-          <strong>Don't recognize the number? Pick up — it's the dentist.</strong>
-        </div>
-      </div>
-
+  <div class="success-screen" id="successScreen">
+  <div id="success-normal">
+    <div class="success-icon-wrap">
+      <span style="font-size:26px;color:var(--grn);">✓</span>
     </div>
+    <div class="success-headline">You're all set.</div>
+    <div class="success-sub">
+      We've notified local dentists in your area.<br>
+      If one is available, they'll call you directly — usually within the hour.
+      At night, we line things up so you can wake up with an appointment.
+    </div>
+    <div class="success-note">
+      Keep your phone nearby. The call will come from a local dental office number.<br>
+      <strong>Don't recognize the number? Pick up — it's the dentist.</strong>
+    </div>
+  </div>
+
+  <div id="success-unsupported" style="display:none;">
+  <div class="unsupported-card">
+    <div class="unsupported-icon">⌛</div>
+    <div class="unsupported-headline">We’re expanding our network in your area</div>
+    <div class="unsupported-sub">
+      We can’t confirm a nearby dentist just yet, but we’re actively growing coverage.
+    </div>
+    <div class="unsupported-note">
+      Leave your request with us and we’ll keep building toward your neighborhood.
+    </div>
+  </div>
+</div>
 
     <!-- Trust strip below form -->
     <div class="trust-strip" style="margin-top:16px;">
@@ -225,24 +243,8 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
     </div>
 
   </section>
+</div>
 
-  <!-- ── TRUST BAR ── -->
-  <div class="trust-bar a5">
-    <div class="trust-inner">
-      <div class="trust-item">
-        <span>✓</span> Licensed local dentists only
-      </div>
-      <div class="trust-item">
-        <span>✓</span> Your number goes to dentists — not marketers
-      </div>
-      <div class="trust-item">
-        <span>✓</span> No account. No signup.
-      </div>
-      <div class="trust-item">
-        <span>✓</span> Seattle-based company
-      </div>
-    </div>
-  </div>
 
   <!-- ── SYMPTOMS ── -->
   <section class="symptom-grid-section">
@@ -482,7 +484,7 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
     <div class="site-footer-link-row">
       <a href="/privacy" style="color:var(--ink3);text-decoration:underline;margin-right:12px;">Privacy Policy</a>
       <a href="/terms" style="color:var(--ink3);text-decoration:underline;margin-right:12px;">Terms of Service</a>
-      <a href="mailto:allen@moxident.com" style="color:var(--ink3);text-decoration:underline;">Contact</a>
+      <a href="mailto:admin@moxident.com" style="color:var(--ink3);text-decoration:underline;">Contact</a>
     </div>
     <div style="margin-top:10px;font-size:11px;color:var(--ink3);line-height:1.6;">
       Moxident is not a dental provider. We connect patients with licensed dental practices.<br>
@@ -560,19 +562,14 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
 
     /* Form submit */
     function handleSubmit() {
+      
       const nameInput  = document.getElementById('name');
       const phoneInput = document.getElementById('phone');
       const zipInput   = document.getElementById('zip');
       const consent    = document.getElementById('smsConsent');
       const btn        = document.getElementById('submitBtn');
       const symptom = document.getElementById('symptom').value;
-       gtag('event', 'ab_conversion', {
-        variant: 'B'
-        });
-
-        gtag('event', 'conversion', {
-            'send_to': 'AW-17976922373/H40YCOnt6ZgcEIWiiPxc'
-        });
+      
       let valid = true;
 
       const digits = phoneInput.value.replace(/\D/g, '');
@@ -601,7 +598,7 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
       
         name: document.getElementById('name')?.value.trim(),
         phone: digits,
-        zip: zip,
+        zip: zip.trim(),
         symptom: symptom,
         consent: consent.checked
 };
@@ -616,18 +613,37 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
                 },
                 body: JSON.stringify(payload)
                 })
-                .then(res => {
-                if (!res.ok) throw new Error("Request failed");
-                return res.json();
+                .then(async res => {
+                  const data = await res.json();
+
+                  if (!res.ok && !data.unsupportedArea) {
+                    throw new Error("Request failed");
+                  }
+
+                  return data;
                 })
                 .then(data => {
-                document.getElementById('formContent').style.display = 'none';
-                document.getElementById('successScreen').classList.add('show');
-                })
-                .catch(err => {
-                console.error("Submit error:", err);
-                alert("Something went wrong. Please try again.");
-                });
+                  console.log('submit response', data);
+                  document.getElementById('formContent').style.display = 'none';
+                  document.querySelector('.hero-section').style.display = 'none';
+
+                  const successScreen = document.getElementById('successScreen');
+                  const normal = document.getElementById('success-normal');
+                  const unsupported = document.getElementById('success-unsupported');
+
+                  if ( data.unsupportedArea) {
+                    normal.style.display = 'none';
+                    unsupported.style.display = 'block';
+                  } else {
+                    normal.style.display = 'block';
+                    unsupported.style.display = 'none';
+                  }
+
+                  gtag('event', 'ab_conversion', { variant: 'B' });
+                  gtag('event', 'conversion', { send_to: 'AW-17976922373/H40YCOnt6ZgcEIWiiPxc' });
+
+                  successScreen.classList.add('show');
+})
     }
     function toggleDrawer() {
     document.getElementById('nav-drawer').classList.toggle('open');

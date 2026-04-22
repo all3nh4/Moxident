@@ -59,10 +59,12 @@
 
 <!-- Mobile Drawer -->
 <div class="nav-drawer" id="nav-drawer">
-  <div class="drawer-section">For Dentists</div>
-  <button class="drawer-pill" onclick="window.location.href='/dentist/portal/join/';closeDrawer()">🦷 Join the Network</button>
-  <div class="drawer-divider"></div>
-  <button class="drawer-pill" onclick="window.location.href='/';closeDrawer()">← Back to Moxident</button>
+  <button class="drawer-pill" onclick="window.location.href='/dentist/join/';closeDrawer()">Join the Network</button>
+  <button class="drawer-pill" onclick="window.location.href='/dentist/portal/';closeDrawer()">Dentist Portal</button>
+  <button class="drawer-pill" onclick="window.location.href='/about-us.html';closeDrawer()">About</button>
+  <button class="drawer-pill" onclick="window.location.href='/contact.html';closeDrawer()">Contact</button>
+  <button class="drawer-pill" onclick="window.location.href='/privacy-policy.html';closeDrawer()">Privacy</button>
+  <button class="drawer-pill" onclick="window.location.href='/terms.html';closeDrawer()">Terms</button>
 </div>
 
 <!-- FUNNEL WRAPPER -->
@@ -158,56 +160,33 @@
         <div class="demand-aggregated-sub hidden" id="demand-aggregated">across the <strong id="demand-city"></strong> area</div>
       </div>
     </div>
-    <section class="how-it-works-section">
-  <div class="how-it-works-inner">
+    <div class="hero-split join-hero-split">
+      <section class="hero-section join-hero-copy">
+        <div class="hero">
+          <h1 class="hero-h1 join-hero-banner a1">
+            We Fill Your Empty Chair
+          </h1>
 
-    <div class="how-it-works-eyebrow">HOW IT WORKS</div>
-    <h2 class="how-it-works-title">Three steps. That’s it.</h2>
+          <div class="hero-sub a2">
+            <p>Tell us when you have open chairs</p>
+            <p>You set your availability — including last-minute cancellations.</p>
+          </div>
 
-    <div class="how-it-works-grid">
-
-      <!-- Step 1 -->
-      <div class="how-card">
-        <div class="how-card-num">1</div>
-        <div class="how-card-title">You set your availability</div>
-        <div class="how-card-sub">
-          Tell us when you have openings and how you want to be contacted — cell, front desk, or both. You can update this anytime.
+          <ul class="hero-bullets a3 join-hero-bullets">
+            <li>When a patient requests care, we text your office</li>
+            <li>The request includes their issue, location, and contact info.</li>
+            <li>If you want the case, you claim it and call the patient</li>
+            <li>Once you accept, the request is removed from other offices.</li>
+            <li>You only pay if the patient shows up</li>
+            <li>We confirm the visit before billing you.</li>
+          </ul>
         </div>
-      </div>
+      </section>
 
-      <!-- Step 2 -->
-      <div class="how-card">
-        <div class="how-card-num">2</div>
-        <div class="how-card-title">We notify your office</div>
-        <div class="how-card-sub">
-          When a patient nearby needs care, we send the request based on your settings — so it reaches the right person at the right time.
-        </div>
-      </div>
-
-      <!-- Step 3 -->
-      <div class="how-card">
-        <div class="how-card-num">3</div>
-        <div class="how-card-title">You decide to accept or ignore</div>
-        <div class="how-card-sub">
-          If you're available, your office contacts the patient directly. If not, you ignore the request — no obligation.
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-    <div class="join-form-shell">
-      <div id="join-top-content">
-      <div class="form-divider"></div>
-        <p class="join-hero-subtitle">Tell us when you have availability and how you want to be contacted. You can update this later.</p>
-        <p class="form-microcopy">
-        We only notify you when you have availability. You can ignore any request — no obligation.
-      </p>
-    </div>
-  </div>
-
-      
-    <div id="join-form-content">
+      <section class="join-hero-form">
+        <div class="join-form-shell">
+          <div id="join-top-content"></div>
+          <div id="join-form-content">
       <div class="fg" id="fg-name">
           <label class="fl">Full name <span class="fl-req">*</span></label>
           <input class="fi" id="f-name" type="text" placeholder="Dr. Jane Smith" autocomplete="name"/>
@@ -264,11 +243,16 @@
 
         <div class="fg" id="fg-extended">
           <label class="fl">Available hours <span class="fl-req">*</span></label>
-          <div class="pill-select" id="extended-pills">
-            <button type="button" class="pill-option" data-val="none"     onclick="selectPill(this,'f-extended','extended-pills')">Weekdays only</button>
-            <button type="button" class="pill-option" data-val="evenings" onclick="selectPill(this,'f-extended','extended-pills')">+ Evenings</button>
-            <button type="button" class="pill-option" data-val="weekends" onclick="selectPill(this,'f-extended','extended-pills')">+ Weekends</button>
-            <button type="button" class="pill-option" data-val="both"     onclick="selectPill(this,'f-extended','extended-pills')">Evenings &amp; Weekends</button>
+          <div class="multi-select" id="extended-hours-multi" data-input-id="f-extended" data-label-id="extended-hours-label" data-placeholder="Select available hours">
+            <button type="button" class="multi-select-trigger" onclick="toggleMultiSelect('extended-hours-multi')">
+              <span id="extended-hours-label">Select available hours</span>
+              <span class="multi-select-arrow">▾</span>
+            </button>
+            <div class="multi-select-menu">
+              <label class="multi-select-option"><input type="checkbox" value="Weekdays" onchange="syncMultiSelect('extended-hours-multi','f-extended','extended-hours-label','Select available hours')"> Weekdays</label>
+              <label class="multi-select-option"><input type="checkbox" value="Evenings" onchange="syncMultiSelect('extended-hours-multi','f-extended','extended-hours-label','Select available hours')"> Evenings</label>
+              <label class="multi-select-option"><input type="checkbox" value="Weekends" onchange="syncMultiSelect('extended-hours-multi','f-extended','extended-hours-label','Select available hours')"> Weekends</label>
+            </div>
           </div>
           <input type="hidden" id="f-extended"/>
           <span class="f-err">Required</span>
@@ -290,13 +274,14 @@
 
   <label class="fl">Emergency case types <span class="fl-req">*</span></label>
 
-  <div class="multi-select" id="case-types-multi">
+  <div class="multi-select" id="case-types-multi" data-input-id="f-case-types" data-label-id="case-types-label" data-placeholder="Select case types">
     <button type="button" class="multi-select-trigger" onclick="toggleMultiSelect('case-types-multi')">
       <span id="case-types-label">Select case types</span>
       <span class="multi-select-arrow">▾</span>
     </button>
 
     <div class="multi-select-menu">
+      <label class="multi-select-option multi-select-option-all"><input type="checkbox" data-select-all value="__all__" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types', event)"> Select all</label>
       <label class="multi-select-option"><input type="checkbox" value="Tooth pain" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types')"> Tooth pain</label>
       <label class="multi-select-option"><input type="checkbox" value="Broken tooth" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types')"> Broken tooth</label>
       <label class="multi-select-option"><input type="checkbox" value="Infection" onchange="syncMultiSelect('case-types-multi','f-case-types','case-types-label','Select case types')"> Infection</label>
@@ -321,13 +306,14 @@
 
   <label class="fl">Insurance</label>
 
-  <div class="multi-select" id="insurance-multi">
+  <div class="multi-select" id="insurance-multi" data-input-id="f-insurance-types" data-label-id="insurance-label" data-placeholder="Select insurance">
     <button type="button" class="multi-select-trigger" onclick="toggleMultiSelect('insurance-multi')">
       <span id="insurance-label">Select insurance</span>
       <span class="multi-select-arrow">▾</span>
     </button>
 
     <div class="multi-select-menu">
+      <label class="multi-select-option multi-select-option-all"><input type="checkbox" data-select-all value="__all__" onchange="syncMultiSelect('insurance-multi','f-insurance-types','insurance-label','Select insurance', event)"> Select all</label>
       <label class="multi-select-option"><input type="checkbox" value="Delta Dental" onchange="syncMultiSelect('insurance-multi','f-insurance-types','insurance-label','Select insurance')"> Delta Dental</label>
       <label class="multi-select-option"><input type="checkbox" value="Premera" onchange="syncMultiSelect('insurance-multi','f-insurance-types','insurance-label','Select insurance')"> Premera</label>
       <label class="multi-select-option"><input type="checkbox" value="Regence" onchange="syncMultiSelect('insurance-multi','f-insurance-types','insurance-label','Select insurance')"> Regence</label>
@@ -396,8 +382,10 @@
         <strong>Questions?</strong> Email us at <a href="mailto:admin@moxident.com" class="link-red">admin@moxident.com</a>
       </div>
     </div>
-
-  </div>
+          </div>
+        </div>
+      </section>
+    </div>
   <!-- end funnel-step-3 -->
 
 </div>
@@ -427,26 +415,6 @@ const submitBtn = document.getElementById('join-submit-btn');
 
 submitBtn.addEventListener('click', () => {
   gtag('event', 'form_submitted');
-});
-</script>
-<script>
-function toggleMultiSelect(id) {
-  document.getElementById(id).classList.toggle('open');
-}
-
-function syncMultiSelect(wrapperId, inputId, labelId, placeholder) {
-  const wrapper = document.getElementById(wrapperId);
-  const checked = wrapper.querySelectorAll('input[type="checkbox"]:checked');
-  const values = Array.from(checked).map(cb => cb.value);
-
-  document.getElementById(inputId).value = values.join(', ');
-  document.getElementById(labelId).textContent = values.length ? values.join(', ') : placeholder;
-}
-
-document.addEventListener('click', function (e) {
-  document.querySelectorAll('.multi-select').forEach(function (el) {
-    if (!el.contains(e.target)) el.classList.remove('open');
-  });
 });
 </script>
 </body>

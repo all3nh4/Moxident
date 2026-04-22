@@ -18,6 +18,18 @@ export function closeDrawer() {
   document.body.style.overflow = '';
 }
 
+function initNavDrawer() {
+  const hamburger = document.getElementById('hamburger');
+  const navDrawer = document.getElementById('nav-drawer');
+  if (!hamburger || !navDrawer) return;
+
+  document.addEventListener('click', (e) => {
+    if (!hamburger.contains(e.target) && !navDrawer.contains(e.target)) {
+      closeDrawer();
+    }
+  });
+}
+
 /* ── Funnel step navigation ──────────────────────────────────────────────── */
 export function goFunnelStep(n) {
   const top = document.getElementById('join-top-content');
@@ -130,6 +142,87 @@ export function toggleInsuranceChips() {
   btn.textContent = hidden ? '+ Show more' : '− Show less';
 }
 
+function getMultiSelectInputs(wrapper) {
+  if (!wrapper) return [];
+  return Array.from(wrapper.querySelectorAll('input[type="checkbox"]:not([data-select-all])'));
+}
+
+function getMultiSelectLabel(values, placeholder) {
+  if (!values.length) return placeholder;
+  return values.length === 1 ? values[0] : `${values.length} selected`;
+}
+
+function syncSelectAllState(wrapper) {
+  const selectAll = wrapper?.querySelector('input[data-select-all]');
+  if (!selectAll) return;
+
+  const options = getMultiSelectInputs(wrapper);
+  const checkedCount = options.filter(cb => cb.checked).length;
+  selectAll.indeterminate = checkedCount > 0 && checkedCount < options.length;
+  selectAll.checked = options.length > 0 && checkedCount === options.length;
+}
+
+function updateMultiSelectState(wrapperId, inputId, labelId, placeholder) {
+  const wrapper = document.getElementById(wrapperId);
+  if (!wrapper) return;
+
+  const values = getMultiSelectInputs(wrapper)
+    .filter(cb => cb.checked)
+    .map(cb => cb.value);
+
+  const input = document.getElementById(inputId);
+  if (input) input.value = values.join(', ');
+
+  const label = document.getElementById(labelId);
+  if (label) label.textContent = getMultiSelectLabel(values, placeholder);
+
+  syncSelectAllState(wrapper);
+
+  if (inputId === 'f-case-types' && values.length) {
+    document.getElementById('fg-insurance')?.classList.remove('err');
+  }
+
+  updateStepBar();
+}
+
+function setMultiSelectValues(wrapperId, inputId, labelId, placeholder, values = []) {
+  const wrapper = document.getElementById(wrapperId);
+  if (!wrapper) return;
+
+  const selected = new Set(values.map(v => v.trim()).filter(Boolean));
+  getMultiSelectInputs(wrapper).forEach(cb => {
+    cb.checked = selected.has(cb.value);
+  });
+
+  updateMultiSelectState(wrapperId, inputId, labelId, placeholder);
+}
+
+export function toggleMultiSelect(id) {
+  document.querySelectorAll('.multi-select').forEach(el => {
+    if (el.id !== id) el.classList.remove('open');
+  });
+  document.getElementById(id)?.classList.toggle('open');
+}
+
+export function syncMultiSelect(wrapperId, inputId, labelId, placeholder, evt) {
+  const wrapper = document.getElementById(wrapperId);
+  if (!wrapper) return;
+
+  const target = evt?.target || window.event?.target || null;
+  const selectAll = wrapper.querySelector('input[data-select-all]');
+
+  if (target?.matches?.('input[data-select-all]')) {
+    const checked = target.checked;
+    getMultiSelectInputs(wrapper).forEach(cb => {
+      cb.checked = checked;
+    });
+  } else if (selectAll) {
+    syncSelectAllState(wrapper);
+  }
+
+  updateMultiSelectState(wrapperId, inputId, labelId, placeholder);
+}
+
 function initChips() {
   document.querySelectorAll('.case-chip').forEach(chip => {
     chip.addEventListener('click', () => {
@@ -186,16 +279,14 @@ export function validate(fields) {
   return ok;
 }
 
-/* ── Collect case types from #insurance-grid ─────────────────────────────── */
+/* ── Collect case types from hidden field ───────────────────────────────── */
 export function collectCaseTypes() {
-  const selected = document.querySelectorAll('#case-chip-grid .case-chip.selected');
-  return Array.from(selected).map(c => c.dataset.val).join(', ');
+  return document.getElementById('f-case-types')?.value?.trim() || '';
 }
 
-/* ── Collect insurance from #specialties-grid ───────────────────────────── */
+/* ── Collect insurance from hidden field ───────────────────────────────── */
 export function collectInsurance() {
-  const checked = document.querySelectorAll('#specialties-grid input[type="checkbox"]:checked');
-  return Array.from(checked).map(cb => cb.value).join(', ');
+  return document.getElementById('f-insurance-types')?.value?.trim() || '';
 }
 
 /* ── Validate case types grid ────────────────────────────────────────────── */
@@ -273,13 +364,17 @@ export async function submitForm() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Server error');
     console.log('REACHING SUCCESS BLOCK');
-    document.querySelectorAll('#join-form-content > *:not(#join-success)')
-      .forEach(el => el.style.display = 'none');
-    document.getElementById('join-form-content').style.display = 'none';;
-    document.getElementById('join-success').style.display = 'block';
-    document.getElementById('join-success').classList.remove('hidden');
-    document.getElementById('join-success').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
+      const formContent = document.getElementById('join-form-content');
+      const success = document.getElementById('join-success');
+
+      Array.from(formContent.children).forEach(el => {
+        if (el.id !== 'join-success') el.style.display = 'none';
+      });
+
+      success.style.display = 'block';
+      success.classList.remove('hidden');
+      success.scrollIntoView({ behavior: 'smooth', block: 'start' });
     if (typeof window.lintrk === 'function') {
       lintrk('track', { conversion_id: 9061468 });
     }
@@ -338,11 +433,9 @@ function initListeners() {
     el.addEventListener('change', () => { document.getElementById(fg)?.classList.remove('err'); updateStepBar(); });
   });
 
-  // Case types checkboxes
-  document.querySelectorAll('#insurance-grid input[type="checkbox"]').forEach(cb => {
-    cb.addEventListener('change', () => {
-      if (collectCaseTypes()) document.getElementById('fg-insurance')?.classList.remove('err');
-      updateStepBar();
+  document.addEventListener('click', event => {
+    document.querySelectorAll('.multi-select').forEach(el => {
+      if (!el.contains(event.target)) el.classList.remove('open');
     });
   });
 
@@ -352,9 +445,13 @@ function initListeners() {
     try {
       const s = JSON.parse(survey);
       if (s.cases?.length) {
-        document.querySelectorAll('#insurance-grid input[type="checkbox"]').forEach(cb => {
-          if (s.cases.includes(cb.value)) cb.checked = true;
-        });
+        setMultiSelectValues(
+          'case-types-multi',
+          'f-case-types',
+          'case-types-label',
+          'Select case types',
+          s.cases
+        );
       }
       if (s.contactMethod) {
         const pill = document.querySelector(`#notification-pills [data-val="${s.contactMethod}"]`);
@@ -362,11 +459,17 @@ function initListeners() {
       }
     } catch(e) {}
   }
+
+  updateMultiSelectState('case-types-multi', 'f-case-types', 'case-types-label', 'Select case types');
+  updateMultiSelectState('insurance-multi', 'f-insurance-types', 'insurance-label', 'Select insurance');
+  updateMultiSelectState('extended-hours-multi', 'f-extended', 'extended-hours-label', 'Select available hours');
 }
 
 /* ── Expose globals ──────────────────────────────────────────────────────── */
 if (typeof window !== 'undefined') {
   window.toggleDrawer       = toggleDrawer;
+  window.toggleMultiSelect  = toggleMultiSelect;
+  window.syncMultiSelect    = syncMultiSelect;
   window.syncChipValues     = syncChipValues;
   window.closeDrawer        = closeDrawer;
   window.submitForm         = submitForm;
@@ -379,5 +482,8 @@ if (typeof window !== 'undefined') {
 
 /* ── Init ────────────────────────────────────────────────────────────────── */
 if (typeof document !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', initListeners);
+  document.addEventListener('DOMContentLoaded', () => {
+    initNavDrawer();
+    initListeners();
+  });
 }

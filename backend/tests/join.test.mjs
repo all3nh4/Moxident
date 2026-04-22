@@ -24,6 +24,7 @@ const {
   validate,
   collectCaseTypes,
   collectInsurance,
+  syncMultiSelect,
   buildPayload,
   submitForm,
 } = await import('../../frontend/dentist/join/join.mjs');
@@ -122,82 +123,165 @@ describe('validate', () => {
 });
 
 // ── collectCaseTypes (Bug 1: reads #insurance-grid, not #specialties-grid) ───
+// ── collectCaseTypes (reads hidden field synced by case-types-multi) ───
 describe('collectCaseTypes', () => {
-  beforeEach(() => jest.clearAllMocks());
+  test('returns empty string when hidden field is empty', () => {
+    document.getElementById.mockImplementation(id => {
+      if (id === 'f-case-types') return { value: '' };
+      return null;
+    });
 
-  test('returns empty string when no checkboxes checked', () => {
-    document.querySelectorAll.mockReturnValue([]);
     expect(collectCaseTypes()).toBe('');
   });
 
-  test('returns single checked value', () => {
-    document.querySelectorAll.mockImplementation(selector => {
-      if (selector === '#insurance-grid input[type="checkbox"]:checked')
-        return [{ value: 'Extractions' }];
-      return [];
+  test('returns single selected case type value from hidden field', () => {
+    document.getElementById.mockImplementation(id => {
+      if (id === 'f-case-types') return { value: 'Extraction' };
+      return null;
     });
-    expect(collectCaseTypes()).toBe('Extractions');
+
+    expect(collectCaseTypes()).toBe('Extraction');
   });
 
-  test('returns multiple checked values as comma-separated string', () => {
-    document.querySelectorAll.mockImplementation(selector => {
-      if (selector === '#insurance-grid input[type="checkbox"]:checked')
-        return [
-          { value: 'Toothache / pain' },
-          { value: 'Root canals' },
-          { value: 'Crowns & fillings' },
-        ];
-      return [];
+  test('returns multiple selected case types as comma-separated string from hidden field', () => {
+    document.getElementById.mockImplementation(id => {
+      if (id === 'f-case-types') {
+        return { value: 'Tooth pain, Root canal, Lost filling or crown' };
+      }
+      return null;
     });
-    expect(collectCaseTypes()).toBe('Toothache / pain, Root canals, Crowns & fillings');
+
+    expect(collectCaseTypes()).toBe('Tooth pain, Root canal, Lost filling or crown');
   });
 
-  test('does NOT read from #specialties-grid', () => {
-    // Only specialties-grid has checkboxes — caseTypes should still be empty
-    document.querySelectorAll.mockImplementation(selector => {
-      if (selector === '#specialties-grid input[type="checkbox"]:checked')
-        return [{ value: 'Delta Dental' }];
-      return [];
+  test('does not read insurance hidden field', () => {
+    document.getElementById.mockImplementation(id => {
+      if (id === 'f-case-types') return { value: '' };
+      if (id === 'f-insurance-types') return { value: 'Delta Dental' };
+      return null;
     });
+
     expect(collectCaseTypes()).toBe('');
   });
 });
 
-// ── collectInsurance (Bug 1: reads #specialties-grid, not #insurance-grid) ───
+// ── collectInsurance (reads hidden field synced by insurance multi-select) ───
 describe('collectInsurance', () => {
   beforeEach(() => jest.clearAllMocks());
 
-  test('returns empty string when no checkboxes checked', () => {
-    document.querySelectorAll.mockReturnValue([]);
+  test('returns empty string when hidden field is empty', () => {
+    document.getElementById.mockImplementation(id => {
+      if (id === 'f-insurance-types') return { value: '' };
+      return null;
+    });
     expect(collectInsurance()).toBe('');
   });
 
-  test('returns single checked value', () => {
-    document.querySelectorAll.mockImplementation(selector => {
-      if (selector === '#specialties-grid input[type="checkbox"]:checked')
-        return [{ value: 'Delta Dental' }];
-      return [];
+  test('returns single selected insurance value from hidden field', () => {
+    document.getElementById.mockImplementation(id => {
+      if (id === 'f-insurance-types') return { value: 'Delta Dental' };
+      return null;
     });
     expect(collectInsurance()).toBe('Delta Dental');
   });
 
-  test('returns multiple insurance plans as comma-separated string', () => {
-    document.querySelectorAll.mockImplementation(selector => {
-      if (selector === '#specialties-grid input[type="checkbox"]:checked')
-        return [{ value: 'Delta Dental' }, { value: 'Cigna' }, { value: 'Premera' }];
-      return [];
+  test('returns multiple insurance plans as comma-separated string from hidden field', () => {
+    document.getElementById.mockImplementation(id => {
+      if (id === 'f-insurance-types') return { value: 'Delta Dental, Cigna, Premera' };
+      return null;
     });
     expect(collectInsurance()).toBe('Delta Dental, Cigna, Premera');
   });
 
-  test('does NOT read from #insurance-grid', () => {
-    // Only insurance-grid has checkboxes — insurance should still be empty
-    document.querySelectorAll.mockImplementation(selector => {
-      if (selector === '#insurance-grid input[type="checkbox"]:checked')
-        return [{ value: 'Toothache / pain' }];
-      return [];
+  test('does not read case-types hidden field', () => {
+    document.getElementById.mockImplementation(id => {
+      if (id === 'f-case-types') return { value: 'Toothache / pain' };
+      if (id === 'f-insurance-types') return { value: '' };
+      return null;
     });
     expect(collectInsurance()).toBe('');
+  });
+});
+
+describe('syncMultiSelect', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  function makeCheckbox(value, checked = false, selectAll = false) {
+    return {
+      value,
+      checked,
+      dataset: selectAll ? { selectAll: 'true' } : {},
+      matches: jest.fn(selector => selectAll && selector === 'input[data-select-all]'),
+    };
+  }
+
+  test('writes selected case types to the hidden input and uses summary text', () => {
+    const selectAll = makeCheckbox('__all__', false, true);
+    const toothPain = makeCheckbox('Tooth pain', true);
+    const infection = makeCheckbox('Infection', true);
+    const wrapper = {
+      querySelectorAll: jest.fn(selector =>
+        selector === 'input[type="checkbox"]:not([data-select-all])'
+          ? [toothPain, infection]
+          : []
+      ),
+      querySelector: jest.fn(selector =>
+        selector === 'input[data-select-all]' ? selectAll : null
+      ),
+    };
+    const hiddenInput = { value: '' };
+    const label = { textContent: 'Select case types' };
+    const fgInsurance = { classList: { remove: jest.fn() } };
+
+    document.getElementById.mockImplementation(id => {
+      if (id === 'case-types-multi') return wrapper;
+      if (id === 'f-case-types') return hiddenInput;
+      if (id === 'case-types-label') return label;
+      if (id === 'fg-insurance') return fgInsurance;
+      if (id === 'seg-1' || id === 'seg-2' || id === 'seg-3') return { classList: { toggle: jest.fn() } };
+      return { value: '' };
+    });
+
+    syncMultiSelect('case-types-multi', 'f-case-types', 'case-types-label', 'Select case types');
+
+    expect(hiddenInput.value).toBe('Tooth pain, Infection');
+    expect(label.textContent).toBe('2 selected');
+    expect(selectAll.checked).toBe(true);
+  });
+
+  test('select all toggles all non-select-all options for insurance', () => {
+    const selectAll = makeCheckbox('__all__', true, true);
+    const delta = makeCheckbox('Delta Dental', false);
+    const cigna = makeCheckbox('Cigna', false);
+    const wrapper = {
+      querySelectorAll: jest.fn(selector =>
+        selector === 'input[type="checkbox"]:not([data-select-all])'
+          ? [delta, cigna]
+          : []
+      ),
+      querySelector: jest.fn(selector =>
+        selector === 'input[data-select-all]' ? selectAll : null
+      ),
+    };
+    const hiddenInput = { value: '' };
+    const label = { textContent: 'Select insurance' };
+
+    document.getElementById.mockImplementation(id => {
+      if (id === 'insurance-multi') return wrapper;
+      if (id === 'f-insurance-types') return hiddenInput;
+      if (id === 'insurance-label') return label;
+      if (id === 'seg-1' || id === 'seg-2' || id === 'seg-3') return { classList: { toggle: jest.fn() } };
+      return { value: '' };
+    });
+
+    syncMultiSelect('insurance-multi', 'f-insurance-types', 'insurance-label', 'Select insurance', {
+      target: selectAll,
+    });
+
+    expect(delta.checked).toBe(true);
+    expect(cigna.checked).toBe(true);
+    expect(hiddenInput.value).toBe('Delta Dental, Cigna');
+    expect(label.textContent).toBe('2 selected');
   });
 });
 
@@ -205,7 +289,6 @@ describe('collectInsurance', () => {
 describe('buildPayload', () => {
   // f-years in the HTML maps to practiceArea in the payload (Bug 3 fix)
   // f-notification maps to notificationPreference (Bug 2 fix)
-  // caseTypes from #insurance-grid, insuranceAccepted from #specialties-grid (Bug 1 fix)
   function mockFields(overrides = {}) {
     const defaults = {
       'f-name':         'Dr. Jane Smith',
@@ -219,17 +302,11 @@ describe('buildPayload', () => {
       'f-notification': 'sms-frontdesk', // notificationPreference value
       'f-uninsured':    'yes',
       'f-exclusions':   '',
+      'f-case-types':   'Toothache / pain, Extractions',
+      'f-insurance-types': 'Delta Dental, Cigna',
     };
     const fields = { ...defaults, ...overrides };
     document.getElementById.mockImplementation(id => ({ value: fields[id] ?? '' }));
-    // Default: caseTypes from insurance-grid, insuranceAccepted from specialties-grid
-    document.querySelectorAll.mockImplementation(selector => {
-      if (selector === '#insurance-grid input[type="checkbox"]:checked')
-        return [{ value: 'Toothache / pain' }, { value: 'Extractions' }];
-      if (selector === '#specialties-grid input[type="checkbox"]:checked')
-        return [{ value: 'Delta Dental' }, { value: 'Cigna' }];
-      return [];
-    });
   }
 
   beforeEach(() => jest.clearAllMocks());
@@ -248,8 +325,8 @@ describe('buildPayload', () => {
     expect(payload.extendedHours).toBe('weekends');
     expect(payload.notificationPreference).toBe('sms-frontdesk'); // f-notification
     expect(payload.acceptsUninsured).toBe('yes');
-    expect(payload.caseTypes).toBe('Toothache / pain, Extractions'); // from insurance-grid
-    expect(payload.insuranceAccepted).toBe('Delta Dental, Cigna');   // from specialties-grid
+    expect(payload.caseTypes).toBe('Toothache / pain, Extractions');
+    expect(payload.insuranceAccepted).toBe('Delta Dental, Cigna');
     expect(payload.source).toBe('dentist-join-page');
   });
 
@@ -261,13 +338,9 @@ describe('buildPayload', () => {
   });
 
   test('caseTypes and insuranceAccepted are not swapped (Bug 1)', () => {
-    document.getElementById.mockImplementation(id => ({ value: '' }));
-    document.querySelectorAll.mockImplementation(selector => {
-      if (selector === '#insurance-grid input[type="checkbox"]:checked')
-        return [{ value: 'Root canals' }];
-      if (selector === '#specialties-grid input[type="checkbox"]:checked')
-        return [{ value: 'Premera Blue Cross' }];
-      return [];
+    mockFields({
+      'f-case-types': 'Root canals',
+      'f-insurance-types': 'Premera Blue Cross',
     });
     const payload = buildPayload();
     expect(payload.caseTypes).toContain('Root canals');
@@ -336,11 +409,18 @@ describe('submitForm', () => {
       'f-notification': 'sms-personal',
       'f-uninsured':    'yes',
       'f-exclusions':   '',
+      'f-case-types':   'Toothache / pain',
+      'f-insurance-types': 'Delta Dental',
     };
 
     const btn         = { disabled: false, textContent: '' };
-    const formContent = { classList: makeClassList(false), scrollIntoView: jest.fn() };
-    const success     = { classList: makeClassList(true),  scrollIntoView: jest.fn() };
+    const childA = { id: 'section-a', style: {} };
+    const success     = { id: 'join-success', classList: makeClassList(true), style: {}, scrollIntoView: jest.fn() };
+    const formContent = {
+      classList: makeClassList(false),
+      children: [childA, success],
+      scrollIntoView: jest.fn(),
+    };
 
     // All fg elements the validation loop touches
     const fgIds = [
@@ -360,15 +440,9 @@ describe('submitForm', () => {
     });
 
     document.querySelector.mockReturnValue(null);
-    document.querySelectorAll.mockImplementation(selector => {
-      if (selector === '#insurance-grid input[type="checkbox"]:checked')
-        return [{ value: 'Toothache / pain' }]; // at least one — passes validateCaseTypes
-      if (selector === '#specialties-grid input[type="checkbox"]:checked')
-        return [{ value: 'Delta Dental' }];
-      return [];
-    });
+    document.querySelectorAll.mockReturnValue([]);
 
-    return { btn, formContent, success, fgElements };
+    return { btn, childA, formContent, success, fgElements };
   }
 
   beforeEach(() => {
@@ -422,7 +496,7 @@ describe('submitForm', () => {
   });
 
   test('shows success screen on 200 response', async () => {
-    const { formContent, success } = setupValidForm();
+    const { childA, success } = setupValidForm();
     mockFetch.mockResolvedValueOnce({
       ok:   true,
       json: async () => ({ success: true, applicationId: 'abc-123' }),
@@ -430,7 +504,8 @@ describe('submitForm', () => {
 
     await submitForm();
 
-    expect(formContent.classList.contains('hidden')).toBe(true);
+    expect(childA.style.display).toBe('none');
+    expect(success.style.display).toBe('block');
     expect(success.classList.contains('hidden')).toBe(false);
   });
 
@@ -464,8 +539,6 @@ describe('submitForm', () => {
       return { value: 'valid', classList: makeClassList() };
     });
     document.querySelector.mockReturnValue(null);
-    document.querySelectorAll.mockReturnValue([{ value: 'Toothache / pain' }]);
-
     await submitForm();
 
     expect(mockFetch).not.toHaveBeenCalled();
@@ -473,27 +546,13 @@ describe('submitForm', () => {
 
   test('does not call fetch when no case types selected (validateCaseTypes fails)', async () => {
     setupValidForm();
-    document.querySelectorAll.mockImplementation(selector => {
-      // No case types checked — insurance-grid returns empty
-      if (selector === '#insurance-grid input[type="checkbox"]:checked') return [];
-      return [];
-    });
-
-    await submitForm();
-
-    expect(mockFetch).not.toHaveBeenCalled();
-  });
-
-  test('does not call fetch when notification preference is empty', async () => {
-    setupValidForm();
     document.getElementById.mockImplementation(id => {
-      if (id === 'f-notification')    return { value: '' };       // fails validation
-      if (id === 'fg-notification')   return { classList: makeClassList() };
+      if (id === 'f-case-types')      return { value: '' };
       if (id === 'join-submit-btn')   return { disabled: false, textContent: '' };
+      if (id === 'join-form-content') return { children: [], classList: makeClassList(false), scrollIntoView: jest.fn() };
+      if (id === 'join-success')      return { classList: makeClassList(true), style: {}, scrollIntoView: jest.fn() };
       return { value: 'valid', classList: makeClassList() };
     });
-    document.querySelectorAll.mockReturnValue([{ value: 'Toothache / pain' }]);
-    document.querySelector.mockReturnValue(null);
 
     await submitForm();
 

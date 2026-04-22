@@ -4,13 +4,47 @@ import { findDentistsByZip, findDentistByPhone, savePatient,
 import { sendSMS } from "./sms.mjs";
 import { getAvailability } from "./portal-db.mjs";
 
-export async function submitRequest({ name, phone, zip, symptom }) {
+const COVERED_ZIPS = new Set([
+  "98033","98034",
+  "98052","98053",
+  "98004","98005","98006","98007","98008",
+  "98028",
+  "98072"
+]);
+
+
+export async function submitRequest({ name, phone, zip, symptom, otpCode, otpExpiresAt, isVerified }) {
   console.log('submitRequest input:', { name, phone, zip, symptom });
-  const requestId   = await savePatient({ name, phone, zip, symptom });
-    console.log('savePatient returned requestId:', requestId);
-  const dentistFound = await routeToNextDentist(requestId, { name, phone, zip, symptom });
-  console.log('routeToNextDentist returned:', dentistFound);
-  return { requestId, dentistFound };
+
+const isCovered = COVERED_ZIPS.has(zip);
+
+const requestId = await savePatient({
+  name,
+  phone,
+  zip,
+  symptom,
+  otpCode,
+  otpExpiresAt,
+  isVerified
+});
+if (!isCovered) {
+  await sendSMS(
+    phone,
+    `Moxident: We’re expanding our dentist network in your area and can’t confirm a nearby match yet. Reply STOP to opt out.`
+  );
+
+  return {
+    requestId,
+    dentistFound: false,
+    unsupportedArea: true,
+    message: "We’re expanding our dentist network in your area."
+  };
+}
+
+const dentistFound = await routeToNextDentist(requestId, { name, phone, zip, symptom });
+
+return { requestId, dentistFound };
+
 }
 
 export async function routeToNextDentist(requestId, patient, excluded = []) {
@@ -18,13 +52,13 @@ export async function routeToNextDentist(requestId, patient, excluded = []) {
   
 
   if (dentists.length === 0) {
-    await sendSMS(
-      patient.phone,
-      `Hi ${patient.name}, this is Moxident. We received your request near ${patient.zip} and are searching for an available dentist. We will text you shortly. If this is a medical emergency call 911.`
-    );
-    
-    return false;
-  }
+  await sendSMS(
+    patient.phone,
+    `Moxident: We’re expanding our dentist network in your area and can’t confirm a nearby match yet. Reply STOP to opt out.`
+  );
+
+  return false;
+}
 
 let dentist = null;
 

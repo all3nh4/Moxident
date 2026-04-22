@@ -1,5 +1,6 @@
 // src/handler.mjs
 import { submitRequest, handleDentistReply } from "./router.mjs";
+import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 import { savePatient, findDentistsByZip, findDentistByPhone,
          updatePatientStatus, findOpenRequestByDentist,
          saveDentistApplication, saveLead, getLeads, updateLead,
@@ -8,10 +9,12 @@ import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 import { generateToken, hashPassword, comparePassword,
          generateVerificationToken, authenticateRequest } from "./portal-auth.mjs";
 import { createPortalAccount, getPortalAccount, verifyPortalAccount,
+         createPortalAccountWithDentistId, updatePortalAccountDentistId,
          setPortalPassword, updateLastLogin, setResetToken, clearResetToken,
-         getDentistByEmail, saveAvailability, getAvailability,
+         getDentistByEmail, ensureDentistProfile, saveAvailability, getAvailability,
          getDentistProfile, getRecentRequests, getDentistStats } from "./portal-db.mjs";
 
+const sns = new SNSClient({ region: "us-east-2" });        
 const ses = new SESClient({ region: "us-east-2" });
 const NOTIFY_EMAIL = "admin@moxident.com";
 
@@ -138,9 +141,29 @@ allen@moxident.com
 
 const PORTAL_BASE_URL =
   process.env.PORTAL_BASE_URL || "https://moxident.com/dentist/portal";
+const API_BASE_URL =
+  process.env.API_BASE_URL || "https://7i7j7c8rx7.execute-api.us-east-2.amazonaws.com/prod";
 
-async function sendPortalVerificationEmail(email, token) {
-const link = `${PORTAL_BASE_URL}/verify.html?token=${token}`;  await ses.send(new SendEmailCommand({
+function getPortalBaseUrl(event) {
+  const headers = event?.headers || {};
+  const origin = headers.origin || headers.Origin;
+  const referer = headers.referer || headers.Referer;
+
+  const sourceUrl = origin || referer;
+  if (sourceUrl) {
+    try {
+      const url = new URL(sourceUrl);
+      return `${url.origin}/dentist/portal`;
+    } catch {}
+  }
+
+  if (process.env.PORTAL_BASE_URL) return process.env.PORTAL_BASE_URL;
+
+  return PORTAL_BASE_URL;
+}
+
+async function sendPortalVerificationEmail(email, token, portalBaseUrl) {
+const link = `${API_BASE_URL}/dentist-portal/verify?token=${token}`;  await ses.send(new SendEmailCommand({
     Source: NOTIFY_EMAIL,
     Destination: { ToAddresses: [email] },
     Message: {
@@ -150,19 +173,19 @@ const link = `${PORTAL_BASE_URL}/verify.html?token=${token}`;  await ses.send(ne
   }));
 }
 
-async function sendPortalWelcomeEmail(email) {
+async function sendPortalWelcomeEmail(email, portalBaseUrl = PORTAL_BASE_URL) {
   await ses.send(new SendEmailCommand({
     Source: NOTIFY_EMAIL,
     Destination: { ToAddresses: [email] },
     Message: {
       Subject: { Data: "You're live on Moxident" },
-      Body: { Text: { Data: `Welcome to the Moxident dentist portal!\n\nYou can now log in to manage your availability, view patient requests, and track your performance.\n\nLog in here: ${PORTAL_BASE_URL}/index.html\n\n— The Moxident Team` } },
+      Body: { Text: { Data: `Welcome to the Moxident dentist portal!\n\nYou can now log in to manage your availability, view patient requests, and track your performance.\n\nLog in here: ${portalBaseUrl}/index.html\n\n— The Moxident Team` } },
     },
   }));
 }
 
-async function sendPortalResetEmail(email, token) {
-  const link = `${PORTAL_BASE_URL}/reset-password.html?token=${token}`;
+async function sendPortalResetEmail(email, token, portalBaseUrl = PORTAL_BASE_URL) {
+  const link = `${portalBaseUrl}/reset-password.html?token=${token}&flow=reset`;
   await ses.send(new SendEmailCommand({
     Source: NOTIFY_EMAIL,
     Destination: { ToAddresses: [email] },
@@ -184,7 +207,10 @@ async function findPortalAccountByVerificationToken(token) {
   }));
   const item = result.Items?.[0];
   if (!item) return null;
-  return { email: item.email?.S };
+  return {
+    email: item.email?.S,
+    dentistId: item.dentistId?.S || "",
+  };
 }
 
 async function findPortalAccountByResetToken(token) {
@@ -203,6 +229,7 @@ export const handler = async (event) => {
 
   const path = (event.rawPath || event.path || "/").replace(/^\/prod/, "");
   const method = event.requestContext?.http?.method || event.httpMethod || "GET";
+  const portalBaseUrl = getPortalBaseUrl(event);
 
   if (method === "OPTIONS") {
     return { statusCode: 200, headers, body: "" };
@@ -213,6 +240,8 @@ export const handler = async (event) => {
     try {
       const body = JSON.parse(event.body || "{}");
       const { name, phone, zip, symptom } = body;
+      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpExpiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
       if (!name || !phone || !zip || !symptom) {
         return {
           statusCode: 400,
@@ -220,32 +249,68 @@ export const handler = async (event) => {
           body: JSON.stringify({ error: "Missing required fields: name, phone, zip, symptom" }),
         };
       }
-      const { requestId, dentistFound } = await submitRequest({ name, phone, zip, symptom });
-      try {
-        await ses.send(new SendEmailCommand({
-          Source: NOTIFY_EMAIL,
-          Destination: { ToAddresses: [NOTIFY_EMAIL] },
-          Message: {
-            Subject: { Data: `Moxident: New Patient Request` },
-            Body: { Text: { Data: `New patient request received.\n\nRequest ID: ${requestId}\nName: ${name}\nPhone: ${phone}\nZip: ${zip}\nSymptom: ${symptom}\nDentist Found: ${dentistFound ? 'Yes' : 'No'}\nSubmitted At: ${new Date().toISOString()}` } },
-          },
-        }));
-        console.log("Patient notification email sent");
-      } catch (emailErr) {
-        console.error("Patient email notification failed:", emailErr.message);
-      }
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ success: true, requestId, dentistFound }),
-      };
-    } catch (err) {
-      console.error("Submit error:", err.message);
-      const status = err.message?.includes("Missing") ? 400 : 500;
-      const message = status === 400 ? err.message : "Something went wrong. Please try again.";
-      return { statusCode: status, headers, body: JSON.stringify({ error: message }) };
-    }
+const result = await submitRequest({ 
+  name, 
+  phone, 
+  zip, 
+  symptom,
+  otpCode,
+  otpExpiresAt,
+  isVerified: false
+});
+
+if (!result.requestId) {
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({
+      success: false,
+      unsupportedArea: true,
+      message: "We’re expanding our dentist network in your area."
+    }),
+  };
+}
+const { requestId, dentistFound, unsupportedArea } = result;
+
+try {
+  await sns.send(new PublishCommand({
+    Message: `Your Moxident code is ${otpCode}`,
+    PhoneNumber: `+1${phone}`
+  }));
+  console.log("OTP sent");
+} catch (smsErr) {
+  console.error("OTP send failed:", smsErr.message);
+}
+
+try {
+  await ses.send(new SendEmailCommand({
+    Source: NOTIFY_EMAIL,
+    Destination: { ToAddresses: [NOTIFY_EMAIL] },
+    Message: {
+      Subject: { Data: `Moxident: New Patient Request` },
+      Body: { Text: { Data: `New patient request received.\n\nRequest ID: ${requestId}\nName: ${name}\nPhone: ${phone}\nZip: ${zip}\nSymptom: ${symptom}\nOut of Network: ${unsupportedArea ? 'Yes' : 'No'}\nDentist Found: ${unsupportedArea ? 'N/A' : (dentistFound ? 'Yes' : 'No')}\nSubmitted At: ${new Date().toISOString()}` } },
+    },
+  }));
+  console.log("Patient notification email sent");
+} catch (emailErr) {
+  console.error("Patient email notification failed:", emailErr.message);
+}
+return {
+  statusCode: 200,
+  headers,
+  body: JSON.stringify({ success: true, requestId, dentistFound, unsupportedArea }),
+};
+} catch (err) {
+  console.error("Submit error:", err.message);
+  const status = err.message?.includes("Missing") ? 400 : 500;
+  const message = status === 400 ? err.message : "Something went wrong. Please try again.";
+  return {
+    statusCode: status,
+    headers,
+    body: JSON.stringify({ error: message })
   }
+}
+}
 
   // POST /sms-webhook
   if (path === "/sms-webhook" && method === "POST") {
@@ -463,25 +528,31 @@ export const handler = async (event) => {
       }
       const applicationId = await saveDentistApplication(body);
       await sendOnboardingNotification(body, applicationId);
+
       // Auto-create portal account
       try {
         const existing = await getPortalAccount(email);
-          console.log("RESEND_FIX_DEPLOYED");
-          console.log("existing portal account:", existing);
+        console.log("existing portal account:", existing);
+        const dentist = await ensureDentistProfile(body);
+        const dentistId = dentist?.dentistId?.S || "";
 
-          if (!existing) {
-            console.log("Creating new portal account for email:", email);
-            const verificationToken = generateVerificationToken();
-            await createPortalAccount(email, verificationToken);
-            await sendPortalVerificationEmail(email, verificationToken);
+        if (!existing) {
+          const verificationToken = generateVerificationToken();
+          await createPortalAccountWithDentistId(email, verificationToken, dentistId);
+          await sendPortalVerificationEmail(email, verificationToken, portalBaseUrl);
 
-          } else if (!existing.verified?.BOOL) {
-            console.log("Resending verification email for:", email);
-            const token = existing.verificationToken?.S;
-      if (token) {
-        await sendPortalVerificationEmail(email, token);
-      }
-    }
+        } else if (!existing.verified?.BOOL) {
+          if (!existing.dentistId?.S && dentistId) {
+            await updatePortalAccountDentistId(email, dentistId);
+          }
+          const token = existing.verificationToken?.S;
+          if (token) {
+      await sendPortalVerificationEmail(email, token, portalBaseUrl);
+          }
+
+        } else {
+          await sendPortalWelcomeEmail(email, portalBaseUrl);
+        }
       } catch (portalErr) {
         console.error("Portal auto-registration failed:", portalErr);
       }
@@ -551,9 +622,11 @@ if (path === "/approve-dentist" && method === "GET") {
       if (existing) {
         return { statusCode: 409, headers, body: JSON.stringify({ error: "Account already exists" }) };
       }
+      const dentist = await ensureDentistProfile({ email });
+      const dentistId = dentist?.dentistId?.S || "";
       const verificationToken = generateVerificationToken();
-      await createPortalAccount(email, verificationToken);
-      await sendPortalVerificationEmail(email, verificationToken);
+      await createPortalAccountWithDentistId(email, verificationToken, dentistId);
+      await sendPortalVerificationEmail(email, verificationToken, portalBaseUrl);
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     } catch (err) {
       console.error("Portal register error:", err.message);
@@ -575,12 +648,15 @@ if (path === "/approve-dentist" && method === "GET") {
       }
       console.log("verify route token:", token);
       console.log("verify route account email:", accounts.email);
-     await verifyPortalAccount(accounts.email);
-        return {
-          statusCode: 200,
-          headers,
-          body: JSON.stringify({ success: true, email: accounts.email }),
-        };
+      await verifyPortalAccount(accounts.email);
+      return {
+        statusCode: 302,
+        headers: {
+          ...headers,
+          Location: `${portalBaseUrl}/set-password.html?email=${encodeURIComponent(accounts.email)}`,
+        },
+        body: "",
+      };
     } catch (err) {
       console.error("Portal verify error:", err);
       return { statusCode: 500, headers, body: JSON.stringify({ error: "Verification failed" }) };
@@ -591,27 +667,73 @@ if (path === "/approve-dentist" && method === "GET") {
   if (path === "/dentist-portal/set-password" && method === "POST") {
     try {
       const body = JSON.parse(event.body || "{}");
-      const { email, password } = body;
-      if (!email || !password) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing email or password" }) };
+      console.log("set-password body:", body);
+      const { email, token, password } = body;
+      console.log("set-password email:", email);
+      console.log("set-password password length:", password ? password.length : 0);
+
+      if ((!email && !token) || !password) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing email/token or password" }) };
       }
       if (password.length < 8) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: "Password must be at least 8 characters" }) };
       }
-      const account = await getPortalAccount(email);
+      let accountEmail = email;
+
+      if (token) {
+        const verificationAccount = await findPortalAccountByVerificationToken(token);
+        if (verificationAccount?.email) {
+          accountEmail = verificationAccount.email;
+          await verifyPortalAccount(accountEmail);
+        } else {
+          const resetAccount = await findPortalAccountByResetToken(token);
+          if (!resetAccount?.email?.S) {
+            return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid or expired setup token" }) };
+          }
+          if (resetAccount.resetTokenExpiry?.S && new Date(resetAccount.resetTokenExpiry.S) < new Date()) {
+            return { statusCode: 400, headers, body: JSON.stringify({ error: "Reset token has expired" }) };
+          }
+          accountEmail = resetAccount.email.S;
+        }
+      }
+
+      const account = await getPortalAccount(accountEmail);
+      console.log("set-password account:", account);
       if (!account) {
         return { statusCode: 404, headers, body: JSON.stringify({ error: "Account not found" }) };
       }
       if (!account.verified?.BOOL) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: "Email not verified" }) };
       }
-      const dentist = await getDentistByEmail(email);
-      const dentistId = dentist?.dentistId?.S || "";
+      const dentist = await getDentistByEmail(accountEmail);
+      console.log("set-password: dentist lookup result:", dentist);
+
+      const dentistId = account.dentistId?.S || dentist?.dentistId?.S || "";
+      console.log("set-password: dentistId:", dentistId);
+      if (!dentistId) {
+        return {
+          statusCode: 409,
+          headers,
+          body: JSON.stringify({ error: "Account is not fully initialized. Dentist profile missing." }),
+        };
+      }
+
       const hashed = await hashPassword(password);
-      await setPortalPassword(email, hashed, dentistId);
-      await sendPortalWelcomeEmail(email);
-      const token = generateToken(email, dentistId);
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true, token }) };
+      console.log("set-password: password hashed");
+
+      await setPortalPassword(accountEmail, hashed, dentistId);
+      console.log("set-password: password saved");
+
+      if (token) {
+        await clearResetToken(accountEmail);
+      }
+
+      await sendPortalWelcomeEmail(accountEmail, portalBaseUrl);
+      console.log("set-password: welcome email sent");
+
+      const authToken = generateToken(accountEmail, dentistId);
+      console.log("set-password: token generated");
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, token: authToken, email: accountEmail }) };
     } catch (err) {
       console.error("Set password error:", err.message);
       return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to set password" }) };
@@ -627,23 +749,45 @@ if (path === "/approve-dentist" && method === "GET") {
         return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing email or password" }) };
       }
       const account = await getPortalAccount(email);
-      if (!account || !account.passwordHash?.S) {
+      if (!account) {
         return { statusCode: 401, headers, body: JSON.stringify({ error: "Invalid email or password" }) };
       }
       if (!account.verified?.BOOL) {
-        return { statusCode: 401, headers, body: JSON.stringify({ error: "Email not verified" }) };
+        return { statusCode: 403, headers, body: JSON.stringify({ error: "Email not verified" }) };
+      }
+      if (!account.passwordHash?.S) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Password not set for this account" }) };
       }
       const valid = await comparePassword(password, account.passwordHash.S);
       if (!valid) {
         return { statusCode: 401, headers, body: JSON.stringify({ error: "Invalid email or password" }) };
       }
       const dentistId = account.dentistId?.S || "";
-      await updateLastLogin(email);
+      if (!dentistId) {
+        return {
+          statusCode: 409,
+          headers,
+          body: JSON.stringify({ error: "Account is not fully initialized. Dentist profile missing." }),
+        };
+      }
+      const dentist = await getDentistProfile(dentistId);
+      if (!dentist) {
+        return {
+          statusCode: 409,
+          headers,
+          body: JSON.stringify({ error: "Dentist profile not found for this account." }),
+        };
+      }
+      try {
+        await updateLastLogin(email);
+      } catch (err) {
+        console.error("login lastLogin update failed:", err);
+      }
       const token = generateToken(email, dentistId);
       return { statusCode: 200, headers, body: JSON.stringify({ success: true, token }) };
     } catch (err) {
-      console.error("Login error:", err.message);
-      return { statusCode: 500, headers, body: JSON.stringify({ error: "Login failed" }) };
+      console.error("login error:", err);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Internal server error" }) };
     }
   }
 
@@ -661,7 +805,11 @@ if (path === "/approve-dentist" && method === "GET") {
       }
       const resetToken = generateVerificationToken();
       await setResetToken(email, resetToken);
-      await sendPortalResetEmail(email, resetToken);
+      try {
+        await sendPortalResetEmail(email, resetToken, portalBaseUrl);
+      } catch (emailErr) {
+        console.error("Forgot password email send failed:", emailErr.message);
+      }
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     } catch (err) {
       console.error("Forgot password error:", err.message);
@@ -698,33 +846,51 @@ if (path === "/approve-dentist" && method === "GET") {
   }
 
   // GET /dentist-portal/dashboard
-  if (path === "/dentist-portal/dashboard" && method === "GET") {
-    const user = authenticateRequest(event);
-    if (!user) {
-      return { statusCode: 401, headers, body: JSON.stringify({ error: "Unauthorized" }) };
-    }
-    try {
-      const profile = user.dentistId ? await getDentistProfile(user.dentistId) : null;
-      const availability = user.dentistId ? await getAvailability(user.dentistId) : {};
-      const recentRequests = user.dentistId ? await getRecentRequests(user.dentistId) : [];
-      const stats = user.dentistId ? await getDentistStats(user.dentistId) : {};
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          dentistName:          profile?.name?.S || "",
-          practiceName:         profile?.practiceName?.S || "",
-          email:                user.email,
-          thisWeekAvailability: availability || {},
-          recentRequests,
-          stats,
-        }),
-      };
-    } catch (err) {
-      console.error("Dashboard error:", err.message);
-      return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to load dashboard" }) };
-    }
+if (path === "/dentist-portal/dashboard" && method === "GET") {
+  const user = authenticateRequest(event);
+  if (!user) {
+    return { statusCode: 401, headers, body: JSON.stringify({ error: "Unauthorized" }) };
   }
+
+  try {
+    if (!user.dentistId) {
+      return {
+        statusCode: 409,
+        headers,
+        body: JSON.stringify({ error: "Account is not fully initialized. Dentist profile missing." }),
+      };
+    }
+
+    const profile = await getDentistProfile(user.dentistId);
+    if (!profile) {
+      return {
+        statusCode: 409,
+        headers,
+        body: JSON.stringify({ error: "Dentist profile not found for this account." }),
+      };
+    }
+
+    const availability = await getAvailability(user.dentistId);
+    const recentRequests = await getRecentRequests(user.dentistId);
+    const stats = await getDentistStats(user.dentistId);
+
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        dentistName: profile?.name?.S || profile?.name || "",
+        practiceName: profile?.practiceName?.S || profile?.practiceName || "",
+        email: user.email,
+        thisWeekAvailability: availability || {},
+        recentRequests: recentRequests || [],
+        stats: stats || {},
+      }),
+    };
+  } catch (err) {
+    console.error("Dashboard error:", err);
+    return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to load dashboard" }) };
+  }
+}
 
   // POST /dentist-portal/availability
   if (path === "/dentist-portal/availability" && method === "POST") {
@@ -733,6 +899,21 @@ if (path === "/approve-dentist" && method === "GET") {
       return { statusCode: 401, headers, body: JSON.stringify({ error: "Unauthorized" }) };
     }
     try {
+      if (!user.dentistId) {
+        return {
+          statusCode: 409,
+          headers,
+          body: JSON.stringify({ error: "Account is not fully initialized. Dentist profile missing." }),
+        };
+      }
+      const dentist = await getDentistProfile(user.dentistId);
+      if (!dentist) {
+        return {
+          statusCode: 409,
+          headers,
+          body: JSON.stringify({ error: "Dentist profile not found for this account." }),
+        };
+      }
       const body = JSON.parse(event.body || "{}");
       const { availability } = body;
       if (!availability || typeof availability !== "object") {
@@ -741,25 +922,41 @@ if (path === "/approve-dentist" && method === "GET") {
       await saveAvailability(user.dentistId, availability);
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     } catch (err) {
-      console.error("Availability save error:", err.message);
+      console.error("Availability save error:", err);
       return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to save availability" }) };
     }
   }
 
   // GET /dentist-portal/availability
-  if (path === "/dentist-portal/availability" && method === "GET") {
-    const user = authenticateRequest(event);
-    if (!user) {
-      return { statusCode: 401, headers, body: JSON.stringify({ error: "Unauthorized" }) };
-    }
-    try {
-      const availability = await getAvailability(user.dentistId);
-      return { statusCode: 200, headers, body: JSON.stringify({ availability: availability || {} }) };
-    } catch (err) {
-      console.error("Availability fetch error:", err.message);
-      return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to fetch availability" }) };
-    }
+ if (path === "/dentist-portal/availability" && method === "GET") {
+  const user = authenticateRequest(event);
+  if (!user) {
+    return { statusCode: 401, headers, body: JSON.stringify({ error: "Unauthorized" }) };
   }
 
-  return { statusCode: 404, headers, body: JSON.stringify({ error: "Not found" }) };
-};
+  try {
+    if (!user.dentistId) {
+      return {
+        statusCode: 409,
+        headers,
+        body: JSON.stringify({ error: "Account is not fully initialized. Dentist profile missing." }),
+      };
+    }
+
+    const dentist = await getDentistProfile(user.dentistId);
+    if (!dentist) {
+      return {
+        statusCode: 409,
+        headers,
+        body: JSON.stringify({ error: "Dentist profile not found for this account." }),
+      };
+    }
+
+    const availability = await getAvailability(user.dentistId);
+    return { statusCode: 200, headers, body: JSON.stringify({ availability: availability || {} }) };
+  } catch (err) {
+    console.error("Availability fetch error:", err);
+    return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to fetch availability" }) };
+  };
+  }
+}

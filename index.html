@@ -3,12 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZSTV1QEQNN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZSTV1QEQNN');
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17976922373"></script>
+<script>
+  gtag('config', 'AW-17976922373');
+</script>
   <title>Emergency Dentist Near You Today | Moxident</title>
   <meta name="description" content="Tooth pain, swelling, or a broken tooth? Moxident contacts available local dentists on your behalf. Enter your phone and zip — a dentist calls you directly." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
 
@@ -19,30 +31,28 @@
   </div>
 
   <!-- ── NAV ── -->
-  <nav class="nav">
-    <a class="nav-logo" href="/">
-      <span class="nav-dot"></span>
-      Moxident
-    </a>
-    <div class="nav-pills">
-      <button class="nav-pill active">Find a Dentist</button>
-      <button class="nav-pill" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">How It Works</button>
-      <button class="nav-pill" onclick="document.getElementById('trust').scrollIntoView({behavior:'smooth'})">FAQs</button>
-    </div>
-    <button class="hamburger" id="hamburger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
-    <div class="nav-drawer" id="navDrawer">
-      <div class="drawer-section">Navigation</div>
-      <button class="drawer-pill active">Find a Dentist</button>
-      <button class="drawer-pill" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'});closeDrawer()">How It Works</button>
-      <button class="drawer-pill" onclick="document.getElementById('trust').scrollIntoView({behavior:'smooth'});closeDrawer()">FAQs</button>
-      <div class="drawer-divider"></div>
-      <button class="drawer-pill" onclick="document.getElementById('intake-form').scrollIntoView({behavior:'smooth'});closeDrawer()">Get Help Now</button>
-    </div>
-  </nav>
+  <nav class="nav" id="main-nav">
+  <a class="nav-logo" href="/">
+    <div class="nav-dot"></div>Moxident
+  </a>
+
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleDrawer()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="nav-drawer" id="nav-drawer">
+  <button class="drawer-pill" onclick="window.location.href='/dentist/join/';closeDrawer()">Join as Dentist</button>
+
+  <button class="drawer-pill" onclick="window.location.href='/dentist/portal/';closeDrawer()">Dentist Portal</button>
+  <button class="drawer-pill" onclick="window.location.href='/about-us.html';closeDrawer()">About</button>
+  <button class="drawer-pill" onclick="window.location.href='/contact.html';closeDrawer()">Contact</button>
+  <button class="drawer-pill" onclick="window.location.href='/privacy-policy.html';closeDrawer()">Privacy</button>
+  <button class="drawer-pill" onclick="window.location.href='/terms.html';closeDrawer()">Terms</button>
+</div>
 
   <!-- ── HERO ── -->
+   <div class="hero-split">
   <section class="hero-section">
     <div class="hero">
 
@@ -58,15 +68,14 @@
       </h1>
 
       <p class="hero-sub a3">
-        Not tomorrow. Not after you sit on hold for 20 minutes. Today.<br>
-        Moxident contacts available local dentists on your behalf. If one can see you,
-        they call you directly — usually within the hour.
+        We contact dentists near you in real time.
+        During the day, you may get a call within the hour.
+        At night, we line things up so you can wake up with an appointment
       </p>
-
       <div class="a4">
         <a class="hero-cta" href="#intake-form"
            onclick="document.getElementById('intake-form').scrollIntoView({behavior:'smooth'});return false;">
-          Get a Dentist to Call Me
+          Get help now 
           <span class="hero-cta-arrow">→</span>
         </a>
         <p class="hero-note">Free to use &nbsp;·&nbsp; No account required &nbsp;·&nbsp; No spam</p>
@@ -74,6 +83,7 @@
 
     </div>
   </section>
+</div>
 
   <!-- ── TRUST BAR ── -->
   <div class="trust-bar a5">
@@ -308,105 +318,8 @@
   </section>
 
   <!-- ── FORM INTRO + INTAKE FORM ── -->
-  <section class="page-wrap" id="intake-form" style="padding-top:24px;padding-bottom:80px;">
+  <section class="page-wrap" id="intake-form">
 
-    <div class="sym-form-section">
-
-      <!-- Form state -->
-      <div id="formContent">
-        <div class="sym-form-title">Ready? It takes ten seconds.</div>
-        <div class="sym-form-sub">
-          Enter your phone number and zip code below. We'll reach out to dentists near you right now.<br>
-          Your number goes to local dentists only — no spam, no sales calls, no nonsense.
-        </div>
-
-        <div class="fg" id="fg-phone">
-          <label class="fl" for="phone">
-            Phone Number <span class="fl-req">*</span>
-          </label>
-          <input
-            class="fi" type="tel" id="phone" name="phone"
-            placeholder="(206) 555-0100"
-            autocomplete="tel" maxlength="14"
-          />
-          <span class="f-err">Please enter a valid 10-digit phone number.</span>
-        </div>
-
-        <div class="fg" id="fg-zip">
-          <label class="fl" for="zip">
-            ZIP Code <span class="fl-req">*</span>
-          </label>
-          <div class="zip-wrap">
-            <input
-              class="fi" type="text" id="zip" name="zip"
-              placeholder="98033"
-              autocomplete="postal-code" maxlength="5" inputmode="numeric"
-            />
-            <div class="geo-badge" id="geoBadge">📍 Detected</div>
-          </div>
-          <span class="f-err">Please enter a valid 5-digit ZIP code.</span>
-        </div>
-
-        <div class="fg" style="margin-top:4px;">
-          <label class="consent-label">
-            <input class="consent-checkbox" type="checkbox" id="smsConsent" />
-            <span>
-              I agree to receive a call or text from a local dentist regarding my request.
-              By checking this box, I consent to be contacted via SMS. Message &amp; data rates may apply.
-              View our <a class="consent-link" href="/privacy" target="_blank">Privacy Policy</a>
-              and <a class="consent-link" href="/terms" target="_blank">Terms of Service</a>.
-            </span>
-          </label>
-        </div>
-
-        <button class="submit-btn" id="submitBtn" style="position:relative;" onclick="handleSubmit()">
-          <span class="btn-label">
-            Notify Dentists Near Me <span class="cta-arrow">→</span>
-          </span>
-          <span class="spinner"></span>
-        </button>
-
-        <p class="form-disclaimer">
-          Free to use &nbsp;·&nbsp; No account &nbsp;·&nbsp; No spam &nbsp;·&nbsp;
-          Moxident LLC &nbsp;·&nbsp; Seattle, WA
-        </p>
-      </div>
-
-      <!-- Success state -->
-      <div class="success-screen" id="successScreen">
-        <div class="success-icon-wrap">
-          <span style="font-size:26px;color:var(--grn);">✓</span>
-        </div>
-        <div class="success-headline">You're all set.</div>
-        <div class="success-sub">
-          We've notified local dentists in your area.<br>
-          If one is available, they'll call you directly — usually within the hour.
-        </div>
-        <div class="success-note">
-          Keep your phone nearby. The call will come from a local dental office number.<br>
-          <strong>Don't recognize the number? Pick up — it's the dentist.</strong>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Trust strip below form -->
-    <div class="trust-strip" style="margin-top:16px;">
-      <div class="trust-item">
-        <div class="trust-val">Free</div>
-        <div class="trust-lbl">To Use</div>
-      </div>
-      <div class="trust-item">
-        <div class="trust-val">Local</div>
-        <div class="trust-lbl">Dentists Only</div>
-      </div>
-      <div class="trust-item">
-        <div class="trust-val">No Spam</div>
-        <div class="trust-lbl">Ever</div>
-      </div>
-    </div>
-
-  </section>
 
   <!-- ── FOOTER ── -->
   <footer class="site-footer">
@@ -425,12 +338,7 @@
   <!-- ── JAVASCRIPT ── -->
   <script>
     /* Mobile nav */
-    const hamburger = document.getElementById('hamburger');
-    const navDrawer = document.getElementById('navDrawer');
-    hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('open');
-      navDrawer.classList.toggle('open');
-    });
+    
     function closeDrawer() {
       hamburger.classList.remove('open');
       navDrawer.classList.remove('open');
@@ -486,6 +394,13 @@
       const zipInput   = document.getElementById('zip');
       const consent    = document.getElementById('smsConsent');
       const btn        = document.getElementById('submitBtn');
+       gtag('event', 'ab_conversion', {
+        variant: 'B'
+        });
+
+        gtag('event', 'conversion', {
+            'send_to': 'AW-17976922373/H40YCOnt6ZgcEIWiiPxc'
+        });
       let valid = true;
 
       const digits = phoneInput.value.replace(/\D/g, '');
@@ -519,6 +434,15 @@
         document.getElementById('formContent').style.display = 'none';
         document.getElementById('successScreen').classList.add('show');
       }, 1800);
+    }
+    function toggleDrawer() {
+    document.getElementById('nav-drawer').classList.toggle('open');
+    document.getElementById('hamburger').classList.toggle('open');
+    }
+
+    function closeDrawer() {
+    document.getElementById('nav-drawer').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
     }
   </script>
 

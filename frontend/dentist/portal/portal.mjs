@@ -18,6 +18,49 @@ function clearToken() {
   localStorage.removeItem("mox_portal_token");
 }
 
+const PORTAL_FLOW_STORAGE_KEY = "mox_portal_flow";
+
+function getStoredPortalFlow() {
+  try {
+    const raw = sessionStorage.getItem(PORTAL_FLOW_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function storePortalFlow(updates = {}) {
+  const next = {
+    ...getStoredPortalFlow(),
+    ...updates,
+  };
+  try {
+    sessionStorage.setItem(PORTAL_FLOW_STORAGE_KEY, JSON.stringify(next));
+  } catch {}
+  return next;
+}
+
+function clearPortalFlow() {
+  try {
+    sessionStorage.removeItem(PORTAL_FLOW_STORAGE_KEY);
+  } catch {}
+}
+
+function getPortalFlowParams() {
+  const params = new URLSearchParams(window.location.search);
+  const queryFlow = {
+    email: params.get("email") || "",
+    token: params.get("token") || "",
+    flow: params.get("flow") || "",
+  };
+
+  if (queryFlow.email || queryFlow.token || queryFlow.flow) {
+    return storePortalFlow(queryFlow);
+  }
+
+  return getStoredPortalFlow();
+}
+
 function authHeaders() {
   const token = getToken();
   return {
@@ -68,7 +111,10 @@ window.handleLogin = async function (e) {
   e.preventDefault();
   hideError("login-error");
   const email = document.getElementById("login-email").value.trim();
+  console.log(email );
+  
   const password = document.getElementById("login-password").value;
+  console.log(password)
 
   setLoading("login-btn", true);
   try {
@@ -104,10 +150,9 @@ window.handleSetPassword = async function (e) {
     return;
   }
 
-  const params = new URLSearchParams(window.location.search);
-  const email = params.get("email");
-  if (!email) {
-    showError("sp-error", "Missing email parameter.");
+  const { email, token } = getPortalFlowParams();
+  if (!email && !token) {
+    showError("sp-error", "Missing setup parameter.");
     return;
   }
 
@@ -116,15 +161,18 @@ window.handleSetPassword = async function (e) {
     const res = await fetch(`${API}/dentist-portal/set-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, token, password }),
     });
     const data = await res.json();
     if (!res.ok) {
       showError("sp-error", data.error || "Failed to set password.");
       return;
     }
-    setToken(data.token);
-    window.location.href = "dashboard.html";
+    clearToken();
+    clearPortalFlow();
+    const nextEmail = data.email || email || "";
+    const next = `index.html?email=${encodeURIComponent(nextEmail)}&passwordSet=1`;
+    window.location.href = next;
   } catch {
     showError("sp-error", "Network error. Please try again.");
   } finally {
@@ -173,8 +221,7 @@ window.handleResetPassword = async function (e) {
     return;
   }
 
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get("token");
+  const { token } = getPortalFlowParams();
   if (!token) {
     showError("reset-error", "Missing reset token.");
     return;
@@ -192,6 +239,7 @@ window.handleResetPassword = async function (e) {
       showError("reset-error", data.error || "Failed to reset password.");
       return;
     }
+    clearPortalFlow();
     document.getElementById("reset-form").classList.add("hidden");
     showSuccess("reset-success");
   } catch {
@@ -205,6 +253,7 @@ window.handleResetPassword = async function (e) {
 
 window.handleLogout = function () {
   clearToken();
+  clearPortalFlow();
   window.location.href = "index.html";
 };
 
@@ -407,7 +456,11 @@ window.handleChangePassword = async function (e) {
       return;
     }
 
-    // Set new password
+    console.log("SET PASSWORD SUBMIT", {
+      API,
+      email,
+      newPwLength: newPw ? newPw.length : 0
+    });
     const setRes = await fetch(`${API}/dentist-portal/set-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -441,8 +494,7 @@ if (page === "dashboard.html") {
 } else if (page === "settings.html") {
   loadSettings();
 } else if (page === "verify.html") {
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get("token");
+  const { token } = getPortalFlowParams();
 
   const loading = document.getElementById("verify-loading");
   const success = document.getElementById("verify-success");
@@ -454,24 +506,29 @@ if (page === "dashboard.html") {
     error?.classList.remove("hidden");
     if (errorMsg) errorMsg.textContent = "Missing verification token.";
   } else {
-    fetch(`${API}/dentist-portal/verify?token=${encodeURIComponent(token)}`)
-      .then(async (res) => {
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || "Verification failed.");
-        loading?.classList.add("hidden");
-        success?.classList.remove("hidden");
-        setTimeout(() => {
-          window.location.href = `set-password.html?email=${encodeURIComponent(data.email || "")}`;
-        }, 1500);
-      })
-      .catch((err) => {
-        loading?.classList.add("hidden");
-        error?.classList.remove("hidden");
-        if (errorMsg) errorMsg.textContent = err.message || "This link may be invalid or expired.";
-      });
+    window.location.replace(`set-password.html?token=${encodeURIComponent(token)}&flow=verify`);
   }
 } else if (page === "index.html" || page === "") {
-  if (getToken()) {
+  const params = new URLSearchParams(window.location.search);
+  const loginEmail = params.get("email");
+  const passwordSet = params.get("passwordSet");
+  const { token, flow } = getPortalFlowParams();
+
+  if (token) {
+    const target = flow === "reset" ? "reset-password.html" : "set-password.html";
+    window.location.replace(`${target}?token=${encodeURIComponent(token)}${flow ? `&flow=${encodeURIComponent(flow)}` : ""}`);
+  } else if (loginEmail) {
+    clearPortalFlow();
+    const emailInput = document.getElementById("login-email");
+    if (emailInput) emailInput.value = loginEmail;
+  }
+   if (passwordSet === "1") {
+    const loginError = document.getElementById("login-error");
+    if (loginError) {
+      loginError.textContent = "Password set successfully. Sign in to access your portal.";
+      loginError.classList.remove("hidden");
+    }
+  } else if (getToken()) {
     window.location.href = "dashboard.html";
   }
 }

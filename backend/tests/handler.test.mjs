@@ -28,9 +28,13 @@ jest.mock('@aws-sdk/client-ses', () => ({
   SendEmailCommand: jest.fn(input => ({ type: 'SendEmailCommand', input })),
 }));
 
-jest.mock('crypto', () => ({
-  randomUUID: jest.fn(() => 'test-uuid-1234'),
-}));
+jest.mock('crypto', () => {
+  const actual = jest.requireActual('crypto');
+  return {
+    ...actual,
+    randomUUID: jest.fn(() => 'test-uuid-1234'),
+  };
+});
 
 // ── Router mock MUST be here, before handler is imported ──────────────────────
 jest.unstable_mockModule('../src/router.mjs', () => ({
@@ -354,6 +358,39 @@ describe('POST /dentist-signup', () => {
     });
     const res = await handler(event);
     expect(res.statusCode).toBe(400);
+  });
+
+    test('sends portal welcome email when portal account already exists and is verified', async () => {
+    mockSend
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({
+        Item: {
+          email: { S: 'existing@dental.com' },
+          verified: { BOOL: true },
+        },
+      })
+      .mockResolvedValueOnce({});
+
+    const event = makeEvent('POST', '/dentist-signup', {
+      name:  'Dr. Existing',
+      phone: '+12065550099',
+      email: 'existing@dental.com',
+    });
+
+    await handler(event);
+
+    const sesCalls = mockSend.mock.calls.filter(
+      c => c[0]?.type === 'SendEmailCommand'
+    );
+
+    const emailSubjects = sesCalls.map(
+      c => c[0]?.input?.Message?.Subject?.Data
+    );
+
+    expect(emailSubjects).toContain('Moxident: New Dentist Onboarding Application');
+    expect(emailSubjects).toContain("You're live on Moxident");
+    expect(emailSubjects).not.toContain('Verify your Moxident portal email');
   });
 
   test('returns 500 when DynamoDB throws', async () => {

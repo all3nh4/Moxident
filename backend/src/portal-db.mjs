@@ -25,6 +25,23 @@ export async function createPortalAccount(email, verificationToken) {
   }));
 }
 
+export async function createPortalAccountWithDentistId(email, verificationToken, dentistId) {
+  await db.send(new PutItemCommand({
+    TableName: PORTAL_TABLE,
+    Item: {
+      email:             { S: email },
+      dentistId:         { S: dentistId || "" },
+      passwordHash:      { S: "" },
+      verified:          { BOOL: false },
+      verificationToken: { S: verificationToken },
+      resetToken:        { S: "" },
+      resetTokenExpiry:  { S: "" },
+      createdAt:         { S: new Date().toISOString() },
+      lastLogin:         { S: "" },
+    },
+  }));
+}
+
 export async function getPortalAccount(email) {
   const result = await db.send(new GetItemCommand({
     TableName: PORTAL_TABLE,
@@ -52,6 +69,17 @@ export async function setPortalPassword(email, passwordHash, dentistId) {
     UpdateExpression: "SET passwordHash = :p, dentistId = :d",
     ExpressionAttributeValues: {
       ":p": { S: passwordHash },
+      ":d": { S: dentistId },
+    },
+  }));
+}
+
+export async function updatePortalAccountDentistId(email, dentistId) {
+  await db.send(new UpdateItemCommand({
+    TableName: PORTAL_TABLE,
+    Key: { email: { S: email } },
+    UpdateExpression: "SET dentistId = :d",
+    ExpressionAttributeValues: {
       ":d": { S: dentistId },
     },
   }));
@@ -100,6 +128,44 @@ export async function getDentistByEmail(email) {
     ExpressionAttributeValues: { ":e": { S: email } },
   }));
   return result.Items?.[0] || null;
+}
+
+export async function ensureDentistProfile(data = {}) {
+  const email = data.email || "";
+  if (!email) {
+    throw new Error("Email is required to ensure dentist profile");
+  }
+
+  const existing = await getDentistByEmail(email);
+  if (existing?.dentistId?.S) {
+    return existing;
+  }
+
+  const dentistId = `dentist-${randomUUID()}`;
+  const item = {
+    dentistId:              { S: dentistId },
+    name:                   { S: data.name || "" },
+    practiceName:           { S: data.practiceName || "" },
+    phone:                  { S: data.phone || "" },
+    email:                  { S: email },
+    zipCodes:               { S: data.zipCodes || "" },
+    practiceArea:           { S: data.practiceArea || "" },
+    dailyCapacity:          { S: data.dailyCapacity || "" },
+    extendedHours:          { S: data.extendedHours || "" },
+    notificationPreference: { S: data.notificationPreference || "" },
+    caseTypes:              { S: data.caseTypes || "" },
+    insuranceAccepted:      { S: data.insuranceAccepted || "" },
+    notes:                  { S: data.notes || "" },
+    active:                 { BOOL: false },
+    createdAt:              { S: new Date().toISOString() },
+  };
+
+  await db.send(new PutItemCommand({
+    TableName: DENTISTS_TABLE,
+    Item: item,
+  }));
+
+  return item;
 }
 
 export async function saveAvailability(dentistId, availability) {
