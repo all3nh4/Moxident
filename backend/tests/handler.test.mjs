@@ -28,6 +28,11 @@ jest.mock('@aws-sdk/client-ses', () => ({
   SendEmailCommand: jest.fn(input => ({ type: 'SendEmailCommand', input })),
 }));
 
+jest.mock('@aws-sdk/client-sns', () => ({
+  SNSClient:      jest.fn(() => ({ send: mockSend })),
+  PublishCommand: jest.fn(input => ({ type: 'PublishCommand', input })),
+}));
+
 jest.mock('crypto', () => {
   const actual = jest.requireActual('crypto');
   return {
@@ -38,15 +43,16 @@ jest.mock('crypto', () => {
 
 // ── Router mock MUST be here, before handler is imported ──────────────────────
 jest.unstable_mockModule('../src/router.mjs', () => ({
-  submitRequest:      jest.fn(),
-  handleDentistReply: jest.fn(),
+  submitRequest:        jest.fn(),
+  handleDentistReply:   jest.fn(),
+  routeVerifiedPatient: jest.fn(),
 }));
 
 // ── Import after ALL mocks are registered ─────────────────────────────────────
 
 const { saveDentistApplication } = await import('../src/db.mjs');
 const { handler }                = await import('../src/handler.mjs');
-const { submitRequest }          = await import('../src/router.mjs');
+const { submitRequest, routeVerifiedPatient } = await import('../src/router.mjs');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -539,22 +545,38 @@ describe('Regression — existing routes unchanged', () => {
   });
 });
 
-// ── POST /submit — dentistFound flag ─────────────────────────────────────────
-// NOTE: submitRequest is already mocked via jest.unstable_mockModule at the
-// top of this file. No second mock registration needed here.
+// ── POST /verify-otp — dentistFound flag ─────────────────────────────────────
+// Option B: verifyPatientOtp runs against a mocked DynamoDB UpdateItem that
+// returns the patient row via ALL_OLD; routeVerifiedPatient is mocked at the
+// router boundary.
 
-describe('POST /submit — dentistFound', () => {
-  beforeEach(() => mockSend.mockResolvedValue({}));
+function patientAttributes(patient) {
+  return {
+    Attributes: {
+      requestId: { S: patient.requestId ?? 'req-123' },
+      name:      { S: patient.name },
+      phone:     { S: patient.phone },
+      zip:       { S: patient.zip },
+      symptom:   { S: patient.symptom },
+    },
+  };
+}
+
+describe('POST /verify-otp — dentistFound', () => {
   afterEach(() => jest.clearAllMocks());
 
   test('returns dentistFound:true in response when router returns true', async () => {
-    submitRequest.mockResolvedValueOnce({ requestId: 'req-123', dentistFound: true });
-
-    const event = makeEvent('POST', '/submit', {
-      name: 'Jane', phone: '+12065559999', zip: '98033', symptom: 'Tooth pain',
+    mockSend.mockResolvedValueOnce(patientAttributes({
+      requestId: 'req-123', name: 'Jane', phone: '+12065559999', zip: '98033', symptom: 'Tooth pain',
+    }));
+    mockSend.mockResolvedValue({});
+    routeVerifiedPatient.mockResolvedValueOnce({
+      requestId: 'req-123', dentistFound: true, unsupportedArea: false,
     });
 
-    const res = await handler(event);
+    const res = await handler(makeEvent('POST', '/verify-otp', {
+      requestId: 'req-123', code: '123456',
+    }));
     const body = JSON.parse(res.body);
 
     expect(res.statusCode).toBe(200);
@@ -563,13 +585,17 @@ describe('POST /submit — dentistFound', () => {
   });
 
   test('returns dentistFound:false in response when router returns false', async () => {
-    submitRequest.mockResolvedValueOnce({ requestId: 'req-456', dentistFound: false });
-
-    const event = makeEvent('POST', '/submit', {
-      name: 'Jane', phone: '+12065559999', zip: '99999', symptom: 'Tooth pain',
+    mockSend.mockResolvedValueOnce(patientAttributes({
+      requestId: 'req-456', name: 'Jane', phone: '+12065559999', zip: '99999', symptom: 'Tooth pain',
+    }));
+    mockSend.mockResolvedValue({});
+    routeVerifiedPatient.mockResolvedValueOnce({
+      requestId: 'req-456', dentistFound: false, unsupportedArea: true,
     });
 
-    const res = await handler(event);
+    const res = await handler(makeEvent('POST', '/verify-otp', {
+      requestId: 'req-456', code: '123456',
+    }));
     const body = JSON.parse(res.body);
 
     expect(res.statusCode).toBe(200);

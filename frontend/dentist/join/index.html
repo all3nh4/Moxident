@@ -242,25 +242,15 @@
         </div>
 
         <div class="fg" id="fg-extended">
-          <label class="fl">Available hours <span class="fl-req">*</span></label>
-          <div class="multi-select" id="extended-hours-multi" data-input-id="f-extended" data-label-id="extended-hours-label" data-placeholder="Select available hours">
-            <button type="button" class="multi-select-trigger" onclick="toggleMultiSelect('extended-hours-multi')">
-              <span id="extended-hours-label">Select available hours</span>
-              <span class="multi-select-arrow">▾</span>
-            </button>
-            <div class="multi-select-menu">
-              <label class="multi-select-option"><input type="checkbox" value="Weekdays" onchange="syncMultiSelect('extended-hours-multi','f-extended','extended-hours-label','Select available hours')"> Weekdays</label>
-              <label class="multi-select-option"><input type="checkbox" value="Evenings" onchange="syncMultiSelect('extended-hours-multi','f-extended','extended-hours-label','Select available hours')"> Evenings</label>
-              <label class="multi-select-option"><input type="checkbox" value="Weekends" onchange="syncMultiSelect('extended-hours-multi','f-extended','extended-hours-label','Select available hours')"> Weekends</label>
-            </div>
+          <label class="fl">Office Hours <span class="fl-req">*</span></label>
+          <div class="pill-select" id="extended-hours-pills">
+            <button type="button" class="pill-option" data-val="Weekdays (business hours)" onclick="togglePill(this,'f-extended','extended-hours-pills','fg-extended')">Weekdays (business hours)</button>
+            <button type="button" class="pill-option" data-val="Evenings" onclick="togglePill(this,'f-extended','extended-hours-pills','fg-extended')">Evenings</button>
+            <button type="button" class="pill-option" data-val="Friday–Saturday" onclick="togglePill(this,'f-extended','extended-hours-pills','fg-extended')">Friday–Saturday</button>
+            <button type="button" class="pill-option" data-val="Sunday" onclick="togglePill(this,'f-extended','extended-hours-pills','fg-extended')">Sunday</button>
+            <button type="button" class="pill-option" data-val="Same-day availability" onclick="togglePill(this,'f-extended','extended-hours-pills','fg-extended')">Same-day availability</button>
           </div>
           <input type="hidden" id="f-extended"/>
-          <span class="f-err">Required</span>
-        </div>
-
-        <div class="fg" id="fg-years">
-          <label class="fl">Where is your clinic located? <span class="fl-req">*</span></label>
-          <input class="fi" id="f-years" type="text" placeholder="e.g. Redmond, WA or 98052"/>
           <span class="f-err">Required</span>
         </div>
       </div>

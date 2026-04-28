@@ -5,14 +5,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Terms and Conditions — Moxident</title>
   <link rel="stylesheet" href="/styles.css"/>
+  <style>
+    .top-nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-left: auto;
+    }
+    .top-nav a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .top-nav a:hover {
+      text-decoration: underline;
+    }
+    .back-home {
+      margin-top: 24px;
+    }
+    .back-home a {
+      color: var(--navy);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .back-home a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 640px) {
+      .top-nav {
+        gap: 12px;
+      }
+      .top-nav a {
+        font-size: 13px;
+      }
+    }
+  </style>
 </head>
 
 <body>
   <nav class="nav">
-    <a class="nav-logo" href="/">
+    <a class="nav-logo site-logo" href="/">
       <div class="nav-dot"></div>Moxident
     </a>
+    <nav class="top-nav">
+      <a href="/">Home</a>
+      <a href="/find/">Find a dentist</a>
+      <a href="/dentist/join">For dentists</a>
+    </nav>
   </nav>
+
+
 
   <section class="hero-section">
     <div class="hero">
@@ -44,11 +87,11 @@
       <h2>2. SMS Program</h2>
       <ul>
         <li><strong>Program name:</strong> Moxident Emergency Dental Routing</li>
-        <li><strong>Description:</strong> Single SMS confirmation sent when a dental provider accepts your request</li>
-        <li><strong>Message frequency:</strong> One message per request submitted</li>
+        <li><strong>Description:</strong> Transactional SMS messages including one-time passcodes (OTP) for phone verification and notifications related to your dental care request</li>        
+        <li><strong>Message frequency:</strong> Varies by request, including one-time verification messages and care-related notifications</li>
         <li><strong>Message and data rates may apply</strong></li>
         <li><strong>To opt out:</strong> Reply <strong>STOP</strong> to any message</li>
-        <li><strong>For help:</strong> Reply <strong>HELP</strong> or email <a href="mailto:hello@moxident.com">hello@moxident.com</a></li>
+        <li><strong>For help:</strong> Reply <strong>HELP</strong> or email <a href="mailto:admin@moxident.com">hello@moxident.com</a></li>
       </ul>
 
       <h2>3. No Medical Advice</h2>
@@ -73,6 +116,9 @@
       <p>
         For questions, contact us at <a href="mailto:admin@moxident.com">admin@moxident.com</a>.
       </p>
+      <div class="back-home">
+        <a href="/">← Back to Moxident</a>
+      </div>
     </div>
   </div>
 </body>

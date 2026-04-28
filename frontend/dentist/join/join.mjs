@@ -262,6 +262,16 @@ export function selectPill(btn, hiddenId, gridId) {
   updateStepBar();
 }
 
+export function togglePill(btn, hiddenId, gridId, fgId) {
+  btn.classList.toggle('selected');
+  const values = Array.from(
+    document.querySelectorAll(`#${gridId} .pill-option.selected`)
+  ).map(b => b.dataset.val);
+  document.getElementById(hiddenId).value = values.join(', ');
+  document.getElementById(fgId)?.classList.remove('err');
+  updateStepBar();
+}
+
 /* ── Validation ──────────────────────────────────────────────────────────── */
 export function validate(fields) {
   let ok = true;
@@ -312,7 +322,6 @@ export function buildPayload() {
     phone:                  normalizePhone(document.getElementById('f-phone').value),
     email:                  document.getElementById('f-email').value.trim(),
     zipCodes:               document.getElementById('f-zip').value.trim(),
-    practiceArea:           document.getElementById('f-years')?.value.trim() || '',
     dailyCapacity:          document.getElementById('f-capacity').value,
     extendedHours:          document.getElementById('f-extended').value,
     caseTypes:              document.getElementById('f-case-types')?.value || '',
@@ -333,7 +342,6 @@ export async function submitForm() {
     { id: 'f-phone',        fg: 'fg-phone',        test: v => v.replace(/\D/g, '').length >= 10 },
     { id: 'f-email',        fg: 'fg-email',        test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
     { id: 'f-zip',          fg: 'fg-zip',          test: v => v.trim().length >= 3 },
-    { id: 'f-years',        fg: 'fg-years',        test: v => v.trim().length >= 2 },
     { id: 'f-capacity',     fg: 'fg-capacity',     test: v => v !== '' },
     { id: 'f-extended',     fg: 'fg-extended',     test: v => v !== '' },
   ];
@@ -397,7 +405,7 @@ export async function submitForm() {
 
 /* ── Progress bar updater ────────────────────────────────────────────────── */
 function updateStepBar() {
-  const section1Fields = ['f-name', 'f-practice', 'f-phone', 'f-email', 'f-zip', 'f-years'];
+  const section1Fields = ['f-name', 'f-practice', 'f-phone', 'f-email', 'f-zip'];
 
   const s1Done = section1Fields.every(id => {
     const el = document.getElementById(id);
@@ -417,13 +425,12 @@ function updateStepBar() {
 /* ── Wire up input listeners ─────────────────────────────────────────────── */
 function initListeners() {
   initChips();
- const clearOnInput = [
+   const clearOnInput = [
     ['f-name',     'fg-name'],
     ['f-practice', 'fg-practice'],
     ['f-phone',    'fg-phone'],
     ['f-email',    'fg-email'],
     ['f-zip',      'fg-zip'],
-    ['f-years',    'fg-years'],
   ];
 
   clearOnInput.forEach(([id, fg]) => {
@@ -462,7 +469,6 @@ function initListeners() {
 
   updateMultiSelectState('case-types-multi', 'f-case-types', 'case-types-label', 'Select case types');
   updateMultiSelectState('insurance-multi', 'f-insurance-types', 'insurance-label', 'Select insurance');
-  updateMultiSelectState('extended-hours-multi', 'f-extended', 'extended-hours-label', 'Select available hours');
 }
 
 /* ── Expose globals ──────────────────────────────────────────────────────── */
@@ -474,6 +480,7 @@ if (typeof window !== 'undefined') {
   window.closeDrawer        = closeDrawer;
   window.submitForm         = submitForm;
   window.selectPill         = selectPill;
+  window.togglePill         = togglePill;
   window.goFunnelStep       = goFunnelStep;
   window.toggleMoreChips    = toggleMoreChips;
   window.toggleInsuranceChips = toggleInsuranceChips;

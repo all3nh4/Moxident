@@ -6,7 +6,7 @@ import { BY_ZIP, CITIES } from "./cities.mjs";
 
 const db = new DynamoDBClient({ region: "us-east-2" });
  
-export async function savePatient({ name, phone, zip, symptom, otpCode, otpExpiresAt, isVerified }) {
+export async function savePatient({ name, phone, zip, symptom, otpCode, otpExpiresAt, isVerified, otpStatus = "generated", smsError = "" }) {
   console.log('savePatient input:', { name, phone, zip, symptom });
   const requestId = randomUUID();
   console.log('savePatient generated requestId:', requestId);
@@ -24,9 +24,116 @@ export async function savePatient({ name, phone, zip, symptom, otpCode, otpExpir
       otpCode:      { S: otpCode },
       otpExpiresAt: { N: String(otpExpiresAt) },
       isVerified:   { BOOL: isVerified },
+      otpStatus:    { S: otpStatus },
+      smsError:     { S: smsError },
+      otpAttempts:  { N: "0" },
+      resendCount:  { N: "0" },
     },
   }));
   return requestId;
+}
+
+export async function updatePatientOtpStatus(requestId, otpStatus, smsError = "") {
+  await db.send(new UpdateItemCommand({
+    TableName: "moxident-patients",
+    Key: { requestId: { S: requestId } },
+    UpdateExpression: "SET otpStatus = :otpStatus, smsError = :smsError",
+    ExpressionAttributeValues: {
+      ":otpStatus": { S: otpStatus },
+      ":smsError": { S: smsError },
+    },
+  }));
+}
+
+export async function markPatientOtpVerified(requestId) {
+  await db.send(new UpdateItemCommand({
+    TableName: "moxident-patients",
+    Key: { requestId: { S: requestId } },
+    UpdateExpression: "SET isVerified = :true, otpStatus = :verifiedStatus",
+    ExpressionAttributeValues: {
+      ":true": { BOOL: true },
+      ":verifiedStatus": { S: "verified" },
+    },
+  }));
+}
+
+export async function resendPatientOtp(requestId, newCode, newExpiresAt) {
+  const MAX_RESENDS = 3;
+  try {
+    const result = await db.send(new UpdateItemCommand({
+      TableName: "moxident-patients",
+      Key: { requestId: { S: requestId } },
+      UpdateExpression: "SET otpCode = :code, otpExpiresAt = :exp, otpAttempts = :zero ADD resendCount :one",
+      ConditionExpression:
+        "attribute_exists(requestId) AND isVerified = :false AND resendCount < :max",
+      ExpressionAttributeValues: {
+        ":code":  { S: newCode },
+        ":exp":   { N: String(newExpiresAt) },
+        ":zero":  { N: "0" },
+        ":one":   { N: "1" },
+        ":false": { BOOL: false },
+        ":max":   { N: String(MAX_RESENDS) },
+      },
+      ReturnValues: "ALL_OLD",
+    }));
+    return { success: true, phone: result.Attributes.phone.S };
+  } catch (err) {
+    if (err.name === "ConditionalCheckFailedException") {
+      return { success: false };
+    }
+    throw err;
+  }
+}
+
+export async function verifyPatientOtp(requestId, code) {
+  const now = Date.now();
+  const MAX_ATTEMPTS = 5;
+
+  try {
+    const result = await db.send(new UpdateItemCommand({
+      TableName: "moxident-patients",
+      Key: { requestId: { S: requestId } },
+      UpdateExpression: "SET isVerified = :true, otpStatus = :verifiedStatus",
+      ConditionExpression:
+        "attribute_exists(requestId) AND isVerified = :false AND otpCode = :code AND otpExpiresAt > :now AND otpAttempts < :max",
+      ExpressionAttributeValues: {
+        ":true":  { BOOL: true },
+        ":verifiedStatus": { S: "verified" },
+        ":false": { BOOL: false },
+        ":code":  { S: code },
+        ":now":   { N: String(now) },
+        ":max":   { N: String(MAX_ATTEMPTS) },
+      },
+      ReturnValues: "ALL_OLD",
+    }));
+    const old = result.Attributes;
+    return {
+      success: true,
+      patient: {
+        name:    old.name.S,
+        phone:   old.phone.S,
+        zip:     old.zip.S,
+        symptom: old.symptom.S,
+      },
+    };
+  } catch (err) {
+    if (err.name !== "ConditionalCheckFailedException") throw err;
+  }
+
+  try {
+    await db.send(new UpdateItemCommand({
+      TableName: "moxident-patients",
+      Key: { requestId: { S: requestId } },
+      UpdateExpression: "ADD otpAttempts :one",
+      ConditionExpression: "attribute_exists(requestId) AND isVerified = :false",
+      ExpressionAttributeValues: {
+        ":one":   { N: "1" },
+        ":false": { BOOL: false },
+      },
+    }));
+  } catch {}
+
+  return { success: false };
 }
 
 export async function findDentistsByZip(zip) {

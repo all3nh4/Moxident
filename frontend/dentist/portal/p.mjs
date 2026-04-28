@@ -2,20 +2,7 @@
 const API = "https://7i7j7c8rx7.execute-api.us-east-2.amazonaws.com/prod";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const SLOTS = ["10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"];
-const SLOT_KEYS = {
-  "10:00 AM": "10am",
-  "11:00 AM": "11am",
-  "12:00 PM": "12pm",
-  "1:00 PM": "1pm",
-  "2:00 PM": "2pm",
-  "3:00 PM": "3pm",
-  "4:00 PM": "4pm",
-};
-const LEGACY_SLOT_MAP = {
-  morning: ["10am", "11am", "12pm"],
-  afternoon: ["1pm", "2pm", "3pm", "4pm"],
-};
+const SLOTS = ["Morning", "Afternoon"];
 
 // ── Auth helpers ──────────────────────────────────────────────────────────────
 
@@ -320,7 +307,6 @@ function buildAvailabilityGrid(current) {
   if (!grid) return;
 
   grid.innerHTML = "";
-  const normalized = normalizeAvailability(current);
 
   // Header row: empty corner + day names
   const corner = document.createElement("div");
@@ -347,34 +333,12 @@ function buildAvailabilityGrid(current) {
       const cb = document.createElement("input");
       cb.type = "checkbox";
       cb.dataset.day = day;
-      cb.dataset.slot = SLOT_KEYS[slot];
-      cb.checked = !!normalized[day]?.[SLOT_KEYS[slot]];
+      cb.dataset.slot = slot.toLowerCase();
+      cb.checked = !!current[day]?.[slot.toLowerCase()];
       cell.appendChild(cb);
       grid.appendChild(cell);
     });
   });
-}
-
-function normalizeAvailability(current = {}) {
-  const normalized = {};
-
-  DAYS.forEach(day => {
-    const dayAvailability = current[day] || {};
-    normalized[day] = {};
-
-    Object.entries(dayAvailability).forEach(([slot, value]) => {
-      if (!value) return;
-      if (LEGACY_SLOT_MAP[slot]) {
-        LEGACY_SLOT_MAP[slot].forEach(mappedSlot => {
-          normalized[day][mappedSlot] = true;
-        });
-        return;
-      }
-      normalized[day][slot] = !!value;
-    });
-  });
-
-  return normalized;
 }
 
 function collectAvailability() {
@@ -418,7 +382,7 @@ function renderRequests(requests) {
   if (!tbody) return;
 
   if (!requests.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="portal-table-empty">No patient requests yet. When a patient in your area needs urgent dental care, their request will appear here.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="portal-table-empty">No requests yet</td></tr>';
     return;
   }
 
@@ -523,14 +487,13 @@ window.handleChangePassword = async function (e) {
 
 // ── Page router ───────────────────────────────────────────────────────────────
 
-const rawPage = window.location.pathname.split("/").pop() || "index";
-const page = rawPage.replace(".html", "");
+const page = window.location.pathname.split("/").pop() || "index.html";
 
-if (page === "dashboard") {
+if (page === "dashboard.html") {
   loadDashboard();
-} else if (page === "settings") {
+} else if (page === "settings.html") {
   loadSettings();
-} else if (page === "verify") {
+} else if (page === "verify.html") {
   const { token } = getPortalFlowParams();
 
   const loading = document.getElementById("verify-loading");
@@ -543,29 +506,9 @@ if (page === "dashboard") {
     error?.classList.remove("hidden");
     if (errorMsg) errorMsg.textContent = "Missing verification token.";
   } else {
-    (async () => {
-      try {
-        const res = await fetch(`${API}/dentist-portal/verify?token=${encodeURIComponent(token)}&frontend=1`, {
-          method: "GET",
-          headers: { Accept: "application/json" },
-        });
-        const data = await res.json();
-
-        if (!res.ok || !data.success || !data.redirectUrl) {
-          throw new Error(data.error || "Verification failed.");
-        }
-
-        loading?.classList.add("hidden");
-        success?.classList.remove("hidden");
-        window.location.replace(data.redirectUrl);
-      } catch (err) {
-        loading?.classList.add("hidden");
-        error?.classList.remove("hidden");
-        if (errorMsg) errorMsg.textContent = err.message || "This link may be invalid or expired.";
-      }
-    })();
+    window.location.replace(`set-password.html?token=${encodeURIComponent(token)}&flow=verify`);
   }
-} else if (page === "index" || page === "") {
+} else if (page === "index.html" || page === "") {
   const params = new URLSearchParams(window.location.search);
   const loginEmail = params.get("email");
   const passwordSet = params.get("passwordSet");

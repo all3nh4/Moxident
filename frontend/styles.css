@@ -187,6 +187,38 @@ body {
   max-width: 520px; margin-left: auto; margin-right: auto;
 }
 
+.coverage-card {
+  margin: 0 auto 18px;
+  max-width: 540px;
+  background: var(--white);
+  border: 1px solid var(--bdr);
+  border-radius: var(--rad-lg);
+  padding: 16px 18px;
+  box-shadow: var(--sh);
+}
+
+.coverage-card-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--navy);
+  margin-bottom: 8px;
+}
+
+.coverage-card-areas {
+  font-size: 15px;
+  color: var(--ink);
+  line-height: 1.55;
+  margin-bottom: 8px;
+}
+
+.coverage-card-note {
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.5;
+}
+
 .hero-cta {
   display: inline-flex; align-items: center; gap: 10px;
   background: var(--green); color: #fff;
@@ -322,6 +354,21 @@ select.fi option { background: #fff; }
 }
 .success-screen.show { display: flex; }
 #successScreen { max-width: 760px; margin: 56px auto 0; }
+#success-normal,
+#success-unsupported {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#success-unsupported .unsupported-card {
+  margin-left: auto;
+  margin-right: auto;
+}
 
 .success-icon-wrap {
   width: 64px; height: 64px;
@@ -723,8 +770,20 @@ select.fi option { background: #fff; }
     display: grid; grid-template-columns: 1.1fr 1fr; gap: 44px;
     align-items: start;
   }
+  .hero-split:has(#successScreen.show) {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
   .hero-split .hero-section { background: transparent; padding: 0; }
   .hero-split .hero         { text-align: left; margin: 0; }
   .hero-split #intake-form  { padding: 0 !important; margin: 0 !important; }
+  .hero-split:has(#successScreen.show) #intake-form {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto !important;
+  }
   .hero-split .sym-form-section { position: sticky; top: calc(var(--nav-h) + 24px); }
+  .hero-split:has(#successScreen.show) .sym-form-section {
+    position: static;
+  }
 }

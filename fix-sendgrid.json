@@ -1,0 +1,16 @@
+{
+  "Comment": "Fix SendGrid tracking record",
+  "Changes": [
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "em2199.moxident.com.",
+        "Type": "CNAME",
+        "TTL": 300,
+        "ResourceRecords": [
+          { "Value": "u106144955.wl206.sendgrid.net." }
+        ]
+      }
+    }
+  ]
+}

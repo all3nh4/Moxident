@@ -27,6 +27,7 @@
     "@aws-sdk/client-dynamodb": "^3.600.0",
     "@aws-sdk/client-ses": "^3.1011.0",
     "@aws-sdk/client-sns": "^3.1033.0",
+    "@sendgrid/mail": "^8.1.6",
     "bcrypt": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
     "twilio": "^5.12.2"

@@ -16,36 +16,16 @@
   gtag('config', 'AW-17976922373');
 </script>
 <script>
-  (function () {
-    const AB_STORAGE_KEY = 'mox_ab_variant';
-    const AB_SPLIT_B = 0.5;
-    const params = new URLSearchParams(window.location.search);
-    const override = params.get('ab');
-    const forcedVariant = override === 'A' || override === 'B' ? override : '';
-    const storedVariant = localStorage.getItem(AB_STORAGE_KEY);
-    const assignedVariant = forcedVariant || storedVariant || (Math.random() < AB_SPLIT_B ? 'B' : 'A');
-
-    window.__moxAbVariant = assignedVariant;
-    localStorage.setItem(AB_STORAGE_KEY, assignedVariant);
-    gtag('event', 'ab_variant_assigned', { variant: assignedVariant });
-
-    window.__trackAbConversion = function () {
-      gtag('event', 'ab_conversion', {
-        variant: localStorage.getItem(AB_STORAGE_KEY) || window.__moxAbVariant || 'A'
-      });
-    };
-
-    const stylesheet = document.createElement('link');
-    stylesheet.rel = 'stylesheet';
-    stylesheet.href = assignedVariant === 'A' ? 'styles-a.css' : 'styles.css';
-    document.head.appendChild(stylesheet);
-  })();
+  window.__trackAbConversion = function () {
+    gtag('event', 'ab_conversion', { variant: localStorage.getItem('mox_ab_variant') || 'A' });
+  };
 </script>
   <title>Emergency Dentist Near You Today | Moxident</title>
   <meta name="description" content="Tooth pain, swelling, or a broken tooth? Moxident contacts available local dentists on your behalf. Enter your phone and zip — a dentist calls you directly." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="frontend/styles-a.css" />
   <!-- Start VWO Async SmartCode -->
 <link rel="preconnect" href="https://dev.visualwebsiteoptimizer.com" />
 <script type='text/javascript' id='vwoCode'>
@@ -80,7 +60,7 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
 </nav>
 
 <div class="nav-drawer" id="nav-drawer">
-  <button class="drawer-pill" onclick="window.location.href='/dentist/join/';closeDrawer()">Join the Network</button>
+  <button class="drawer-pill" onclick="window.location.href='/dentist/join/';closeDrawer()">Join as Dentist</button>
 
   <button class="drawer-pill" onclick="window.location.href='/dentist/portal/';closeDrawer()">Dentist Portal</button>
   <button class="drawer-pill" onclick="window.location.href='/about-us.html';closeDrawer()">About</button>
@@ -88,8 +68,8 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
   <button class="drawer-pill" onclick="window.location.href='/privacy-policy.html';closeDrawer()">Privacy</button>
   <button class="drawer-pill" onclick="window.location.href='/terms.html';closeDrawer()">Terms</button>
 </div>
- <!-- ── HERO + FORM (SPLIT) ── -->
-  <div class="hero-split">
+
+  <!-- ── HERO ── -->
   <section class="hero-section">
     <div class="hero">
 
@@ -100,24 +80,25 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
 
       <h1 class="hero-h1 a2">
         You're in pain.<br>
-        Let's connect you a<br>
-        with a dentist <br>
+        Let's get you a<br>
+        <em>dentist today.</em>
       </h1>
 
       <p class="hero-sub a3">
-            We connect you with nearby dentists who can help you.
+            We connect you with nearby dentists who can help you today.
       </p>
-      <ul class="hero-bullets a4">
-      <li>Licensed local dentists — not marketers</li>
-      <li>No account, no signup, no fee to use</li>
-      <li>Your number only goes to the dentist responding</li>
-      <li>Most patients hear back the same day</li>
-</ul>
 
     </div>
   </section>
+  <div class="coverage-band a4" aria-label="Coverage areas">
+    <div class="coverage-band-inner">
+      <div class="coverage-heading">Currently serving these areas</div>
+      <div class="coverage-areas">South Bothell · Woodinville · Kenmore · Kirkland · Bellevue · Redmond</div>
+      <div class="coverage-note">Expanding quickly — if you're nearby, still submit your request</div>
+    </div>
+  </div>
   <!----INTAKE FORM -->
-<section class="page-wrap" id="intake-form">  
+<section class="page-wrap" id="intake-form" style="padding-top:0;padding-bottom:80px;margin-top:-120px;">
     <div class="sym-form-section">
 
       <!-- Form state -->
@@ -199,7 +180,8 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
           <label class="consent-label">
             <input class="consent-checkbox" type="checkbox" id="smsConsent" />
             <span>
-              I agree to receive calls and SMS messages from Moxident and local dentists regarding my request, including verification codes and care-related notifications. Message and data rates may apply. Reply STOP to opt out.  
+              I agree to receive a call or text from a local dentist regarding my request.(no spam, no sales calls).
+              By checking this box, I consent to be contacted via SMS. Message &amp; data rates may apply.
               View our <a class="consent-link" href="/privacy" target="_blank">Privacy Policy</a>
               and <a class="consent-link" href="/terms" target="_blank">Terms of Service</a>.
             </span>
@@ -208,7 +190,7 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
 
         <button class="submit-btn" id="submitBtn" style="position:relative;" onclick="handleSubmit()">
           <span class="btn-label">
-            Get Help ASAP <span class="cta-arrow">→</span>
+            Get Help Now <span class="cta-arrow">→</span>
           </span>
           <span class="spinner"></span>
         </button>
@@ -219,61 +201,24 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
         </p>
       </div>
 
-      <!-- OTP verification step -->
-      <div id="otpScreen" style="display:none;">
-        <div class="success-icon-wrap"><span style="font-size:26px;">📱</span></div>
-        <div class="success-headline">Enter verification code</div>
-        <div class="success-sub">
-          We texted a 6-digit code to your phone. Enter it below to connect with a local dentist.
+      <!-- Success state -->
+      <div class="success-screen" id="successScreen">
+        <div class="success-icon-wrap">
+          <span style="font-size:26px;color:var(--grn);">✓</span>
         </div>
-        <input id="otpCode" inputmode="numeric" maxlength="6" pattern="\d{6}" autocomplete="one-time-code"
-               placeholder="123456"
-               style="margin-top:20px;width:100%;padding:14px;font-size:22px;text-align:center;letter-spacing:8px;border:1px solid #ccc;border-radius:8px;">
-        <div id="otpError" style="display:none;color:#c0392b;margin-top:10px;font-size:14px;"></div>
-        <button class="submit-btn" id="verifyBtn" style="position:relative;margin-top:16px;" onclick="handleVerifyOtp()">
-          <span class="btn-label">Verify &amp; Connect <span class="cta-arrow">→</span></span>
-          <span class="spinner"></span>
-        </button>
-        <div style="margin-top:14px;text-align:center;font-size:14px;">
-          Didn't get it?
-          <button type="button" id="resendBtn" onclick="handleResendOtp()"
-                  style="background:none;border:none;color:#0b63d6;cursor:pointer;padding:0;font-size:14px;text-decoration:underline;">
-            Resend code
-          </button>
-          <span id="resendCooldown" style="display:none;color:#666;"></span>
+        <div class="success-headline">You're all set.</div>
+        <div class="success-sub">
+          We've notified local dentists in your area.<br>
+          If one is available, they'll call you directly — usually within the hour.
+          At night, we line things up so you can wake up with an appointment.
+        </div>
+        <div class="success-note">
+          Keep your phone nearby. The call will come from a local dental office number.<br>
+          <strong>Don't recognize the number? Pick up — it's the dentist.</strong>
         </div>
       </div>
 
-      <!-- Success state -->
-  <div class="success-screen" id="successScreen">
-  <div id="success-normal">
-    <div class="success-icon-wrap">
-      <span style="font-size:26px;color:var(--grn);">✓</span>
     </div>
-    <div class="success-headline">You're all set.</div>
-    <div class="success-sub">
-      We've notified local dentists in your area.<br>
-      If one is available, they'll call you directly — usually within the hour.
-      At night, we line things up so you can wake up with an appointment.
-    </div>
-    <div class="success-note">
-      Keep your phone nearby. The call will come from a local dental office number.<br>
-      <strong>Don't recognize the number? Pick up — it's the dentist.</strong>
-    </div>
-  </div>
-
-  <div id="success-unsupported" style="display:none;">
-  <div class="unsupported-card">
-    <div class="unsupported-icon">⌛</div>
-    <div class="unsupported-headline">We’re expanding our network in your area</div>
-    <div class="unsupported-sub">
-      We can’t confirm a nearby dentist just yet, but we’re actively growing coverage.
-    </div>
-    <div class="unsupported-note">
-      Leave your request with us and we’ll keep building toward your neighborhood.
-    </div>
-  </div>
-</div>
 
     <!-- Trust strip below form -->
     <div class="trust-strip" style="margin-top:16px;">
@@ -292,8 +237,24 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
     </div>
 
   </section>
-</div>
 
+  <!-- ── TRUST BAR ── -->
+  <div class="trust-bar a5">
+    <div class="trust-inner">
+      <div class="trust-item">
+        <span>✓</span> Licensed local dentists only
+      </div>
+      <div class="trust-item">
+        <span>✓</span> Your number goes to dentists — not marketers
+      </div>
+      <div class="trust-item">
+        <span>✓</span> No account. No signup.
+      </div>
+      <div class="trust-item">
+        <span>✓</span> Seattle-based company
+      </div>
+    </div>
+  </div>
 
   <!-- ── SYMPTOMS ── -->
   <section class="symptom-grid-section">
@@ -395,9 +356,8 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
         <div class="step-num">1</div>
         <div class="step-title">Tell us where you are</div>
         <div class="step-desc">
-          Enter your phone number, ZIP code, and what’s going on.
-            We use this to connect you with the right dentist fast.
-            Takes about 10 seconds.
+          Enter your phone number and zip code. Nothing else. Takes ten seconds.
+          We don't ask for insurance, a description of symptoms, or a credit card.
         </div>
       </div>
 
@@ -406,7 +366,7 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
         <div class="step-title">We contact dentists near you</div>
         <div class="step-desc">
           Moxident automatically notifies local dentists who accept emergency patients.
-          They see your request in real time,They see your request in real time and can respond if available.
+          They see your request in real time — the same way a restaurant sees a new order come in.
         </div>
       </div>
 
@@ -414,7 +374,7 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
         <div class="step-num">3</div>
         <div class="step-title">A dentist calls you</div>
         <div class="step-desc">
-          If a dentist is available and can help, they contact you directly.
+          If a dentist is available and can help, they call you directly.
           You talk to a real person. You decide if it's a fit. No pressure, no commitment.
         </div>
       </div>
@@ -448,7 +408,7 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
   <section class="page-wrap" id="trust" style="padding-top:64px;">
 
     <div class="section-eyebrow">Trust &amp; transparency</div>
-    <div class="section-title">Common questions</div>
+    <div class="section-title">Fair questions.<br>Straight answers.</div>
 
     <div class="faq-item">
       <button class="faq-q">
@@ -492,10 +452,9 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
         <span class="faq-icon">+</span>
       </button>
       <div class="faq-a">
-        Your request is routed to dentists in your area and nearby zip codes.
-      If the first office isn’t available, it moves to the next until you’re matched with a clinic that can help.
-      You won’t be left without a response.
-      If you submit after hours, the clinic will follow up the next day.
+        Coverage depends on your zip code. If no dentist responds,
+        you won't be left guessing. We're actively adding dentist partners every week.
+        If your area isn't covered yet, we'll let you know.
       </div>
     </div>
 
@@ -517,9 +476,10 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
         <span class="faq-icon">+</span>
       </button>
       <div class="faq-a">
-       As soon as you submit, your request is sent to a nearby dentist who has opted in to receive emergency cases.
-      That office reviews the request and contacts you directly to confirm an appointment.
-      Most patients hear back the same day.
+        We can't guarantee a specific timeframe — it depends on dentist availability in your area.
+        In areas with good coverage, patients typically hear back within the hour.
+        If you're in a less-covered area it may take longer, or we may not have a match yet.
+        Either way, we'll be upfront with you.
       </div>
     </div>
 
@@ -534,7 +494,7 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
     <div class="site-footer-link-row">
       <a href="/privacy" style="color:var(--ink3);text-decoration:underline;margin-right:12px;">Privacy Policy</a>
       <a href="/terms" style="color:var(--ink3);text-decoration:underline;margin-right:12px;">Terms of Service</a>
-      <a href="mailto:admin@moxident.com" style="color:var(--ink3);text-decoration:underline;">Contact</a>
+      <a href="mailto:allen@moxident.com" style="color:var(--ink3);text-decoration:underline;">Contact</a>
     </div>
     <div style="margin-top:10px;font-size:11px;color:var(--ink3);line-height:1.6;">
       Moxident is not a dental provider. We connect patients with licensed dental practices.<br>
@@ -612,14 +572,12 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
 
     /* Form submit */
     function handleSubmit() {
-      
       const nameInput  = document.getElementById('name');
       const phoneInput = document.getElementById('phone');
       const zipInput   = document.getElementById('zip');
       const consent    = document.getElementById('smsConsent');
       const btn        = document.getElementById('submitBtn');
       const symptom = document.getElementById('symptom').value;
-      
       let valid = true;
 
       const digits = phoneInput.value.replace(/\D/g, '');
@@ -638,13 +596,6 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
         document.getElementById('fg-zip').classList.remove('err');
       }
 
-      if (!symptom) {
-        document.getElementById('fg-symptom').classList.add('err');
-        valid = false;
-      } else {
-        document.getElementById('fg-symptom').classList.remove('err');
-      }
-
       if (!consent.checked) {
         alert('Please check the consent box to continue.');
         return;
@@ -655,7 +606,7 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
       
         name: document.getElementById('name')?.value.trim(),
         phone: digits,
-        zip: zip.trim(),
+        zip: zip,
         symptom: symptom,
         consent: consent.checked
 };
@@ -665,154 +616,25 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
 
                 fetch(url, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify(payload)
                 })
-                .then(async res => {
-                  const data = await res.json();
-                  if (!res.ok) throw new Error(data.error || "Request failed");
-                  return data;
+                .then(res => {
+                if (!res.ok) throw new Error("Request failed");
+                return res.json();
                 })
                 .then(data => {
-                  console.log('submit response', data);
-                  window.__moxPendingRequestId = data.requestId;
-                  document.getElementById('formContent').style.display = 'none';
-                  document.querySelector('.hero-section').style.display = 'none';
-                  if (data.otpStatus === 'verified' || typeof data.dentistFound === 'boolean' || data.unsupportedArea) {
-                    const successScreen = document.getElementById('successScreen');
-                    const normal = document.getElementById('success-normal');
-                    const unsupported = document.getElementById('success-unsupported');
-
-                    if (data.unsupportedArea) {
-                      normal.style.display = 'none';
-                      unsupported.style.display = 'block';
-                    } else {
-                      normal.style.display = 'block';
-                      unsupported.style.display = 'none';
-                    }
-
-                    window.__trackAbConversion();
-                    gtag('event', 'conversion', { send_to: 'AW-17976922373/H40YCOnt6ZgcEIWiiPxc' });
-
-                    successScreen.classList.add('show');
-                    return;
-                  }
-
-                  document.getElementById('otpScreen').style.display = 'block';
-                  document.getElementById('otpCode').focus();
+                document.getElementById('formContent').style.display = 'none';
+                window.__trackAbConversion();
+                gtag('event', 'conversion', { send_to: 'AW-17976922373/H40YCOnt6ZgcEIWiiPxc' });
+                document.getElementById('successScreen').classList.add('show');
                 })
                 .catch(err => {
-                  console.error('submit error', err);
-                  alert(err.message || 'Something went wrong. Please try again.');
+                console.error("Submit error:", err);
+                alert("Something went wrong. Please try again.");
                 });
-    }
-
-    function handleResendOtp() {
-      const errorEl = document.getElementById('otpError');
-      errorEl.style.display = 'none';
-      const requestId = window.__moxPendingRequestId;
-      if (!requestId) {
-        errorEl.textContent = 'Session expired. Please resubmit the form.';
-        errorEl.style.display = 'block';
-        return;
-      }
-
-      const btn = document.getElementById('resendBtn');
-      const cooldownEl = document.getElementById('resendCooldown');
-      btn.disabled = true;
-      btn.style.display = 'none';
-      cooldownEl.style.display = 'inline';
-      let seconds = 30;
-      cooldownEl.textContent = ` Resend available in ${seconds}s`;
-      const timer = setInterval(() => {
-        seconds -= 1;
-        if (seconds > 0) {
-          cooldownEl.textContent = ` Resend available in ${seconds}s`;
-        } else {
-          clearInterval(timer);
-          cooldownEl.style.display = 'none';
-          btn.disabled = false;
-          btn.style.display = 'inline';
-        }
-      }, 1000);
-
-      const resendUrl = "https://7i7j7c8rx7.execute-api.us-east-2.amazonaws.com/resend-otp";
-      fetch(resendUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ requestId })
-      })
-      .then(async res => {
-        const data = await res.json();
-        if (!res.ok) {
-          errorEl.textContent = data.error || 'Could not resend. Please try again.';
-          errorEl.style.display = 'block';
-        } else {
-          document.getElementById('otpCode').value = '';
-          document.getElementById('otpCode').focus();
-        }
-      })
-      .catch(() => {
-        errorEl.textContent = 'Network error. Please try again.';
-        errorEl.style.display = 'block';
-      });
-    }
-
-    function handleVerifyOtp() {
-      const code = (document.getElementById('otpCode').value || '').trim();
-      const errorEl = document.getElementById('otpError');
-      errorEl.style.display = 'none';
-
-      if (!/^\d{6}$/.test(code)) {
-        errorEl.textContent = 'Enter the 6-digit code from your text message.';
-        errorEl.style.display = 'block';
-        return;
-      }
-      const requestId = window.__moxPendingRequestId;
-      if (!requestId) {
-        errorEl.textContent = 'Session expired. Please resubmit the form.';
-        errorEl.style.display = 'block';
-        return;
-      }
-
-      const verifyUrl = "https://7i7j7c8rx7.execute-api.us-east-2.amazonaws.com/verify-otp";
-      fetch(verifyUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ requestId, code })
-      })
-      .then(async res => {
-        const data = await res.json();
-        if (!res.ok) {
-          const msg = data.error || 'Verification failed. Please try again.';
-          errorEl.textContent = msg;
-          errorEl.style.display = 'block';
-          return null;
-        }
-        return data;
-      })
-      .then(data => {
-        if (!data) return;
-        console.log('verify response', data);
-        document.getElementById('otpScreen').style.display = 'none';
-
-        const successScreen = document.getElementById('successScreen');
-        const normal = document.getElementById('success-normal');
-        const unsupported = document.getElementById('success-unsupported');
-
-        if (data.unsupportedArea) {
-          normal.style.display = 'none';
-          unsupported.style.display = 'block';
-        } else {
-          normal.style.display = 'block';
-          unsupported.style.display = 'none';
-        }
-
-        window.__trackAbConversion();
-        gtag('event', 'conversion', { send_to: 'AW-17976922373/H40YCOnt6ZgcEIWiiPxc' });
-
-        successScreen.classList.add('show');
-      });
     }
     function toggleDrawer() {
     document.getElementById('nav-drawer').classList.toggle('open');

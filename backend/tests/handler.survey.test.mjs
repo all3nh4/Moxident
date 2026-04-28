@@ -15,12 +15,15 @@ jest.unstable_mockModule("../src/db.mjs", () => ({
   updateLead:               jest.fn(),
   approveDentistApplication:jest.fn(),
   getSearchVolume:          jest.fn(),
+  verifyPatientOtp:         jest.fn(),
+  resendPatientOtp:         jest.fn(),
 }));
 
 // ── Mock router ────────────────────────────────────────────────────
 jest.unstable_mockModule("../src/router.mjs", () => ({
-  submitRequest:      jest.fn(),
-  handleDentistReply: jest.fn(),
+  submitRequest:        jest.fn(),
+  handleDentistReply:   jest.fn(),
+  routeVerifiedPatient: jest.fn(),
 }));
 
 // ── Mock SES ───────────────────────────────────────────────────────

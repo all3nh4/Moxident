@@ -27,8 +27,9 @@ jest.mock('crypto', () => ({
 }));
 
 jest.unstable_mockModule('../src/router.mjs', () => ({
-  submitRequest:      jest.fn(),
-  handleDentistReply: jest.fn(),
+  submitRequest:        jest.fn(),
+  handleDentistReply:   jest.fn(),
+  routeVerifiedPatient: jest.fn(),
 }));
 
 // ── Import after ALL mocks ───────────────────────────────────────────────────

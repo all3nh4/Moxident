@@ -1,11 +1,12 @@
 // src/handler.mjs
-import { submitRequest, handleDentistReply } from "./router.mjs";
+import { submitRequest, handleDentistReply, routeVerifiedPatient } from "./router.mjs";
 import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 import { savePatient, findDentistsByZip, findDentistByPhone,
          updatePatientStatus, findOpenRequestByDentist,
          saveDentistApplication, saveLead, getLeads, updateLead,
-         getDentistApplications, approveDentistApplication, getSearchVolume } from "./db.mjs";
-import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+         getDentistApplications, approveDentistApplication, getSearchVolume,
+         verifyPatientOtp, resendPatientOtp, updatePatientOtpStatus,
+         markPatientOtpVerified } from "./db.mjs";
 import { generateToken, hashPassword, comparePassword,
          generateVerificationToken, authenticateRequest } from "./portal-auth.mjs";
 import { createPortalAccount, getPortalAccount, verifyPortalAccount,
@@ -13,10 +14,15 @@ import { createPortalAccount, getPortalAccount, verifyPortalAccount,
          setPortalPassword, updateLastLogin, setResetToken, clearResetToken,
          getDentistByEmail, ensureDentistProfile, saveAvailability, getAvailability,
          getDentistProfile, getRecentRequests, getDentistStats } from "./portal-db.mjs";
+import sgMail from '@sendgrid/mail';
 
 const sns = new SNSClient({ region: "us-east-2" });        
-const ses = new SESClient({ region: "us-east-2" });
 const NOTIFY_EMAIL = "admin@moxident.com";
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+function isSmsEnabled() {
+  return process.env.SMS_ENABLED === "true";
+}
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -52,20 +58,16 @@ https://7i7j7c8rx7.execute-api.us-east-2.amazonaws.com/prod/approve-dentist?appl
 Moxident Admin Notification
   `.trim();
   try {
-    console.log("Sending SES email to:", NOTIFY_EMAIL);
-    await ses.send(new SendEmailCommand({
-      Source: NOTIFY_EMAIL,
-      Destination: { ToAddresses: [NOTIFY_EMAIL] },
-      Message: {
-        Subject: { Data: subject },
-        Body: { Text: { Data: body } },
-      },
-    }));
-    console.log("SES email sent successfully");
-  } catch (err) {
-    console.error("SES send failed:", err.message);
-    throw err;
-  }
+  await sgMail.send({
+    to: NOTIFY_EMAIL,
+    from: NOTIFY_EMAIL,
+    subject,
+    text: body
+  });
+} catch (err) {
+  console.error('SendGrid send failed:', err.response?.body || err.message || err);
+   throw err; // keep behavior same as before (fail fast)
+}
 }
 
 async function sendOnboardingNotification(data, applicationId) {
@@ -99,19 +101,18 @@ Notes:                   ${data.notes || "—"}
 Moxident Admin Notification
   `.trim();
   try {
-    await ses.send(new SendEmailCommand({
-      Source: NOTIFY_EMAIL,
-      Destination: { ToAddresses: [NOTIFY_EMAIL] },
-      Message: {
-        Subject: { Data: subject },
-        Body: { Text: { Data: body } },
-      },
-    }));
-    console.log("Onboarding notification email sent");
-  } catch (err) {
-    console.error("Onboarding email notification failed:", err.message);
-    // Don't fail the request if email fails
-  }
+  await sgMail.send({
+    to: NOTIFY_EMAIL,
+    from: NOTIFY_EMAIL,
+    subject,
+    text: body
+  });
+
+  console.log("Onboarding notification email sent");
+} catch (err) {
+  console.error("Onboarding email notification failed:", err.response?.body || err.message || err);
+  // Don't fail the request if email fails
+}
 }
 async function sendWelcomeEmail(dentist) {
   const subject = `You're live on Moxident`;
@@ -128,15 +129,17 @@ Allen Hafezipour
 CEO & Founder, Moxident
 allen@moxident.com
   `.trim();
-
-  await ses.send(new SendEmailCommand({
-    Source: "admin@moxident.com",
-    Destination: { ToAddresses: [dentist.email] },
-    Message: {
-      Subject: { Data: subject },
-      Body: { Text: { Data: body } },
-    },
-  }));
+  try {
+  await sgMail.send({
+    to: dentist.email,
+    from: "admin@moxident.com",
+    subject,
+    text: body
+  });
+} catch (err) {
+  console.error("Onboarding email notification failed:", err.response?.body || err.message || err);
+  throw err;
+}
 }
 
 const PORTAL_BASE_URL =
@@ -162,38 +165,97 @@ function getPortalBaseUrl(event) {
   return PORTAL_BASE_URL;
 }
 
-async function sendPortalVerificationEmail(email, token, portalBaseUrl) {
-const link = `${API_BASE_URL}/dentist-portal/verify?token=${token}`;  await ses.send(new SendEmailCommand({
-    Source: NOTIFY_EMAIL,
-    Destination: { ToAddresses: [email] },
-    Message: {
-      Subject: { Data: "Verify your Moxident portal email" },
-      Body: { Text: { Data: `Hi,\n\nPlease verify your email to access your Moxident dentist portal:\n\n${link}\n\nThis link will expire in 24 hours.\n\n— The Moxident Team` } },
-    },
-  }));
+
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+async function sendPortalVerificationEmail(email, token, portalBaseUrl = PORTAL_BASE_URL) {
+  const link = `${portalBaseUrl}/verify.html?token=${encodeURIComponent(token)}`;
+
+  await sgMail.send({
+    to: email,
+    from: NOTIFY_EMAIL,
+    subject: "Verify your Moxident portal email",
+    text: `Hi,\n\nPlease verify your email to access your Moxident dentist portal:\n\n${link}\n\nThis link will expire in 24 hours.\n\n— The Moxident Team`,
+    html: `<p>Hi,</p>
+      <p>Please verify your email to access your Moxident dentist portal:</p>
+      <p><a href="${link}">${link}</a></p>
+      <p>This link will expire in 24 hours.</p>
+      <p>— The Moxident Team</p>`,
+    trackingSettings: {
+      clickTracking: {
+        enable: false,
+        enableText: false
+      }
+    }
+  });
 }
 
 async function sendPortalWelcomeEmail(email, portalBaseUrl = PORTAL_BASE_URL) {
-  await ses.send(new SendEmailCommand({
-    Source: NOTIFY_EMAIL,
-    Destination: { ToAddresses: [email] },
-    Message: {
-      Subject: { Data: "You're live on Moxident" },
-      Body: { Text: { Data: `Welcome to the Moxident dentist portal!\n\nYou can now log in to manage your availability, view patient requests, and track your performance.\n\nLog in here: ${portalBaseUrl}/index.html\n\n— The Moxident Team` } },
-    },
-  }));
+  const loginUrl = `${portalBaseUrl}/login`;
+  try {
+    await sgMail.send({
+      to: email,
+      from: NOTIFY_EMAIL,
+      subject: "You're live on Moxident",
+      text: `Welcome to the Moxident dentist portal!
+
+You can now log in to manage your availability, view patient requests, and track your performance.
+
+Log in here: ${loginUrl}
+
+— The Moxident Team`,
+      html: `<p>Welcome to the Moxident dentist portal!</p>
+<p>You can now log in to manage your availability, view patient requests, and track your performance.</p>
+<p><a href="${loginUrl}" clicktracking="off">Log in here</a></p>
+<p>— The Moxident Team</p>`,
+      trackingSettings: {
+        clickTracking: {
+          enable: false,
+          enableText: false
+        }
+      }
+    });
+  } catch (err) {
+    console.error('SendGrid portal welcome email failed:', err.response?.body || err.message || err);
+    throw err;
+  }
 }
 
 async function sendPortalResetEmail(email, token, portalBaseUrl = PORTAL_BASE_URL) {
   const link = `${portalBaseUrl}/reset-password.html?token=${token}&flow=reset`;
-  await ses.send(new SendEmailCommand({
-    Source: NOTIFY_EMAIL,
-    Destination: { ToAddresses: [email] },
-    Message: {
-      Subject: { Data: "Reset your Moxident password" },
-      Body: { Text: { Data: `Hi,\n\nWe received a request to reset your Moxident portal password.\n\nReset your password here:\n${link}\n\nThis link expires in 1 hour. If you didn't request this, ignore this email.\n\n— The Moxident Team` } },
-    },
-  }));
+
+  try {
+    await sgMail.send({
+      to: email,
+      from: NOTIFY_EMAIL,
+      subject: "Reset your Moxident password",
+      text: `Hi,
+
+We received a request to reset your Moxident portal password.
+
+Reset your password here:
+${link}
+
+This link expires in 1 hour. If you didn't request this, ignore this email.
+
+— The Moxident Team`,
+      html: `<p>Hi,</p>
+<p>We received a request to reset your Moxident portal password.</p>
+<p>Reset your password here:<br><a href="${link}">${link}</a></p>
+<p>This link expires in 1 hour. If you didn't request this, ignore this email.</p>
+<p>— The Moxident Team</p>`,
+      trackingSettings: {
+        clickTracking: {
+          enable: false,
+          enableText: false
+        }
+      }
+    });
+  } catch (err) {
+    console.error('SendGrid portal reset email failed:', err.response?.body || err.message || err);
+    throw err;
+  }
 }
 
 import { DynamoDBClient, ScanCommand as PortalScanCommand } from "@aws-sdk/client-dynamodb";
@@ -235,13 +297,11 @@ export const handler = async (event) => {
     return { statusCode: 200, headers, body: "" };
   }
 
-  // POST /submit
+  // POST /submit — save pending patient + SMS the OTP; no dentist routing yet
   if (path === "/submit" && method === "POST") {
     try {
       const body = JSON.parse(event.body || "{}");
       const { name, phone, zip, symptom } = body;
-      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-      const otpExpiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
       if (!name || !phone || !zip || !symptom) {
         return {
           statusCode: 400,
@@ -249,68 +309,176 @@ export const handler = async (event) => {
           body: JSON.stringify({ error: "Missing required fields: name, phone, zip, symptom" }),
         };
       }
-const result = await submitRequest({ 
-  name, 
-  phone, 
-  zip, 
-  symptom,
-  otpCode,
-  otpExpiresAt,
-  isVerified: false
-});
 
-if (!result.requestId) {
-  return {
-    statusCode: 200,
-    headers,
-    body: JSON.stringify({
-      success: false,
-      unsupportedArea: true,
-      message: "We’re expanding our dentist network in your area."
-    }),
-  };
-}
-const { requestId, dentistFound, unsupportedArea } = result;
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpExpiresAt = Date.now() + 5 * 60 * 1000;
+      const requestId = await savePatient({
+        name, phone, zip, symptom,
+        otpCode: code,
+        otpExpiresAt,
+        isVerified: false,
+        otpStatus: "generated",
+      });
 
-try {
-  await sns.send(new PublishCommand({
-    Message: `Your Moxident code is ${otpCode}`,
-    PhoneNumber: `+1${phone}`
-  }));
-  console.log("OTP sent");
-} catch (smsErr) {
-  console.error("OTP send failed:", smsErr.message);
-}
+      console.log("OTP (disabled mode):", code);
+      await markPatientOtpVerified(requestId);
+      const { dentistFound, unsupportedArea } = await routeVerifiedPatient({
+        requestId,
+        name,
+        phone,
+        zip,
+        symptom,
+      });
 
-try {
-  await ses.send(new SendEmailCommand({
-    Source: NOTIFY_EMAIL,
-    Destination: { ToAddresses: [NOTIFY_EMAIL] },
-    Message: {
-      Subject: { Data: `Moxident: New Patient Request` },
-      Body: { Text: { Data: `New patient request received.\n\nRequest ID: ${requestId}\nName: ${name}\nPhone: ${phone}\nZip: ${zip}\nSymptom: ${symptom}\nOut of Network: ${unsupportedArea ? 'Yes' : 'No'}\nDentist Found: ${unsupportedArea ? 'N/A' : (dentistFound ? 'Yes' : 'No')}\nSubmitted At: ${new Date().toISOString()}` } },
-    },
-  }));
-  console.log("Patient notification email sent");
-} catch (emailErr) {
-  console.error("Patient email notification failed:", emailErr.message);
-}
-return {
-  statusCode: 200,
-  headers,
-  body: JSON.stringify({ success: true, requestId, dentistFound, unsupportedArea }),
-};
-} catch (err) {
-  console.error("Submit error:", err.message);
-  const status = err.message?.includes("Missing") ? 400 : 500;
-  const message = status === 400 ? err.message : "Something went wrong. Please try again.";
-  return {
-    statusCode: status,
-    headers,
-    body: JSON.stringify({ error: message })
+      try {
+        await sgMail.send({
+          to: NOTIFY_EMAIL,
+          from: NOTIFY_EMAIL,
+          subject: `Moxident: New Patient Request`,
+          text: `New patient request received.
+
+    Request ID: ${requestId}
+    Name: ${name}
+    Phone: ${phone}
+    Zip: ${zip}
+    Symptom: ${symptom}
+    Out of Network: ${unsupportedArea ? 'Yes' : 'No'}
+    Dentist Found: ${unsupportedArea ? 'N/A' : (dentistFound ? 'Yes' : 'No')}
+    Submitted At: ${new Date().toISOString()}`
+        });
+      } catch (emailErr) {
+        console.error("Patient email notification failed:", emailErr.response?.body || emailErr.message || emailErr);
+      }
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ success: true, requestId, otpStatus: "verified", dentistFound, unsupportedArea }),
+      };
+    } catch (err) {
+      console.error("Submit error:", err.message);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: "Something went wrong. Please try again." }),
+      };
+    }
   }
+
+  // POST /verify-otp — validate OTP, then route to dentist
+  if (path === "/verify-otp" && method === "POST") {
+    try {
+      const body = JSON.parse(event.body || "{}");
+      const { requestId, code } = body;
+      if (!requestId || !code) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: "Missing requestId or code" }),
+        };
+      }
+
+      const verified = await verifyPatientOtp(requestId, code);
+      if (!verified.success) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: "Invalid or expired code" }),
+        };
+      }
+
+      const { name, phone, zip, symptom } = verified.patient;
+      const { dentistFound, unsupportedArea } = await routeVerifiedPatient({
+        requestId, name, phone, zip, symptom,
+      });
+
+      try {
+  await sgMail.send({
+    to: NOTIFY_EMAIL,
+    from: NOTIFY_EMAIL,
+    subject: `Moxident: New Patient Request`,
+    text: `New patient request received.
+
+    Request ID: ${requestId}
+    Name: ${name}
+    Phone: ${phone}
+    Zip: ${zip}
+    Symptom: ${symptom}
+    Out of Network: ${unsupportedArea ? 'Yes' : 'No'}
+    Dentist Found: ${unsupportedArea ? 'N/A' : (dentistFound ? 'Yes' : 'No')}
+    Submitted At: ${new Date().toISOString()}`
+      });
+} catch (emailErr) {
+  console.error("Patient email notification failed:", emailErr.response?.body || emailErr.message || emailErr);
 }
-}
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ success: true, requestId, dentistFound, unsupportedArea }),
+      };
+    } catch (err) {
+      console.error("Verify-OTP error:", err.message);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: "Something went wrong. Please try again." }),
+      };
+    }
+  }
+
+  // POST /resend-otp — generate a new code, reset attempts, SMS it
+  if (path === "/resend-otp" && method === "POST") {
+    try {
+      const body = JSON.parse(event.body || "{}");
+      const { requestId } = body;
+      if (!requestId) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing requestId" }) };
+      }
+
+      const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const newExpiresAt = Date.now() + 5 * 60 * 1000;
+      const result = await resendPatientOtp(requestId, newCode, newExpiresAt);
+      if (!result.success) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: "Cannot resend. Please restart the form." }),
+        };
+      }
+
+      if (!isSmsEnabled()) {
+        await updatePatientOtpStatus(requestId, "generated");
+        console.log("OTP (local mode):", newCode);
+        return { statusCode: 200, headers, body: JSON.stringify({ success: true, otpStatus: "generated" }) };
+      }
+
+      try {
+        await sns.send(new PublishCommand({
+          Message: `Your Moxident code is ${newCode}`,
+          PhoneNumber: `+1${result.phone}`,
+        }));
+        await updatePatientOtpStatus(requestId, "sent");
+      } catch (smsErr) {
+        console.error("Resend-OTP SMS send failed:", smsErr.message);
+        await updatePatientOtpStatus(requestId, "failed", smsErr.message || "SMS send failed");
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ success: false, otpStatus: "failed", error: "OTP delivery failed" }),
+        };
+      }
+
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, otpStatus: "sent" }) };
+    } catch (err) {
+      console.error("Resend-OTP error:", err.message);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: "Something went wrong. Please try again." }),
+      };
+    }
+  }
 
   // POST /sms-webhook
   if (path === "/sms-webhook" && method === "POST") {
@@ -639,6 +807,8 @@ if (path === "/approve-dentist" && method === "GET") {
     try {
       const token = event.queryStringParameters?.token
         || new URLSearchParams(event.rawQueryString || "").get("token") || "";
+      const frontendMode = (event.queryStringParameters?.frontend
+        || new URLSearchParams(event.rawQueryString || "").get("frontend") || "") === "1";
       if (!token) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing verification token" }) };
       }
@@ -649,11 +819,19 @@ if (path === "/approve-dentist" && method === "GET") {
       console.log("verify route token:", token);
       console.log("verify route account email:", accounts.email);
       await verifyPortalAccount(accounts.email);
+      const redirectUrl = `${portalBaseUrl}/set-password.html?email=${encodeURIComponent(accounts.email)}`;
+      if (frontendMode) {
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ success: true, email: accounts.email, redirectUrl }),
+        };
+      }
       return {
         statusCode: 302,
         headers: {
           ...headers,
-          Location: `${portalBaseUrl}/set-password.html?email=${encodeURIComponent(accounts.email)}`,
+          Location: redirectUrl,
         },
         body: "",
       };
@@ -959,4 +1137,6 @@ if (path === "/dentist-portal/dashboard" && method === "GET") {
     return { statusCode: 500, headers, body: JSON.stringify({ error: "Failed to fetch availability" }) };
   };
   }
+
+  return { statusCode: 404, headers, body: JSON.stringify({ error: "Not found" }) };
 }
